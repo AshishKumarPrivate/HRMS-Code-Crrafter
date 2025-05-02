@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/admin/add_employee_screen.dart';
-import '../bottom_navigation_screen.dart';
-import '../ui_helper/app_text_styles.dart';
+ import 'package:hrms_management_code_crafter/admin/home/admin_home_screen.dart';
+ import '../ui_helper/app_text_styles.dart';
 import '../ui_helper/common_widget/solid_rounded_button.dart';
-import '../util/size_config.dart';
-import 'auth/login_screen.dart';
+ import 'auth/login_screen.dart';
 
 class UserSelectionScreen extends StatelessWidget {
   const UserSelectionScreen({Key? key}) : super(key: key);
@@ -104,7 +102,7 @@ class UserSelectionScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddEmployeeScreen(),
+                          builder: (context) => LoginScreen(),
                         ),
                       );
                       // Navigate to Employee Flow

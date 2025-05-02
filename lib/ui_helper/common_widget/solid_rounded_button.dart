@@ -14,7 +14,9 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final TextStyle? textStyle;
   final EdgeInsetsGeometry padding;
-  final Icon? icon;
+  final IconData? iconData;
+  final double? iconSize;
+  final Color? iconColor;
   final int? borderWidth;
   final ButtonType type;
   final Color? borderColor;
@@ -22,15 +24,17 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     Key? key,
     this.text = '',
-    this.color =const Color(0xFF004658),
+    this.color = const Color(0xFF004658),
     this.textColor = Colors.white,
-    this.borderRadius = 30.0,
+    this.borderRadius = 10.0,
     this.heightPercentage = 5.0,
     this.widthPercentage = 100.0,
     required this.onPressed,
     this.textStyle,
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
-    this.icon,
+    this.iconData,
+    this.iconSize,
+    this.iconColor,
     this.borderWidth,
     this.type = ButtonType.solid,
     this.borderColor,
@@ -65,14 +69,21 @@ class CustomButton extends StatelessWidget {
       style: style,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icon != null) icon!,
+          if (iconData != null)
+            Icon(
+              iconData,
+              size: iconSize ?? 20,
+              color: type == ButtonType.outlined
+                  ? (iconColor ?? (borderColor ?? color))
+                  : textColor,
+            ),
           if (text.isNotEmpty) ...[
-            SizedBox(width: icon != null ? 8.0 : 0),
+            if (iconData != null) SizedBox(width: 8.0),
             Text(
               text,
-              style: AppTextStyles.heading3(context,overrideStyle: TextStyle(color: textColor)
-              ) ??
+              style: AppTextStyles.heading3(context, overrideStyle: TextStyle(color: textColor)) ??
                   TextStyle(
                     fontSize: 14,
                     color: textColor,

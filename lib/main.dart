@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hrms_management_code_crafter/admin/auth/controller/admin_auth_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provider.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 import 'package:hrms_management_code_crafter/screen/user_selection_screen.dart' show UserSelectionScreen;
+import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
+import 'package:hrms_management_code_crafter/splash/screen/SplashScreen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/theme/app_theme.dart';
 import 'package:hrms_management_code_crafter/ui_helper/theme/theme_provider.dart';
 import 'package:hrms_management_code_crafter/util/responsive_builder.dart';
+import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await StorageHelper().init();
   // Set default status bar style globally
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -24,11 +29,14 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => NetworkProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => PunchInOutProvider()),
         ChangeNotifierProvider(create: (context) => AuthAPIProvider()),
+        // ChangeNotifierProvider(create: (context) => AdminAuthAPIProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeApiProvider()),
+        ChangeNotifierProvider(create: (context) => PunchInOutProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -46,7 +54,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
       debugShowCheckedModeBanner: false,
-      home: ResponsiveBuilder(child: UserSelectionScreen()),
+      home: ResponsiveBuilder(child: SplashScreen()),
     );
   }
 }

@@ -24,9 +24,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   // handle the login api here
   void handleSubmit() {
     final loginProvider = context.read<AuthAPIProvider>();
-    print("🟢 Login Button Clicked");
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      print("🔴 Validation Failed: Fields are empty");
       return;
     }
     loginProvider.userLogin(
@@ -86,7 +84,6 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   errorMessage: "Invalid Password",
                 ),
                 const SizedBox(height: 15),
-
                 Consumer<AuthAPIProvider>(
                   builder: (context, loginProvider, child) {
                     print("✅ Consumer call ho rha hai ");

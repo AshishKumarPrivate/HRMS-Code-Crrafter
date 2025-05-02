@@ -11,6 +11,18 @@ Dio getDio () {
           onRequest: (RequestOptions options, handler){
             printValue(tag: 'API URL:', '${options.uri}');
             printValue(tag: 'HEADER:', options.headers);
+            // Custom print for FormData
+            if (options.data is FormData) {
+              final formDataMap = {};
+              (options.data as FormData).fields.forEach((field) {
+                formDataMap[field.key] = field.value;
+              });
+              (options.data as FormData).files.forEach((file) {
+                formDataMap[file.key] = '📎 File: ${file.value.filename}';
+              });
+
+              printValue(tag: '📤 FORM DATA:', formDataMap);
+            }
             try{
               printValue(tag: '✔️ REQUEST BODY: ', jsonEncode(options.data));
             }catch (e){

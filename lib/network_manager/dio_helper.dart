@@ -69,13 +69,41 @@ class DioHelper {
   // }
 
   /// POST API ye CHAT GPT WALA POST DIO HELPER HAI
+  // Future<dynamic> post ({required String url, Object? requestBody, bool isAuthRequired = false}) async{
+  //   try{
+  //     Response response;
+  //     if(requestBody == null){
+  //       response = await dio.post(url, options: options(isAuthRequired));
+  //     }else{
+  //       response = await dio.post(url, data: requestBody, options: options(isAuthRequired));
+  //     }
+  //
+  //     return response.data;
+  //   } on DioException catch (e) {
+  //     // ❌ If DioException, check if it contains a response
+  //     if (e.response != null) {
+  //       print("❌ API Error Response: ${e.response?.data}");
+  //
+  //       return e.response?.data; // ✅ Return error response from API
+  //     } else {
+  //       print("❌ Network Error: ${e.message}");
+  //       return null; // ✅ Return null for network errors
+  //     }
+  //   }
+  // }
   Future<dynamic> post ({required String url, Object? requestBody, bool isAuthRequired = false}) async{
     try{
       Response response;
-      if(requestBody == null){
-        response = await dio.post(url, options: options(isAuthRequired));
-      }else{
-        response = await dio.post(url, data: requestBody, options: options(isAuthRequired));
+      final isMultipart = requestBody is FormData;
+
+      final Options reqOptions = options(isAuthRequired).copyWith(
+        contentType: isMultipart ? 'multipart/form-data' : 'application/json',
+      );
+
+      if (requestBody == null) {
+        response = await dio.post(url, options: reqOptions);
+      } else {
+        response = await dio.post(url, data: requestBody, options: reqOptions);
       }
 
       return response.data;

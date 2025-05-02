@@ -17,7 +17,8 @@ class CustomTextField extends StatelessWidget {
   final double? borderWidth;
   final Color? borderColor;
   final Color? shadowColor;
-  final bool enableShadow; // New optional parameter
+  final bool enableShadow;
+  final bool enableValidation;
 
   const CustomTextField({
     Key? key,
@@ -34,7 +35,8 @@ class CustomTextField extends StatelessWidget {
     this.borderWidth,
     this.borderColor,
     this.shadowColor,
-    this.enableShadow = true, // Default value set to true
+    this.enableShadow = true,
+    this.enableValidation = true,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class CustomTextField extends StatelessWidget {
       children: [
         FormField<String>(
           validator: (value) {
-            if (controller.text.isEmpty) {
+            if (enableValidation && controller.text.isEmpty) {
               return errorMessage;
             }
             return null;
@@ -61,7 +63,7 @@ class CustomTextField extends StatelessWidget {
                     style: AppTextStyles.heading2(
                       context,
                       overrideStyle: TextStyle(
-                        fontSize: ResponsiveHelper.fontSize(context, 14),
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
                       ),
                     ),
                   ),
@@ -114,7 +116,6 @@ class CustomTextField extends StatelessWidget {
 
 
                             decoration: InputDecoration(
-
                               counterText: "", // Hides the counter text
                               hintText: hintText,
                               border: InputBorder.none,

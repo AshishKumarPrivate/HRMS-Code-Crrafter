@@ -1,0 +1,167 @@
+class AddEmployeeModelResponse {
+  bool? success;
+  String? message;
+  Data? data;
+
+  AddEmployeeModelResponse({this.success, this.message, this.data});
+
+  AddEmployeeModelResponse.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['message'] = this.message;
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
+    }
+    return data;
+  }
+}
+
+class Data {
+  String? name;
+  String? email;
+  String? workEmail;
+  String? alternateMobile;
+  String? mobile;
+  String? dob;
+  String? gender;
+  String? address;
+  String? state;
+  String? city;
+  String? qualification;
+  String? experience;
+  String? maritalStatus;
+  String? children;
+  String? emergencyContact;
+  EmployeeImage? employeeImage;
+  EmployeeImage? employeeIdCard;
+  EmployeeImage? employeeDocument;
+  String? role;
+  String? token;
+  String? sId;
+  String? createdAt;
+  String? updatedAt;
+  int? iV;
+  String? registrationId;
+
+  Data(
+      {this.name,
+        this.email,
+        this.workEmail,
+        this.alternateMobile,
+        this.mobile,
+        this.dob,
+        this.gender,
+        this.address,
+        this.state,
+        this.city,
+        this.qualification,
+        this.experience,
+        this.maritalStatus,
+        this.children,
+        this.emergencyContact,
+        this.employeeImage,
+        this.employeeIdCard,
+        this.employeeDocument,
+        this.role,
+        this.token,
+        this.sId,
+        this.createdAt,
+        this.updatedAt,
+        this.iV,
+        this.registrationId});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    email = json['email'];
+    workEmail = json['workEmail'];
+    alternateMobile = json['alternateMobile'];
+    mobile = json['mobile'];
+    dob = json['dob'];
+    gender = json['gender'];
+    address = json['address'];
+    state = json['state'];
+    city = json['city'];
+    qualification = json['qualification'];
+    experience = json['experience'];
+    maritalStatus = json['maritalStatus'];
+    children = json['children'];
+    emergencyContact = json['emergencyContact'];
+    employeeImage = json['employeeImage'] != null
+        ? new EmployeeImage.fromJson(json['employeeImage'])
+        : null;
+    employeeIdCard = json['employeeIdCard'] != null
+        ? new EmployeeImage.fromJson(json['employeeIdCard'])
+        : null;
+    employeeDocument = json['employeeDocument'] != null
+        ? new EmployeeImage.fromJson(json['employeeDocument'])
+        : null;
+    role = json['role'];
+    token = json['token'];
+    sId = json['_id'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    iV = json['__v'];
+    registrationId = json['registrationId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['email'] = this.email;
+    data['workEmail'] = this.workEmail;
+    data['alternateMobile'] = this.alternateMobile;
+    data['mobile'] = this.mobile;
+    data['dob'] = this.dob;
+    data['gender'] = this.gender;
+    data['address'] = this.address;
+    data['state'] = this.state;
+    data['city'] = this.city;
+    data['qualification'] = this.qualification;
+    data['experience'] = this.experience;
+    data['maritalStatus'] = this.maritalStatus;
+    data['children'] = this.children;
+    data['emergencyContact'] = this.emergencyContact;
+    if (this.employeeImage != null) {
+      data['employeeImage'] = this.employeeImage!.toJson();
+    }
+    if (this.employeeIdCard != null) {
+      data['employeeIdCard'] = this.employeeIdCard!.toJson();
+    }
+    if (this.employeeDocument != null) {
+      data['employeeDocument'] = this.employeeDocument!.toJson();
+    }
+    data['role'] = this.role;
+    data['token'] = this.token;
+    data['_id'] = this.sId;
+    data['createdAt'] = this.createdAt;
+    data['updatedAt'] = this.updatedAt;
+    data['__v'] = this.iV;
+    data['registrationId'] = this.registrationId;
+    return data;
+  }
+}
+
+class EmployeeImage {
+  String? publicId;
+  String? secureUrl;
+
+  EmployeeImage({this.publicId, this.secureUrl});
+
+  EmployeeImage.fromJson(Map<String, dynamic> json) {
+    publicId = json['public_id'];
+    secureUrl = json['secure_url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['public_id'] = this.publicId;
+    data['secure_url'] = this.secureUrl;
+    return data;
+  }
+}

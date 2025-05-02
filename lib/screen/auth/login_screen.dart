@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/screen/auth/widget/login_form_widget.dart';
+import 'package:hrms_management_code_crafter/util/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../bottom_navigation_screen.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../util/dimensions_utils.dart';
@@ -18,19 +17,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final Uri _url = Uri.parse('https://codecrafter.co.in/');
+
+  final Uri _url = Uri.parse(AppConstants.codeCrafterSiteUrl);
 
   Future<void> _launchURL() async {
     if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $_url');
     }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-
   }
 
   @override

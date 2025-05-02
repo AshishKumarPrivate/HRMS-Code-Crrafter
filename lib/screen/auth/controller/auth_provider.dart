@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:hrms_management_code_crafter/admin/home/admin_home_screen.dart';
 
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_exception.dart';
@@ -22,15 +23,30 @@ class AuthAPIProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> userLogin(BuildContext context,  String email,String password ) async {
-
+  Future<void> userLogin(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {"email": email, "password": password};
       var response = await _repository.userLogin(requestBody);
-      if (response.success == true) {
+      if (response.success == true && response.data != null) {
         await setLoginUserData(response);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserBottomNavigationScreen()),);
+        if (response.data!.role == "Admin") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminHomeScreen()),
+          );
+        } else if (response.data!.role == "employee") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserBottomNavigationScreen(),
+            ),
+          );
+        }
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
           message: response.message ?? 'Login successful!',
@@ -40,7 +56,7 @@ class AuthAPIProvider with ChangeNotifier {
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
-          message:response.message ?? 'Login failed!',
+          message: response.message ?? 'Login failed!',
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         );
@@ -78,11 +94,12 @@ class AuthAPIProvider with ChangeNotifier {
 
   Future<void> setLoginUserData(UserLoginModelResponse response) async {
     if (response.data != null) {
-      StorageHelper().setUserId(response.data!.id.toString());
-      StorageHelper().setUserEmail(response.data!.email.toString());
-      StorageHelper().setUserRole(response.data!.role.toString());
+      await StorageHelper().setUserId(response.data!.id.toString());
+      await StorageHelper().setUserEmail(response.data!.email.toString());
+      await StorageHelper().setUserRole(response.data!.role.toString());
+      await StorageHelper().setBoolIsLoggedIn(true);
     } else {
-      await  StorageHelper().clearAll();
+      await StorageHelper().clearAll();
     }
   }
 
