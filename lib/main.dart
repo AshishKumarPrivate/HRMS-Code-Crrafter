@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hrms_management_code_crafter/admin/auth/controller/admin_auth_provider.dart';
+ import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/policy/company_policy_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/work_module/employee_work_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provider.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 import 'package:hrms_management_code_crafter/screen/user_selection_screen.dart' show UserSelectionScreen;
@@ -32,9 +34,11 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => NetworkProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => AuthAPIProvider()),
-        // ChangeNotifierProvider(create: (context) => AdminAuthAPIProvider()),
+        ChangeNotifierProvider(create: (context) => AddEmployeeBankDetailApiProvider()),
         ChangeNotifierProvider(create: (context) => EmployeeApiProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeWorkApiProvider()),
         ChangeNotifierProvider(create: (context) => PunchInOutProvider()),
+        ChangeNotifierProvider(create: (context) => CompanyPolicyApiProvider()),
       ],
       child: const MyApp(),
     ),

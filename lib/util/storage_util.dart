@@ -66,6 +66,15 @@ class  StorageHelper {
   }
   /// 🔐 Logout and clear user data
    Future<void> logout() async {
+     await prefs.remove('user_id');
+     await prefs.remove('user_email');
+     await prefs.remove('user_role');
+     await prefs.remove('isLoggedIn');
+     await prefs.remove('user_access_token');
+     await prefs.remove(_employeeDataKey);
+     await prefs.remove('punchIn');
+     await prefs.remove('punchOut');
+     await prefs.remove('workingSeconds');
     await prefs.clear(); // or use `remove(...)` for selected keys
   }
 
@@ -112,6 +121,48 @@ class  StorageHelper {
   Future<void> clearEmployeeData() async {
     await prefs.remove(_employeeDataKey);
   }
+
+  // 🔍 Specific Getters for Employee Fields
+
+  Future<String?> getEmployeeId() async => (await getEmployeeData())?.sId;
+  Future<String?> getEmployeeName() async => (await getEmployeeData())?.name;
+  Future<String?> getEmployeeEmail() async => (await getEmployeeData())?.email;
+  Future<String?> getEmployeeWorkEmail() async => (await getEmployeeData())?.workEmail;
+  Future<String?> getEmployeeMobile() async => (await getEmployeeData())?.mobile;
+  // Future<String?> getEmployeeAlternateMobile() async => (await getEmployeeData())?.alternateMobile;
+  Future<String?> getEmployeeDob() async => (await getEmployeeData())?.dob;
+  Future<String?> getEmployeeGender() async => (await getEmployeeData())?.gender;
+  Future<String?> getEmployeeAddress() async => (await getEmployeeData())?.address;
+  Future<String?> getEmployeeState() async => (await getEmployeeData())?.state;
+  Future<String?> getEmployeeCity() async => (await getEmployeeData())?.city;
+  Future<String?> getEmployeeQualification() async => (await getEmployeeData())?.qualification;
+  Future<String?> getEmployeeExperience() async => (await getEmployeeData())?.experience;
+  Future<String?> getEmployeeMaritalStatus() async => (await getEmployeeData())?.maritalStatus;
+  // Future<String?> getEmployeeChildren() async => (await getEmployeeData())?.children;
+  // Future<String?> getEmployeeEmergencyContact() async => (await getEmployeeData())?.emergencyContact;
+  Future<String?> getEmployeeRoleDetail() async => (await getEmployeeData())?.role;
+  Future<String?> getEmployeeToken() async => (await getEmployeeData())?.token;
+  Future<String?> getEmployeeCreatedAt() async => (await getEmployeeData())?.createdAt;
+  Future<String?> getEmployeeUpdatedAt() async => (await getEmployeeData())?.updatedAt;
+  Future<String?> getEmployeeRegistrationId() async => (await getEmployeeData())?.registrationId;
+  // Future<String?> getEmployeeBankId() async => (await getEmployeeData())?.bankId;
+  /// bank details
+  Future<String?> getEmployeeBankId() async => (await getEmployeeData())?.bankId?.sId;
+  Future<String?> getEmployeeBankName() async => (await getEmployeeData())?.bankId?.bankName;
+  Future<String?> getEmployeeBankAccountNumber() async => (await getEmployeeData())?.bankId?.accountNumber;
+  Future<String?> getEmployeeBankBranch() async => (await getEmployeeData())?.bankId?.branch;
+  Future<String?> getEmployeeBankIFSC() async => (await getEmployeeData())?.bankId?.ifscCode;
+  Future<String?> getEmployeeBankCode() async => (await getEmployeeData())?.bankId?.bankCode;
+  Future<String?> getEmployeeBankAddress() async => (await getEmployeeData())?.bankId?.bankAddress;
+  /// Wrok details
+  Future<String?> getEmployeeWorkId() async => (await getEmployeeData())?.workId?.sId;
+  Future<String?> getEmployeeWorkCompanyName() async => (await getEmployeeData())?.workId?.company;
+  Future<String?> getEmployeeDepartment() async => (await getEmployeeData())?.workId?.department;
+  Future<String?> getEmployeeJoiningDate() async => (await getEmployeeData())?.workId?.joiningDate;
+  Future<String?> getEmployeeJobPosition() async => (await getEmployeeData())?.workId?.jobPosition;
+  Future<String?> getEmployeeSalary() async => (await getEmployeeData())?.workId?.salary;
+  Future<String?> getEmployeeWorkLocation() async => (await getEmployeeData())?.workId?.workLocation;
+  Future<String?> getEmployeeWork() async => (await getEmployeeData())?.workId?.workType;
 
 
 }

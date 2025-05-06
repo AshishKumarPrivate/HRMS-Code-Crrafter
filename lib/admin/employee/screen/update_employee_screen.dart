@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/admin/auth/controller/admin_auth_provider.dart';
-import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
-import 'package:hrms_management_code_crafter/util/custom_snack_bar.dart';
-import 'package:image_picker/image_picker.dart';
+ import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

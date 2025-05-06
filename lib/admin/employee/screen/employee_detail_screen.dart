@@ -1,9 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/admin/auth/controller/admin_auth_provider.dart';
-import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+ import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+ import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/add_employee_bank_detail_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/employee_bank_detail_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/update_employee_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/add_employee_work_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/employee_work_detail_screen.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:hrms_management_code_crafter/util/storage_util.dart';
@@ -31,7 +34,6 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch employee list when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeApiProvider>(
         context,
@@ -71,8 +73,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh:
-                      () => provider.getEmployeeDetail(widget.employeeId),
+                  onRefresh:() => provider.getEmployeeDetail(widget.employeeId),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -212,8 +213,87 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                             },
                           ),
                         ),
-
                         const SizedBox(height: 40),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: CustomButton(
+                                    text: "🏦 Add Bank",
+                                    textColor: Colors.black,
+                                    type: ButtonType.outlined,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => AddEmployeeBankDetailScreen()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: CustomButton(
+                                    text: "🏦 Bank Details",
+                                    textColor: Colors.black,
+                                    type: ButtonType.outlined,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => EmpBankDetailScreen()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: CustomButton(
+                                    text: "👔 Add Work",
+                                    textColor: Colors.black,
+                                    type: ButtonType.outlined,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => AddEmployeeWorkScreen()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: CustomButton(
+                                    text: "👔 Work Details",
+                                    textColor: Colors.black,
+                                    type: ButtonType.outlined,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => EmpWorkDetailScreen()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+
                       ],
                     ),
                   ),
@@ -326,6 +406,7 @@ void showDeleteBottomSheet(BuildContext context, String employeeId) {
                 /// **Logout Button**
                 ElevatedButton(
                   onPressed: () async {
+                    print("idd=>${employeeId}");
                     Provider.of<EmployeeApiProvider>(
                       context,
                       listen: false,

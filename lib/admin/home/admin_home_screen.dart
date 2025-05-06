@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/add_employee_screen.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
+ import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/policy/add_company_policy_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/policy/policy_list_screen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_text_styles.dart';
+import 'package:hrms_management_code_crafter/util/storage_util.dart';
+import 'package:provider/provider.dart';
+
+import '../../screen/auth/controller/auth_provider.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -109,10 +115,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       color: Colors.deepPurple,
                     ),
                   ),
-                  DashboardCard(
-                    title: 'Expenses Management',
-                    icon: Icons.calculate,
-                    color: Colors.pinkAccent,
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddCompanyPolicyScreen(),
+                        ),
+                      );
+                    },
+                    child: DashboardCard(
+                      title: 'Add\nCompany Policy',
+                      icon: Icons.calculate,
+                      color: Colors.pinkAccent,
+                    ),
                   ),
                   DashboardCard(
                     title: 'Payroll Management',
@@ -141,11 +157,29 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   bgColor: Color(0xFFE6F0FA),
                 ),
               ),
-              const CustomListTile(
-                title: 'NOC/Ex Certificate',
-                icon: Icons.description_outlined,
-                color: Colors.deepOrange,
-                bgColor: Color(0xFFFFF1E6),
+              InkWell(
+                onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => EmpBankDetailScreen()),
+                // );
+              },
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PolicyListScreen(),
+                      ),
+                    );
+                  },
+                  child: const CustomListTile(
+                    title: 'View Company Policy',
+                    icon: Icons.description_outlined,
+                    color: Colors.deepOrange,
+                    bgColor: Color(0xFFFFF1E6),
+                  ),
+                ),
               ),
               const CustomListTile(
                 title: 'Notice Board',
@@ -160,12 +194,157 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 color: Colors.deepPurple,
                 bgColor: Color(0xFFF3E6FA),
               ),
+              InkWell(
+                onTap: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => EmpBankDetailScreen()),
+                  // );
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    showLogoutBottomSheet(context );
+                  },
+                  child: const CustomListTile(
+                    title: 'Logout',
+                    icon: Icons.logout,
+                    color: Colors.deepOrange,
+                    bgColor: Color(0xFFFFF1E6),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+
+
+void showLogoutBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    backgroundColor: Colors.white,
+    builder: (context) {
+      return Builder(
+        builder: (innerContext) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Drag Handle
+              Container(
+                width: 100,
+                height: 5,
+                color: Colors.grey[400],
+              ),
+
+              /// Warning Icon & Message
+              Container(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 50,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Sign out from Account",
+                        style: AppTextStyles.bodyText1(context,
+                            overrideStyle: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Are you sure you would like to logout of your Account",
+                        style: AppTextStyles.bodyText1(context,
+                            overrideStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            )),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// Cancel & Logout Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Cancel Button
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(innerContext),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.lightBrown_color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 0),
+                    ),
+                    child: Text(
+                      "Cancel",
+                      style: AppTextStyles.heading1(context,
+                          overrideStyle: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          )),
+                    ),
+                  ),
+
+                  // Logout Button
+                  ElevatedButton(
+                    onPressed: () {
+                      print("Logout button clicked");
+                      // Use the correct context with Provider
+                      Provider.of<AuthAPIProvider>(innerContext, listen: false)
+                          .logoutUser(innerContext);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 0),
+                    ),
+                    child: Text(
+                      "Logout",
+                      style: AppTextStyles.heading1(context,
+                          overrideStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          )),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class DashboardCard extends StatelessWidget {

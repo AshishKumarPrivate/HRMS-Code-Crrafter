@@ -6,7 +6,7 @@ import '../../util/responsive_helper_util.dart';
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
-  final IconData icon;
+  final IconData? icon;
   final Color? iconColor;
   final int? maxLength;
   final String hintText;
@@ -19,12 +19,15 @@ class CustomTextField extends StatelessWidget {
   final Color? shadowColor;
   final bool enableShadow;
   final bool enableValidation;
+  final bool enableAllCaps;
+  final int? maxLines;
+
 
   const CustomTextField({
     Key? key,
     required this.controller,
     required this.focusNode,
-    required this.icon,
+    this.icon,
     this.iconColor,
     this.maxLength,
     required this.hintText,
@@ -37,6 +40,8 @@ class CustomTextField extends StatelessWidget {
     this.shadowColor,
     this.enableShadow = true,
     this.enableValidation = true,
+    this.enableAllCaps = false,
+    this.maxLines,
   }) : super(key: key);
 
   @override
@@ -97,24 +102,28 @@ class CustomTextField extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Padding(
-                          padding: ResponsiveHelper.padding(context, 2, 0.02),
-                          child: Icon(
-                            icon,
-                            size: ResponsiveHelper.fontSize(context, 20),
-                            color: isFocused
-                                ? (iconColor ?? AppColors.primary)
-                                : AppColors.txtGreyColor,
-                          ),
-                        ),
+                        icon != null ? // 👈 only render if icon is not null
+                          Padding(
+                            padding: ResponsiveHelper.padding(context, 2, 0.02),
+                            child: Icon(
+                              icon,
+                              size: ResponsiveHelper.fontSize(context, 20),
+                              color: isFocused
+                                  ? (iconColor ?? AppColors.primary)
+                                  : AppColors.txtGreyColor,
+                            ),
+                          ) :Padding(
+                          padding: ResponsiveHelper.padding(context, 1, 0.02),
+
+                        ) ,
                         Expanded(
                           child: TextFormField(
                             controller: controller,
                             focusNode: focusNode,
                             keyboardType: keyboardType,
                             maxLength: maxLength,
-
-
+                            maxLines: maxLines ?? 1,
+                            textCapitalization: enableAllCaps ? TextCapitalization.characters : TextCapitalization.none,
                             decoration: InputDecoration(
                               counterText: "", // Hides the counter text
                               hintText: hintText,

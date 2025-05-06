@@ -8,6 +8,7 @@ import '../../../network_manager/dio_error_handler.dart' show DioErrorHandler;
 import '../../../network_manager/repository.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../util/custom_snack_bar.dart';
+import '../../../util/full_screen_loader_utiil.dart';
 import '../../../util/storage_util.dart';
 import '../../user_selection_screen.dart';
 import '../model/user_login_model.dart';
@@ -35,17 +36,26 @@ class AuthAPIProvider with ChangeNotifier {
       if (response.success == true && response.data != null) {
         await setLoginUserData(response);
         if (response.data!.role == "Admin") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => AdminHomeScreen()),
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+                (Route<dynamic> route) => false,
           );
+          // Navigator.pushAndRemoveUntil(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => AdminHomeScreen())
+          // );
         } else if (response.data!.role == "employee") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserBottomNavigationScreen(),
-            ),
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const UserBottomNavigationScreen()),
+                (Route<dynamic> route) => false,
           );
+
+          // Navigator.pushAndRemoveUntil(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => UserBottomNavigationScreen(),
+          //   ),
+          // );
         }
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
@@ -80,14 +90,27 @@ class AuthAPIProvider with ChangeNotifier {
     }
   }
 
+  // void logoutUser(BuildContext context) {
+  //   FullScreenLoader.show(context, message: "Logout");
+  //   Future.delayed(Duration(seconds: 5), () {
+  //     StorageHelper().logout();
+  //     FullScreenLoader.hide(context);
+  //     Navigator.of(context).pushAndRemoveUntil(
+  //       MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+  //       (route) => false,
+  //     );
+  //   });
+  // }
   void logoutUser(BuildContext context) {
-    _setLoading(true);
+    // _setLoading(true);
+    FullScreenLoader.show(context, message: "Logout");
     Future.delayed(Duration(seconds: 1), () {
       StorageHelper().logout();
-      _setLoading(false);
+      // _setLoading(false);
+      FullScreenLoader.hide(context);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-        (route) => false,
+            (route) => false,
       );
     });
   }

@@ -102,8 +102,10 @@ class EmployeeApiProvider with ChangeNotifier {
           duration: Duration(seconds: 2),
         );
         // Navigator.of(context).pop();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
-
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+              (Route<dynamic> route) => false,
+        );
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
@@ -169,6 +171,7 @@ class EmployeeApiProvider with ChangeNotifier {
       _setErrorState("⚠️ API Error: $error");
     }
 
+    _setLoadingState(false);
     return false;
   }
   /// Fetch Employee Detail by ID
@@ -206,8 +209,8 @@ class EmployeeApiProvider with ChangeNotifier {
       final bool success = response['success'] == true;
       final String message = response['message'] ?? "Unknown error";
       // 👇 Hide loader
-      FullScreenLoader.hide(context);
       if (success) {
+        FullScreenLoader.hide(context);
         print("✅ $message");
         // Close the bottom sheet first (safely)
         Navigator.of(context, rootNavigator: true).pop();
