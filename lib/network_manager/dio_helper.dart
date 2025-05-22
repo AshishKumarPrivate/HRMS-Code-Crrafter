@@ -41,16 +41,52 @@ class DioHelper {
   //   );
   // }
 
+  /// Unified error handler with timeout handling
+  dynamic _handleError(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      print("⏰ Request Timeout Error: ${e.message}");
+      return {
+        "status": false,
+        "message": "Request timed out. Please try again.",
+      };
+    }
+
+    if (e.response != null) {
+      print("❌ API Error Response: ${e.response?.data}");
+      return e.response?.data;
+    } else {
+      print("❌ Network Error: ${e.message}");
+      return {
+        "status": false,
+        "message": "Network error occurred. Please check your connection.",
+      };
+    }
+  }
+
   /// GET API
   Future<dynamic> get({
     required String url,
     bool isAuthRequired = false,
+    Map<String, dynamic>? queryParams,
   }) async {
     try {
-      Response response = await dio.get(url, options: options(isAuthRequired));
+      Response response = await dio.get(url,
+          queryParameters: queryParams, options: options(isAuthRequired));
       return response.data;
-    } catch (error) {
-      return null;
+    } on DioException catch (e) {
+
+      return _handleError(e);
+      // ❌ If DioException, check if it contains a response
+      if (e.response != null) {
+        print("❌ API Error Response: ${e.response?.data}");
+
+        return e.response?.data; // ✅ Return error response from API
+      } else {
+        print("❌ Network Error: ${e.message}");
+        return null; // ✅ Return null for network errors
+      }
     }
   }
 
@@ -118,6 +154,7 @@ class DioHelper {
 
       return response.data;
     } on DioException catch (e) {
+      return _handleError(e);
       // ❌ If DioException, check if it contains a response
       if (e.response != null) {
         print("❌ API Error Response: ${e.response?.data}");
@@ -177,7 +214,10 @@ class DioHelper {
       }
 
       return response.data;
-    } catch (error) {
+    }
+    on DioException catch (e) {
+      return _handleError(e);
+    }catch (error) {
       return null;
     }
   }
@@ -203,7 +243,9 @@ class DioHelper {
       }
 
       return response.data;
-    } catch (error) {
+    } on DioException catch (e) {
+      return _handleError(e);
+    }catch (error) {
       return null;
     }
   }
@@ -225,6 +267,8 @@ class DioHelper {
       );
 
       return response.data;
+    }on DioException catch (e) {
+      return _handleError(e);
     } catch (error) {
       return null;
     }

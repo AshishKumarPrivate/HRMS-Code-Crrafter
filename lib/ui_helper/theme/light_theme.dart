@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../app_colors.dart';
 
 ThemeData buildLightTheme() {
@@ -9,12 +10,16 @@ ThemeData buildLightTheme() {
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primary,
       iconTheme: IconThemeData(color: Colors.black),
       titleTextStyle: TextStyle(
         color: Colors.black,
         fontSize: 18,
         fontWeight: FontWeight.bold,
+      ),
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: AppColors.primary, // ✅ This sets the status bar color
+        statusBarIconBrightness: Brightness.light, // Icons will be light on dark bg
       ),
     ),
     colorScheme: base.colorScheme.copyWith(

@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_background/animated_background.dart';
 
-import '../../ui_helper/app_colors.dart';
-import 'controller/punch_in_out_provider.dart';
+import '../../../ui_helper/app_colors.dart';
+import '../controller/punch_in_out_provider.dart';
 
 class PunchInOutScreen extends StatefulWidget {
 
@@ -15,6 +16,7 @@ class PunchInOutScreen extends StatefulWidget {
 
 class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProviderStateMixin {
   String currentTime = "";
+  Timer? _clockTimer;   // ← store reference
 
   @override
   void initState() {
@@ -26,7 +28,7 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
   }
 
   void _startClock() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    _clockTimer =  Timer.periodic(Duration(seconds: 1), (timer) {
       final now = DateTime.now();
       setState(() {
         currentTime =
@@ -34,28 +36,34 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
       });
     });
   }
-
+  @override
+  void dispose() {
+    _clockTimer?.cancel(); // ← cancel when widget is removed
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final provider = Provider.of<PunchInOutProvider>(context);
-    final formattedDate =
-        "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year} - ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.weekday % 7]}";
+    // final formattedDate =
+    //     "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year} - ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.weekday % 7]}";
 
+  // Format: 19, May 2025
+    final formattedDate = "${DateFormat("dd MMMM yyyy").format(now)} - ${DateFormat('EEEE').format(now)}";
     return Container(
       child: Column(
         children: [
-          SizedBox(height: 30),
+          // SizedBox(height: 30),
           Text(
             currentTime,
             style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 1),
           Text(
             formattedDate,
             style: TextStyle(color: Colors.grey[600], fontSize: 14),
           ),
-          SizedBox(height: 40),
+          SizedBox(height: 20),
           Stack(
             alignment: Alignment.center,
             children: [
@@ -92,7 +100,7 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
                 circularStrokeCap: CircularStrokeCap.round,
                 center: GestureDetector(
                   onTap: () {
-                    provider.isPunchedIn ? provider.punchOut() : provider.punchIn();
+                    provider.isPunchedIn ? provider.empCheckOut(context) : provider.empCheckIn(context);
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +119,6 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
               ),
             ],
           ),
-
           SizedBox(height: 16),
           if (provider.halfDayReached)
             Container(
@@ -144,7 +151,7 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
                       : "--:--",
                   "Punch Out",
                 ),
-                _buildPunchTile(provider.getTotalHours(), "Total Hours"),
+                _buildPunchTile( provider.getTotalHours() , "Total Hours"),
               ],
             ),
           ),
@@ -169,5 +176,12 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     final minute = dt.minute.toString().padLeft(2, '0');
     final suffix = dt.hour >= 12 ? "PM" : "AM";
     return "$hour:$minute $suffix";
+  }
+  String _formatISTTime(DateTime utcTime) {
+    final istTime = utcTime.toUtc().add(Duration(hours: 5, minutes: 30));
+    final hours = istTime.hour.toString().padLeft(2, '0');
+    final minutes = istTime.minute.toString().padLeft(2, '0');
+    final ampm = istTime.hour >= 12 ? "PM" : "AM";
+    return "$hours:$minutes $ampm";
   }
 }

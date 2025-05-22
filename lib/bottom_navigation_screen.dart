@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
- import 'package:hrms_management_code_crafter/screen/home_screen.dart';
-import 'package:hrms_management_code_crafter/screen/nav_profile/profile_screen.dart';
+import 'package:hrms_management_code_crafter/screen/emp_attandance/screen/employee_single_profile_detail_screen.dart';
+ import 'package:hrms_management_code_crafter/screen/nav_home/screen/emp_home_screen.dart';
+import 'package:hrms_management_code_crafter/screen/nav_profile/screen/profile_screen.dart';
 
 class UserBottomNavigationScreen extends StatefulWidget {
   const UserBottomNavigationScreen({super.key});
@@ -17,10 +18,10 @@ class _UserBottomNavigationScreenState
   DateTime? _lastBackPressed;
 
   final List<Widget> _screens = [
-    HomeScreen(),
-    HomeScreen(),
-    HomeScreen(),
-    ProfileScreen(),
+    EmployeeHomeScreen(),
+    EmployeeHomeScreen(),
+    EmployeeHomeScreen(),
+    EmployeeSingleProfileDetailScreen(),
   ];
 
   Future<bool> _onBackPressed() async {

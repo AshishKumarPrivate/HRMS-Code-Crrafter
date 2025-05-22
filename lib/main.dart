@@ -4,7 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/policy/company_policy_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/work_module/employee_work_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/admin_leave_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provider.dart';
+import 'package:hrms_management_code_crafter/screen/emp_attandance/controller/emp_attendance_chart_provider.dart';
+import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 import 'package:hrms_management_code_crafter/screen/user_selection_screen.dart' show UserSelectionScreen;
 import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
@@ -39,6 +42,9 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => EmployeeWorkApiProvider()),
         ChangeNotifierProvider(create: (context) => PunchInOutProvider()),
         ChangeNotifierProvider(create: (context) => CompanyPolicyApiProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeLeaveApiProvider()),
+        ChangeNotifierProvider(create: (context) => AdminEmployeeLeaveApiProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceChartProvider()),
       ],
       child: const MyApp(),
     ),
@@ -55,9 +61,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'HRMS Code Crafter',
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.themeMode,
+      // darkTheme: AppTheme.darkTheme,
+      // themeMode: themeProvider.themeMode,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return Overlay(
+          initialEntries: [
+            OverlayEntry(
+              builder: (context) {
+                SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
+                  statusBarColor: AppColors.primary,
+                  statusBarIconBrightness: Brightness.light,
+                ));
+
+                return child!;
+              },
+            ),
+          ],
+        );
+      },
       home: ResponsiveBuilder(child: SplashScreen()),
     );
   }

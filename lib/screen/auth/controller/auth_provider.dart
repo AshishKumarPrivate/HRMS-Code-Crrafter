@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/home/admin_home_screen.dart';
+import 'package:hrms_management_code_crafter/screen/auth/model/user_and_admin_login_model.dart';
 
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_exception.dart';
@@ -34,8 +35,14 @@ class AuthAPIProvider with ChangeNotifier {
       Map<String, dynamic> requestBody = {"email": email, "password": password};
       var response = await _repository.userLogin(requestBody);
       if (response.success == true && response.data != null) {
-        await setLoginUserData(response);
         if (response.data!.role == "Admin") {
+          /// admin login id set here
+          await StorageHelper().setAdminLoginId(response.data!.id.toString());
+          await StorageHelper().setAdminLoginEmail(response.data!.email.toString());
+          await StorageHelper().setUserRole(response.data!.role.toString());
+          await StorageHelper().setBoolIsLoggedIn(true);
+          /// admin login id set here
+
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
                 (Route<dynamic> route) => false,
@@ -45,6 +52,9 @@ class AuthAPIProvider with ChangeNotifier {
           //   MaterialPageRoute(builder: (context) => AdminHomeScreen())
           // );
         } else if (response.data!.role == "employee") {
+
+          await setLoginUserData(response);
+          print("EmploginData=>>${response.employeeeData!.name.toString()} ");
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const UserBottomNavigationScreen()),
                 (Route<dynamic> route) => false,
@@ -115,11 +125,31 @@ class AuthAPIProvider with ChangeNotifier {
     });
   }
 
-  Future<void> setLoginUserData(UserLoginModelResponse response) async {
+  Future<void> setLoginUserData(UserAndAdminLoginModelResponse response) async {
     if (response.data != null) {
-      await StorageHelper().setUserId(response.data!.id.toString());
-      await StorageHelper().setUserEmail(response.data!.email.toString());
-      await StorageHelper().setUserRole(response.data!.role.toString());
+
+      // await StorageHelper().setUserRole(response.data!.role.toString());
+      await StorageHelper().setEmpLoginId(response.employeeeData!.sId.toString());
+      await StorageHelper().setEmpLoginName(response.employeeeData!.name.toString());
+      await StorageHelper().setEmpLoginEmail(response.employeeeData!.email.toString());
+      await StorageHelper().setEmpLoginWorkEmail(response.employeeeData!.workEmail.toString());
+      await StorageHelper().setEmpLoginMobile(response.employeeeData!.mobile.toString());
+      await StorageHelper().setEmpLoginAlternateMobile(response.employeeeData!.alternateMobile.toString());
+      await StorageHelper().setEmpLoginDOB(response.employeeeData!.dob.toString());
+      await StorageHelper().setEmpLoginGender(response.employeeeData!.gender.toString());
+      await StorageHelper().setEmpLoginAddress(response.employeeeData!.address.toString());
+      await StorageHelper().setEmpLoginState(response.employeeeData!.state.toString());
+      await StorageHelper().setEmpLoginCity(response.employeeeData!.city.toString());
+      await StorageHelper().setEmpLoginQualification(response.employeeeData!.qualification.toString());
+      await StorageHelper().setEmpLoginExperience(response.employeeeData!.experience.toString());
+      await StorageHelper().setEmpLoginMaritalStatus(response.employeeeData!.maritalStatus.toString());
+      await StorageHelper().setEmpLoginChildren(response.employeeeData!.children.toString());
+      await StorageHelper().setEmpLoginEmergencyContact(response.employeeeData!.emergencyContact.toString());
+      await StorageHelper().setUserRole(response.employeeeData!.role.toString());
+      await StorageHelper().setEmpLoginToken(response.employeeeData!.token.toString());
+      await StorageHelper().setEmpLoginRegistrationId(response.employeeeData!.registrationId.toString());
+      await StorageHelper().setEmpLoginBankId(response.employeeeData!.bankId.toString());
+      await StorageHelper().setEmpLoginWorkId(response.employeeeData!.workId.toString());
       await StorageHelper().setBoolIsLoggedIn(true);
     } else {
       await StorageHelper().clearAll();

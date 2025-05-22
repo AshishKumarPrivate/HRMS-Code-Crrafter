@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/add_employee_screen.dart';
  import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/emp__leaves_request_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/add_company_policy_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/policy_list_screen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_text_styles.dart';
+import 'package:hrms_management_code_crafter/util/responsive_helper_util.dart';
 import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:provider/provider.dart';
 
@@ -26,16 +28,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final now = DateTime.now();
     if (_lastBackPressed == null ||
         now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+      // Show snackbar message to press again
       _lastBackPressed = now;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Press back again to exit the app"),
-          duration: Duration(seconds: 2),
+          content: const Text("Press back again to exit the app"),
+          duration: const Duration(seconds: 2),
         ),
       );
-      return false; // Prevent pop
+      return false; // Prevent app from exiting
     }
-    return true; // Allow pop (exit app)
+    return true; // Allow app to exit
   }
 
   @override
@@ -181,12 +184,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   ),
                 ),
               ),
-              const CustomListTile(
-                title: 'Notice Board',
-                icon: Icons.notifications_active_outlined,
-                color: Colors.green,
-                bgColor: Color(0xFFE6FAF0),
-                hasNotification: true,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EmployeeLeaveRequestListScreen()),
+                  );
+                },
+                child: const CustomListTile(
+                  title: 'Leave Request',
+                  icon: Icons.notifications_active_outlined,
+                  color: Colors.green,
+                  bgColor: Color(0xFFE6FAF0),
+                  hasNotification: true,
+                ),
               ),
               const CustomListTile(
                 title: 'Award',
@@ -378,7 +389,7 @@ class DashboardCard extends StatelessWidget {
           // Left side colored bar
           Container(
             width: 6,
-            height: double.infinity,
+            // height: double.infinity,
             decoration: BoxDecoration(
               color: color,
               borderRadius: const BorderRadius.only(
@@ -393,7 +404,7 @@ class DashboardCard extends StatelessWidget {
           // Content
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -418,7 +429,7 @@ class DashboardCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: AppTextStyles.heading3(
                       context,
-                      overrideStyle: TextStyle(fontSize: 14),
+                      overrideStyle: TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12)),
                     ),
                   ),
                 ],

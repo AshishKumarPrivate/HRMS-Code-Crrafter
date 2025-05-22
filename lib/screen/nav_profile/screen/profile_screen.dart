@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/screen/nav_profile/widget/cell_profile_list_tile.dart';
+ import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:provider/provider.dart';
 
-import '../../ui_helper/app_colors.dart';
-import '../../ui_helper/app_text_styles.dart';
-import '../../ui_helper/common_widget/solid_rounded_button.dart';
-import '../../util/responsive_helper_util.dart';
-import '../auth/controller/auth_provider.dart';
-import 'attandance_list_screen.dart';
+import '../../../ui_helper/app_colors.dart';
+import '../../../ui_helper/app_text_styles.dart';
+import '../../../ui_helper/common_widget/solid_rounded_button.dart';
+import '../../../util/responsive_helper_util.dart';
+import '../../auth/controller/auth_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final List<ProfileOption> options = [
-    ProfileOption(
-      "Attendance",
-      "Check your attendance details",
-      Icons.access_time,
-    ),
-    ProfileOption("MIS", "Check your daily MIS log", Icons.assignment),
-    ProfileOption("Leave", "Check your Leave Request Status", Icons.event_busy),
-    ProfileOption(
-      "Holiday List",
-      "Download your Holiday List",
-      Icons.calendar_today,
-    ),
-    ProfileOption(
-      "Expense List",
-      "Check your Expense History and Status",
-      Icons.receipt_long,
-    ),
-    ProfileOption("Meeting", "Check your Meeting History", Icons.video_call),
-    ProfileOption("Logbook", "Check your Logbook History", Icons.book),
-    ProfileOption("Overtime", "Check your Expense Status", Icons.access_alarm),
-  ];
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? empName, empEmail, empPhone;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadUserStorageData();
+  }
+
+  Future<void> loadUserStorageData() async {
+    String? name = await StorageHelper().getEmpLoginName();
+    String? email = await StorageHelper().getEmpLoginEmail();
+    String? phone = await StorageHelper().getEmpLoginMobile();
+
+    setState(() {
+      empName = name ?? "UserName";
+      empEmail = email ?? "eg@gmail.com";
+      empPhone = phone ?? "xxxxxxxxxx";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,60 +46,9 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildProfileHeader(context),
-              const SizedBox(height: 16),
-              ProfileListTile(
-                title: "Attendance",
-                subtitle: "Check your attendance details",
-                leadingIcon: Icons.access_time,
-                backgroundColor: Colors.white,
-                borderRadius: 16,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AttendanceScreen()),
-                  );
-                },
-                titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              ProfileListTile(
-                title: "Leave",
-                subtitle: "Check your Leave Request Status",
-                leadingIcon: Icons.event_busy,
-                backgroundColor: Colors.white,
-                borderRadius: 16,
-                onTap: () {
-                  // TODO: Add navigation for each item here
-                },
-                titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              ProfileListTile(
-                title: "Holiday List",
-                subtitle: "Download your Holiday List",
-                leadingIcon: Icons.event_busy,
-                backgroundColor: Colors.white,
-                borderRadius: 16,
-                onTap: () {
-                  // TODO: Add navigation for each item here
-                },
-                titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              ProfileListTile(
-                title: "Expense List",
-                subtitle: "Check your Expense History and Status",
-                leadingIcon: Icons.event_busy,
-                backgroundColor: Colors.white,
-                borderRadius: 16,
-                onTap: () {
-                  // TODO: Add navigation for each item here
-                },
-                titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-              ),
               const SizedBox(height: 5),
               SizedBox(
-                width:  ResponsiveHelper.containerWidth(context, 30),
+                width: ResponsiveHelper.containerWidth(context, 30),
                 height: ResponsiveHelper.containerWidth(context, 8),
                 child: CustomButton(
                   text: "Logout",
@@ -105,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                   type: ButtonType.outlined,
                   iconData: Icons.logout,
                   iconColor: Colors.red,
-                    borderColor: Colors.red,
+                  borderColor: Colors.red,
                   onPressed: () {
                     showLogoutBottomSheet(context);
                   },
@@ -136,10 +87,10 @@ class ProfileScreen extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Vikram Singh", style: AppTextStyles.heading3(context)),
-              Text("2310011", style: AppTextStyles.caption(context)),
+              Text("${empName}", style: AppTextStyles.heading3(context)),
+              Text("${empEmail}", style: AppTextStyles.caption(context)),
               Text(
-                "Technology | UI/UX Designer",
+                "Mobile No:${empPhone}",
                 style: AppTextStyles.caption(context),
               ),
             ],
@@ -148,15 +99,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class ProfileOption {
-  // list style for the card design for product profile liset
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  ProfileOption(this.title, this.subtitle, this.icon);
 }
 
 void showLogoutBottomSheet(BuildContext context) {
@@ -208,7 +150,7 @@ void showLogoutBottomSheet(BuildContext context) {
 
                     /// **Confirmation Message**
                     Text(
-                      "Are you sure you would like to signout of your Account",
+                      "Are you sure you would like to Logout of your Account",
                       textAlign: TextAlign.start,
                       style: AppTextStyles.bodyText1(
                         context,

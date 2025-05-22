@@ -82,15 +82,19 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: Column(
                             children: [
-                              const CircleAvatar(
+                              CircleAvatar(
                                 radius: 45,
                                 backgroundColor: Colors.white,
-                                child: Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
+                                backgroundImage: (employee.employeeImage!.secureUrl != null &&
+                                    employee.employeeImage!.secureUrl!.isNotEmpty)
+                                    ? NetworkImage(employee.employeeImage!.secureUrl!)
+                                    : null, // fallback tab null
+                                child: (employee.employeeImage!.secureUrl == null ||
+                                    employee.employeeImage!.secureUrl!.isEmpty)
+                                    ? Icon(Icons.person, size: 45, color: Colors.grey)
+                                    : null, // agar image hai toh child null
                               ),
+
                               const SizedBox(height: 10),
                               Text(
                                 employee.name ?? 'N/A',
@@ -145,7 +149,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                                 icon: Icons.group,
                                 title: "DOB",
                                 value:
-                                    "${DateFormatter.formatToShortMonth(employee.dob.toString())}",
+                                    "${DateFormatter.formatCustomDdMmYyyy(employee.dob.toString())}",
                               ),
                             ],
                           ),

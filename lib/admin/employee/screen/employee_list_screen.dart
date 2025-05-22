@@ -153,17 +153,34 @@ class EmployeeListItem extends StatelessWidget {
                       // 👈 rotate colors
                       shape: BoxShape.circle,
                     ),
-                    child: CircleAvatar(
+                    child:
+                    // CircleAvatar(
+                    //   radius: 28,
+                    //   backgroundColor: avatarBgColors[index %
+                    //           avatarBgColors.length]
+                    //       .withOpacity(0.6),
+                    //   child: Icon(
+                    //     Icons.person,
+                    //     size: 28,
+                    //     color: Colors.black54,
+                    //   ),
+                    // ),
+
+                    CircleAvatar(
                       radius: 28,
                       backgroundColor: avatarBgColors[index %
-                              avatarBgColors.length]
+                          avatarBgColors.length]
                           .withOpacity(0.6),
-                      child: Icon(
-                        Icons.person,
-                        size: 28,
-                        color: Colors.black54,
-                      ),
+                      backgroundImage: (employeData.employeeImage!.secureUrl != null &&
+                          employeData.employeeImage!.secureUrl!.isNotEmpty)
+                          ? NetworkImage(employeData.employeeImage!.secureUrl!)
+                          : null, // fallback tab null
+                      child: (employeData.employeeImage!.secureUrl == null ||
+                          employeData.employeeImage!.secureUrl!.isEmpty)
+                          ? Icon(Icons.person, size: 45, color: Colors.grey)
+                          : null, // agar image hai toh child null
                     ),
+
                   ),
                   const SizedBox(width: 12),
 

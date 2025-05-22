@@ -64,6 +64,9 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
   File? _image;
   bool _isAgreed = false;
   Data? storedEmployee;
+  late final  String? profileImageUrl; // Existing profile image URL
+
+
   // handle the login api here
   Future<void> handleSubmit() async {
     final loginProvider = context.read<EmployeeApiProvider>();
@@ -95,6 +98,25 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
       "password": passwordController.text.trim(),
     });
     loginProvider.updateEmployee(context, requestBodyAddEmployee , storedEmployee!.sId ?? '');
+  }
+
+  Widget _buildProfileImage() {
+    if (_image != null) {
+      return CircleAvatar(
+        radius: 45,
+        backgroundImage: FileImage(_image!),
+      );
+    } else if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
+      return CircleAvatar(
+        radius: 45,
+        backgroundImage: NetworkImage(profileImageUrl!),
+      );
+    } else {
+      return const CircleAvatar(
+        radius: 45,
+        child: Icon(Icons.person, size: 60),
+      );
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -132,11 +154,12 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
       emailController.text = storedEmployee!.email ?? '';
       workEmailController.text = storedEmployee!.workEmail ?? '';
       phoneController.text = storedEmployee!.mobile ?? '';
-      // altPhoneController.text = storedEmployee!.alternateMobile ?? '';
+      altPhoneController.text = storedEmployee!.alternateMobile ?? '';
       dobController.text = storedEmployee!.dob ?? '';
       addressController.text = storedEmployee!.address ?? '';
       stateController.text = storedEmployee!.state ?? '';
       cityController.text = storedEmployee!.city ?? '';
+      profileImageUrl = storedEmployee!.employeeImage!.secureUrl ?? '';
       qualificationController.text = storedEmployee!.qualification ?? '';
       experienceController.text = storedEmployee!.experience ?? '';
       roleController.text = storedEmployee!.role ?? '';
@@ -222,14 +245,15 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
               children: [
                 GestureDetector(
                   onTap: _pickImage,
-                  child: Center(
-                    child: _image  == null
-                        ? Icon(Icons.account_circle, size: 100, color: Colors.blueAccent)
-                        : CircleAvatar(
-                      radius: 50,
-                      backgroundImage: FileImage(_image !),
-                    ),
-                  ),
+                  child: Center(child: _buildProfileImage()),
+                  // Center(
+                  //   child: _image  == null
+                  //       ? Icon(Icons.account_circle, size: 100, color: Colors.blueAccent)
+                  //       : CircleAvatar(
+                  //     radius: 50,
+                  //     backgroundImage: FileImage(_image !),
+                  //   ),
+                  // ),
                 ),
                 const SizedBox(height: 30),
                 CustomTextField(
@@ -246,6 +270,7 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
                   controller: emailController,
                   focusNode: _emailFocusNode,
                   icon: Icons.email_outlined,
+                  readOnly: true,
                   hintText: "Employee Email",
                   title: "Email",
                   errorMessage: "Invalid Email",
@@ -256,6 +281,7 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
                   controller: workEmailController,
                   focusNode: _workEmailFocusNode,
                   icon: Icons.email_outlined,
+                  readOnly: true,
                   hintText: "Employee Work Email",
                   title: "Work Email",
                   errorMessage: "Invalid Email",

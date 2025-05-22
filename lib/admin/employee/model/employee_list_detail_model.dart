@@ -30,6 +30,7 @@ class Data {
   String? name;
   String? email;
   String? workEmail;
+  String? alternateMobile;
   String? mobile;
   String? dob;
   String? gender;
@@ -56,6 +57,7 @@ class Data {
         this.name,
         this.email,
         this.workEmail,
+        this.alternateMobile,
         this.mobile,
         this.dob,
         this.gender,
@@ -88,6 +90,7 @@ class Data {
     name = json['name'];
     email = json['email'];
     workEmail = json['workEmail'];
+    alternateMobile = json['alternateMobile'];
     mobile = json['mobile'];
     dob = json['dob'];
     gender = json['gender'];
@@ -124,6 +127,7 @@ class Data {
     data['name'] = this.name;
     data['email'] = this.email;
     data['workEmail'] = this.workEmail;
+    data['alternateMobile'] = this.alternateMobile;
     data['mobile'] = this.mobile;
     data['dob'] = this.dob;
     data['gender'] = this.gender;

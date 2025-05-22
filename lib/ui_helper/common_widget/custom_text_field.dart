@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget {
   final bool enableValidation;
   final bool enableAllCaps;
   final int? maxLines;
+  final bool readOnly; // Add this
 
 
   const CustomTextField({
@@ -42,6 +43,7 @@ class CustomTextField extends StatelessWidget {
     this.enableValidation = true,
     this.enableAllCaps = false,
     this.maxLines,
+    this.readOnly = false, // Default false
   }) : super(key: key);
 
   @override
@@ -123,6 +125,7 @@ class CustomTextField extends StatelessWidget {
                             keyboardType: keyboardType,
                             maxLength: maxLength,
                             maxLines: maxLines ?? 1,
+                            readOnly: readOnly,
                             textCapitalization: enableAllCaps ? TextCapitalization.characters : TextCapitalization.none,
                             decoration: InputDecoration(
                               counterText: "", // Hides the counter text

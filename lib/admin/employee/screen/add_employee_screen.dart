@@ -33,7 +33,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   final TextEditingController altPhoneController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController stateController = TextEditingController();
+  final TextEditingController stateController = TextEditingController(text: "Uttar Pradesh",);
   final TextEditingController cityController = TextEditingController();
   final TextEditingController qualificationController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
@@ -104,7 +104,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       lastDate: DateTime.now(),
     );
     if (pickedDate != null) {
-      String formattedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
+      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       // String formattedDate = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
       setState(() {
         dobController.text = formattedDate;
@@ -286,7 +286,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                     child: CustomTextField(
                       controller: dobController,
                       focusNode: _dobFocusNode,
-                      icon: Icons.calendar_today,
+                      icon: Icons.calendar_month,
                       hintText: "Select Date of Birth",
                       title: "Date of Birth",
                       errorMessage: "Invalid Date of Birth",
@@ -309,6 +309,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   controller: roleController,
                   focusNode: _roleFocusNode,
                   icon: Icons.badge_outlined,
+                  readOnly: true,
                   hintText: "Role",
                   title: "Role",
                   errorMessage: "Invalid Role",
@@ -326,7 +327,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 CustomTextField(
                   controller: stateController,
                   focusNode: _stateFocusNode,
-                  icon: Icons.badge_outlined,
+                  icon: Icons.location_pin,
+                  readOnly: true,
                   hintText: "State",
                   title: "State",
                   errorMessage: "Invalid State",
@@ -335,7 +337,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                 CustomTextField(
                   controller: cityController,
                   focusNode: _cityFocusNode,
-                  icon: Icons.badge_outlined,
+                  icon: Icons.location_pin,
                   hintText: "City",
                   title: "City",
                   errorMessage: "Invalid City",

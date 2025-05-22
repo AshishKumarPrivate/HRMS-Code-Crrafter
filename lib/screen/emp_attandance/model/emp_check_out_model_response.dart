@@ -1,30 +1,28 @@
-class EmpCheckInModel {
+class EmpCheckOUTModelResponse {
   bool? success;
   String? message;
-  AddEmployee? addEmployee;
+  Data? data;
 
-  EmpCheckInModel({this.success, this.message, this.addEmployee});
+  EmpCheckOUTModelResponse({this.success, this.message, this.data});
 
-  EmpCheckInModel.fromJson(Map<String, dynamic> json) {
+  EmpCheckOUTModelResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
-    addEmployee = json['addEmployee'] != null
-        ? new AddEmployee.fromJson(json['addEmployee'])
-        : null;
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     data['message'] = this.message;
-    if (this.addEmployee != null) {
-      data['addEmployee'] = this.addEmployee!.toJson();
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
-class AddEmployee {
+class Data {
   String? sId;
   String? employeeId;
   bool? isHalfDay;
@@ -36,8 +34,10 @@ class AddEmployee {
   String? updatedAt;
   String? loginTime;
   String? status;
+  String? logoutTime;
+  String? workingHours;
 
-  AddEmployee(
+  Data(
       {this.sId,
         this.employeeId,
         this.isHalfDay,
@@ -48,9 +48,11 @@ class AddEmployee {
         this.createdAt,
         this.updatedAt,
         this.loginTime,
-        this.status});
+        this.status,
+        this.logoutTime,
+        this.workingHours});
 
-  AddEmployee.fromJson(Map<String, dynamic> json) {
+  Data.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     employeeId = json['employeeId'];
     isHalfDay = json['isHalfDay'];
@@ -62,6 +64,8 @@ class AddEmployee {
     updatedAt = json['updatedAt'];
     loginTime = json['loginTime'];
     status = json['status'];
+    logoutTime = json['logoutTime'];
+    workingHours = json['workingHours'];
   }
 
   Map<String, dynamic> toJson() {
@@ -77,6 +81,8 @@ class AddEmployee {
     data['updatedAt'] = this.updatedAt;
     data['loginTime'] = this.loginTime;
     data['status'] = this.status;
+    data['logoutTime'] = this.logoutTime;
+    data['workingHours'] = this.workingHours;
     return data;
   }
 }
