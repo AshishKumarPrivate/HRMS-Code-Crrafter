@@ -32,7 +32,8 @@ class AuthAPIProvider with ChangeNotifier {
   ) async {
     _setLoading(true);
     try {
-      Map<String, dynamic> requestBody = {"email": email, "password": password};
+      final String fcmToken = await StorageHelper().getFCMToken();
+      Map<String, dynamic> requestBody = {"email": email, "password": password, "fcmToken": fcmToken};
       var response = await _repository.userLogin(requestBody);
       if (response.success == true && response.data != null) {
         if (response.data!.role == "Admin") {

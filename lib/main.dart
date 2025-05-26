@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
  import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
@@ -22,6 +23,7 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageHelper().init();
+  await Firebase.initializeApp();
   // Set default status bar style globally
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

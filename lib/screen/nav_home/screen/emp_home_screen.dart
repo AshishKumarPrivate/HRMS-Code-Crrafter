@@ -6,6 +6,7 @@ import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:hrms_management_code_crafter/util/string_utils.dart';
 import 'package:provider/provider.dart';
 import '../../../admin/home/admin_home_screen.dart';
+import '../../../firebase/FirebaseNotificationService.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/theme/theme_provider.dart';
@@ -37,6 +38,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
     String? name = await StorageHelper().getEmpLoginName();
     String? email = await StorageHelper().getEmpLoginEmail();
     String? phone = await StorageHelper().getEmpLoginMobile();
+
+    // NotificationService.initialize(context); // Initialize FCM
 
     setState(() {
       empName = name ?? "UserName";

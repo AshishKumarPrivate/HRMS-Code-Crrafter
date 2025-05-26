@@ -94,6 +94,14 @@ class  StorageHelper {
 
     return prefs.getString('user_email') ?? "";
   }
+  void setFCMToken(String token) {
+    prefs.setString('fcm_token', token);
+  }
+
+  String getFCMToken() {
+    return prefs.getString('fcm_token') ?? "";
+  }
+
   //  Future<void> setUserRole(String email) async {
   //   await prefs.setString('user_role', email);
   // }

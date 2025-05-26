@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../bottom_navigation_screen.dart';
 import '../../../ui_helper/app_colors.dart';
+import '../../firebase/FirebaseNotificationService.dart';
 import '../../screen/user_selection_screen.dart';
 import '../../util/responsive_helper_util.dart';
 import '../../util/storage_util.dart';
@@ -51,6 +52,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateTo(Widget screen) {
+
+    NotificationService.initialize(context); // Initialize FCM
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => screen));
   }
 

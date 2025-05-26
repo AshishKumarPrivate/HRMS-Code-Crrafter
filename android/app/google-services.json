@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "311965807725",
+    "project_id": "hrms-code-crafter",
+    "storage_bucket": "hrms-code-crafter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311965807725:android:f16b7408c60cd4bbc2bb64",
+        "android_client_info": {
+          "package_name": "com.codecrafter.hrms_code_crafter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCex6bFJx3-S806-1tehRlr_XYoEmLDpcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -83,6 +83,8 @@ class EmployeeeData {
   String? registrationId;
   String? bankId;
   String? workId;
+  String? fcmToken;
+  String? leaveID;
 
   EmployeeeData(
       {this.employeeImage,
@@ -111,7 +113,10 @@ class EmployeeeData {
         this.iV,
         this.registrationId,
         this.bankId,
-        this.workId});
+        this.workId,
+        this.fcmToken,
+        this.leaveID
+      });
 
   EmployeeeData.fromJson(Map<String, dynamic> json) {
     employeeImage = json['employeeImage'] != null
@@ -147,6 +152,8 @@ class EmployeeeData {
     registrationId = json['registrationId'];
     bankId = json['bankId'];
     workId = json['workId'];
+    fcmToken = json['fcmToken'];
+    leaveID = json['leaveID'];
   }
 
   Map<String, dynamic> toJson() {
@@ -184,6 +191,8 @@ class EmployeeeData {
     data['registrationId'] = this.registrationId;
     data['bankId'] = this.bankId;
     data['workId'] = this.workId;
+    data['fcmToken'] = this.fcmToken;
+    data['leaveID'] = this.leaveID;
     return data;
   }
 }

@@ -50,6 +50,9 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   fl_chart: ^1.0.0
   rename: ^3.0.1
+  firebase_core: ^3.12.1
+  firebase_messaging: ^15.2.4
+  fluttertoast: any
 
 dev_dependencies:
   flutter_test:
