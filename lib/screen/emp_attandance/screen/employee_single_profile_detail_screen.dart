@@ -1,22 +1,13 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/add_employee_bank_detail_screen.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/employee_bank_detail_screen.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/update_employee_screen.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/add_employee_work_screen.dart';
-import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/employee_work_detail_screen.dart';
-import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
+import 'package:flutter/material.dart';import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
-import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:hrms_management_code_crafter/util/string_utils.dart';
 import 'package:provider/provider.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
-import '../../../ui_helper/common_widget/default_common_app_bar.dart';
 import '../../../ui_helper/common_widget/solid_rounded_button.dart';
 import '../../../util/responsive_helper_util.dart';
 import '../../auth/controller/auth_provider.dart';
@@ -63,13 +54,25 @@ class _EmployeeSingleProfileDetailScreenState
                   return loadingIndicator();
                 }
                 if (provider.errorMessage.isNotEmpty) {
-                  return Center(child: Text(provider.errorMessage));
+                  return Center(child: Text(provider.errorMessage, style: AppTextStyles.heading2(
+                    context,
+                    overrideStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: ResponsiveHelper.fontSize(context, 12),
+                    ),
+                  ),));
                 }
                 final employee = provider.empSingleProfileDetailModel?.data;
 
                 if (employee == null) {
-                  return const Center(
-                    child: Text('No employee details found.'),
+                  return  Center(
+                    child: Text('No employee details found.',  style: AppTextStyles.heading2(
+                      context,
+                      overrideStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),),
                   );
                 }
                 return RefreshIndicator(
@@ -522,14 +525,25 @@ class _InfoItem extends StatelessWidget {
       children: [
         CircleAvatar(
           backgroundColor: Colors.blue.shade50,
-          child: Icon(icon, color: Colors.blue),
+          child: Icon(icon, color:AppColors.primary),
         ),
         const SizedBox(height: 8),
         Text(
           title,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
+          style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: ResponsiveHelper.fontSize(context, 9),
+            ),
+          ),
         ),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(value, style: AppTextStyles.heading1(
+          context,
+          overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 12),
+          ),
+        ),),
       ],
     );
   }

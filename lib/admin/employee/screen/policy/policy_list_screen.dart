@@ -113,9 +113,11 @@ class _PolicyListItemState extends State<PolicyListItem> {
                   Expanded(
                     child: Text(
                       widget.policyData.title ?? "No Title",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.heading1(
+                        context,
+                        overrideStyle: TextStyle(
+                          fontSize: ResponsiveHelper.fontSize(context, 14),
+                        ),
                       ),
                       maxLines: isExpanded ? null : 1,
                       overflow: isExpanded

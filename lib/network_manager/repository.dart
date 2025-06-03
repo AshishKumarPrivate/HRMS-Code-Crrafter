@@ -15,6 +15,7 @@ import 'package:hrms_management_code_crafter/admin/employee/model/work_module/up
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/model/all_emp_leave_requests_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/model/emp_leave_approved_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/model/emp_leave_rejected_model.dart';
+import 'package:hrms_management_code_crafter/admin/home/attendance/model/admin_filter_attendance_model.dart';
 import 'package:hrms_management_code_crafter/screen/auth/model/user_and_admin_login_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_attandance_detail_model_response.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_chart_attendance_model.dart';
@@ -643,6 +644,13 @@ class Repository {
       url: '$baseUrl/api/v1/employee/attendance/get/chart',queryParams: queryParameters
     );
     return AttendanceChartModel.fromJson(response);
+  }
+
+  Future<AdminFilterAttendanceModel> filterAdminAttendanceExcel(Map<String, dynamic>? queryParameters,) async {
+    Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/employee/attendance/filter',queryParams: queryParameters
+    );
+    return AdminFilterAttendanceModel.fromJson(response);
   }
 /// !!!!!!!!!!!!!!!!!!!!!!!! ATTENDANCE CHART END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
 

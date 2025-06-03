@@ -201,7 +201,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   onTap: _pickImage,
                   child: Center(
                     child: _image  == null
-                        ? Icon(Icons.account_circle, size: 100, color: Colors.blueAccent)
+                        ? Icon(Icons.account_circle, size: 100, color: AppColors.primary)
                         : CircleAvatar(
                       radius: 50,
                       backgroundImage: FileImage(_image !),
@@ -354,7 +354,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                           _isAgreed = value ?? false;
                         });
                       },
-                      activeColor: Colors.blueAccent,
+                      activeColor: AppColors.primary,
                     ),
                     Expanded(
                       child: RichText(
@@ -362,18 +362,34 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                           children: [
                             TextSpan(
                               text: "I agree to the ",
-                              style: TextStyle(color: Colors.black87),
+                                style: AppTextStyles.bodyText2(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                                  ),
+                                ),
                             ),
                             TextSpan(
                               text: "Terms & Conditions & Privacy Policy",
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
+                              style: AppTextStyles.heading1(
+                                context,
+                                overrideStyle: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: ResponsiveHelper.fontSize(context, 12),
+                                ),
                               ),
                             ),
                             TextSpan(
                               text: " set out by this site.",
-                              style: TextStyle(color: Colors.black87),
+                              style: AppTextStyles.bodyText2(
+                                context,
+                                overrideStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: ResponsiveHelper.fontSize(context, 12),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -401,7 +417,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                               }
                             }
                           },
-                          text: 'Login',
+                          text: 'Add Employee',
                         );
                   },
                 ),

@@ -15,7 +15,11 @@ import '../../../util/responsive_helper_util.dart';
 import '../../nav_home/controller/punch_in_out_provider.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({Key? key}) : super(key: key);
+  // const AttendanceScreen({Key? key, required String employeeId}) : super(key: key);
+
+
+  late String employeeId; // Replace with actual ID
+  AttendanceScreen({Key? key, required this.employeeId}) : super(key: key);
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -27,8 +31,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   List<AttendanceData> data = [];
   bool isLoading = true;
 
-  late String employeeId; // Replace with actual ID
-
   @override
   void initState() {
     super.initState();
@@ -38,8 +40,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     _fetchAndGenerateData();
   }
 
+// Helper function to convert UTC DateTime to IST formatted string
+  String _formatISTTime(DateTime utcTime) {
+    // Convert to UTC first, then add the IST offset.
+    // This ensures consistent conversion even if DateTime.parse
+    // initially interprets it differently based on local timezone.
+    final istTime = utcTime.toUtc().add(Duration(hours: 5, minutes: 30));
+    return DateFormat('hh:mm a').format(istTime);
+  }
+
   Future<void> _fetchAndGenerateData() async {
-    employeeId = await StorageHelper().getEmpLoginId();
     setState(() => isLoading = true);
 
     try {
@@ -49,6 +59,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         listen: false,
       ).empMonthlyAttendanceHistory(
         context,
+        widget.employeeId,
         currentMonth.toString().padLeft(2, '0'),
         currentYear.toString(),
       );
@@ -62,24 +73,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             final dateTime = DateTime.parse(item.date ?? '');
             final loginTime =
                 item.loginTime != null
-                    ? DateTime.tryParse(item.loginTime!)
+                    ? DateTime.parse(item.loginTime!)
                     : null;
             final logoutTime =
                 item.logoutTime != null
-                    ? DateTime.tryParse(item.logoutTime!)
+                    ? DateTime.parse(item.logoutTime!)
                     : null;
 
             return AttendanceData(
               date: dateTime.day.toString(),
               day: DateFormat('EEE').format(dateTime).toUpperCase(),
-              loginTime:
-                  loginTime != null
-                      ? DateFormat('hh:mm a').format(loginTime)
-                      : '-',
-              logOutTime:
-                  logoutTime != null
-                      ? DateFormat('hh:mm a').format(logoutTime)
-                      : '-',
+              loginTime: loginTime != null ? _formatISTTime(loginTime) : '-',
+              logOutTime: logoutTime != null ? _formatISTTime(logoutTime) : '-',
               workingHours: item.workingHours ?? '-',
               status: item.status ?? '',
               isFullDay: item.isFullDay ?? false,
@@ -111,7 +116,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         Uri.parse(Repository().baseUrl.toString()),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "employeeId": employeeId,
+          "employeeId": widget.employeeId,
           "month": month.toString().padLeft(2, '0'),
           "year": year.toString(),
         }),
@@ -137,12 +142,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             day: DateFormat('EEE').format(dateTime).toUpperCase(),
             loginTime:
                 loginTime != null
-                    ? DateFormat('hh:mm a').format(loginTime)
-                    : '-',
+                    ? _formatISTTime(loginTime) : '-',
             logOutTime:
                 logoutTime != null
-                    ? DateFormat('hh:mm a').format(logoutTime)
-                    : '-',
+                    ? _formatISTTime(logoutTime) : '-',
             workingHours: item['workingHours'] ?? '-',
             status: item['status'] ?? '',
           );

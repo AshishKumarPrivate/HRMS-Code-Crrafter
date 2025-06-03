@@ -47,6 +47,7 @@ class  StorageHelper {
 
     return prefs.getInt('workingSeconds') ?? 0;
   }
+
    Future<void> clearAll() async {
 
     await prefs.remove('punchIn');

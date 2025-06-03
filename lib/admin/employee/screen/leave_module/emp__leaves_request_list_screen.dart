@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/admin_leave_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/model/all_emp_leave_requests_model.dart';
-import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
- import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
+  import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:hrms_management_code_crafter/util/string_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -190,11 +189,33 @@ class _EmployeeLeaveCardState extends State<EmployeeLeaveCard> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        title: const Text('Leave Approval',style: TextStyle(color: Colors.black),),
-        content: const Text('Are you sure you want to approve this leave?'),
+        title: Text('Leave Approval', style: AppTextStyles.heading2(
+          context,
+          overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 14),
+          ),
+        ),),
+        content: Text('Are you sure you want to approve this leave?',style: AppTextStyles.heading2(
+          context,
+          overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 12),
+          ),
+        ),),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Approved')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel',      style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+              color: Colors.red,
+              fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
+          ),)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Approved' ,style: AppTextStyles.heading2(
+    context,
+    overrideStyle: TextStyle(
+      color: AppColors.primary,
+    fontSize: ResponsiveHelper.fontSize(context, 12),
+    ),
+    ),)),
         ],
       ),
     );
@@ -361,7 +382,13 @@ class _EmployeeLeaveCardState extends State<EmployeeLeaveCard> {
                           // TODO: Add Approve logic
                           handleApprove(context);
                         },
-                        child: const Text("Approve", style: TextStyle(color: Colors.teal)),
+                        child: Text("Approve", style: AppTextStyles.heading2(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.teal,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),),
                       ),
                     ),
                     Expanded(
@@ -375,7 +402,13 @@ class _EmployeeLeaveCardState extends State<EmployeeLeaveCard> {
                           ),
                         ),
                         onPressed: () => handleReject(context),
-                        child: const Text("Reject", style: TextStyle(color: Colors.red)),
+                        child: Text("Reject",style: AppTextStyles.heading2(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.red,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),),
                       ),
                     ),
                   ],

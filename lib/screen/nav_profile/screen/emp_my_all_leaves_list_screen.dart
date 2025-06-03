@@ -45,11 +45,23 @@ class _EmployeeLeaveListScreenState extends State<EmployeeLeaveListScreen> {
           }
 
           if (provider.errorMessage.isNotEmpty) {
-            return Center(child: Text(provider.errorMessage));
+            return Center(child: Text(provider.errorMessage,style: AppTextStyles.heading2(
+              context,
+              overrideStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),));
           }
 
           if (provider.empLeaveListModel!.data!.isEmpty) {
-            return const Center(child: Text("No leave records found."));
+            return Center(child: Text("No leave records found.",style: AppTextStyles.heading2(
+              context,
+              overrideStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),));
           }
           final leavesProvider = provider.empLeaveListModel!.data;
 

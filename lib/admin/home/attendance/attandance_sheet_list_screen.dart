@@ -90,7 +90,7 @@ class _AttendanceSheetTableScreenState
     }
   }
 
-  // Helper function to format date from API (assumingYYYY-MM-DD or similar)
+  // Helper function to format date from API (assuming YYYY-MM-DD or similar)
   String _formatDateFromApi(String? dateString) {
     if (dateString == null || dateString.isEmpty) return 'N/A';
     try {
@@ -118,7 +118,7 @@ class _AttendanceSheetTableScreenState
     );
     final apiData = provider.adminFilterAttendanceModel?.data ?? [];
     final dates =
-    apiData.map((e) => _formatDateFromApi(e.date)).toSet().toList();
+        apiData.map((e) => _formatDateFromApi(e.date)).toSet().toList();
     dates.sort((a, b) {
       final d1 = _parseDate(a);
       final d2 = _parseDate(b);
@@ -144,46 +144,47 @@ class _AttendanceSheetTableScreenState
     }
 
     final List<AttendanceModel> attendanceList =
-    apiData.map((entry) {
-      return AttendanceModel(
-        name: entry.employee?.name ?? '',
-        email: entry.employee?.email ?? '',
-        mobile: entry.employee?.mobile ?? '',
-        date: _formatDateFromApi(entry.date),
-        checkIn:
-        entry.loginTime != null
-            ? _formatISTTime(DateTime.parse(entry.loginTime.toString()))
-            : '-',
-        // checkIn:  entry.loginTime ?? 'N/A',
-        // checkOut: entry.logoutTime ?? 'N/A',
-        checkOut:
-        entry.logoutTime != null
-            ? _formatISTTime(
-          DateTime.parse(entry.logoutTime.toString()),
-        )
-            : '-',
-        totalWorkingHours: entry.workingHours ?? '-',
-        otTime: entry.otTime ?? '-',
-        status: entry.status == "present"
-            ? "Present"
-            : entry.status == "absent"
-            ? "Absent"
-            : "-",
-      );
-    }).toList();
+        apiData.map((entry) {
+          return AttendanceModel(
+            name: entry.employee?.name ?? '',
+            email: entry.employee?.email ?? '',
+            mobile: entry.employee?.mobile ?? '',
+            date: _formatDateFromApi(entry.date),
+            checkIn:
+                entry.loginTime != null
+                    ? _formatISTTime(DateTime.parse(entry.loginTime.toString()))
+                    : '-',
+            // checkIn:  entry.loginTime ?? 'N/A',
+            // checkOut: entry.logoutTime ?? 'N/A',
+            checkOut:
+                entry.logoutTime != null
+                    ? _formatISTTime(
+                      DateTime.parse(entry.logoutTime.toString()),
+                    )
+                    : '-',
+            totalWorkingHours: entry.workingHours ?? '-',
+            otTime: entry.otTime ?? '-',
+            status:
+                entry.status == "present"
+                    ? "Present"
+                    : entry.status == "absent"
+                    ? "Absent"
+                    : "-",
+          );
+        }).toList();
 
     return attendanceList.where((item) {
       final matchesStatus =
           selectedStatus == 'All' ||
-              item.status.toLowerCase() == selectedStatus.toLowerCase();
+          item.status.toLowerCase() == selectedStatus.toLowerCase();
 
       final matchesDate = selectedDate == 'All' || item.date == selectedDate;
 
       final matchesSearch =
           searchQuery.isEmpty ||
-              item.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              item.email.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              item.mobile.contains(searchQuery);
+          item.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+          item.email.toLowerCase().contains(searchQuery.toLowerCase()) ||
+          item.mobile.contains(searchQuery);
 
       bool matchesDateRange = true;
       if (startDate != null) {
@@ -268,9 +269,9 @@ class _AttendanceSheetTableScreenState
     final dir = await getDownloadDirectory();
     final filePath = '${dir?.path}/attendance_report.xlsx';
     final file =
-    File(filePath)
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(excel.encode()!);
+        File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(excel.encode()!);
 
     await Share.shareXFiles([
       XFile(file.path),
@@ -293,55 +294,55 @@ class _AttendanceSheetTableScreenState
       pw.MultiPage(
         build:
             (context) => [
-          pw.Center(
-            child: pw.Text(
-              'Attendance Report',
-              style: pw.TextStyle(
-                fontSize: 22,
-                fontWeight: pw.FontWeight.bold,
+              pw.Center(
+                child: pw.Text(
+                  'Attendance Report',
+                  style: pw.TextStyle(
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ),
-          pw.SizedBox(height: 20),
-          pw.Table.fromTextArray(
-            headers: [
-              'S.No',
-              'Name',
-              'Email',
-              'Mobile',
-              'Date',
-              'CheckIn',
-              'CheckOut',
-              'Working Hours',
-              'Over Time Hrs',
-              'Status',
-            ],
-            data: List<List<String>>.generate(
-              data.length,
+              pw.SizedBox(height: 20),
+              pw.Table.fromTextArray(
+                headers: [
+                  'S.No',
+                  'Name',
+                  'Email',
+                  'Mobile',
+                  'Date',
+                  'CheckIn',
+                  'CheckOut',
+                  'Working Hours',
+                  'Over Time Hrs',
+                  'Status',
+                ],
+                data: List<List<String>>.generate(
+                  data.length,
                   (i) => [
-                '${i + 1}',
-                data[i].name,
-                data[i].email,
-                data[i].mobile,
-                data[i].date,
-                data[i].checkIn,
-                data[i].checkOut,
-                data[i].totalWorkingHours,
-                data[i].otTime,
-                data[i].status,
-              ],
-            ),
-          ),
-        ],
+                    '${i + 1}',
+                    data[i].name,
+                    data[i].email,
+                    data[i].mobile,
+                    data[i].date,
+                    data[i].checkIn,
+                    data[i].checkOut,
+                    data[i].totalWorkingHours,
+                    data[i].otTime,
+                    data[i].status,
+                  ],
+                ),
+              ),
+            ],
       ),
     );
 
     final dir = await getDownloadDirectory();
     final filePath = '${dir?.path}/attendance_report.pdf';
     final file =
-    File(filePath!)
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(await pdf.save());
+        File(filePath!)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(await pdf.save());
 
     await Share.shareXFiles([XFile(file.path)], text: 'Attendance PDF Report');
     ScaffoldMessenger.of(
@@ -417,10 +418,29 @@ class _AttendanceSheetTableScreenState
               Navigator.of(context).pop(); // Navigate back
             },
           ),
-          title: const Text(
+          title: Text(
             'Attendance Table',
-            style: TextStyle(color: Colors.white),
+            style: AppTextStyles.heading1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.white,
+                fontSize: ResponsiveHelper.fontSize(context, 14),
+              ),
+            ),
           ),
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.file_download, color: AppColors.white),
+          //     tooltip: 'Export to Excel',
+          //     onPressed: () => exportToExcel(filteredData),
+          //   ),
+          //   IconButton(
+          //     icon: const Icon(Icons.picture_as_pdf, color: AppColors.white),
+          //     tooltip: 'Export to PDF',
+          //     onPressed: () => exportToPDF(filteredData),
+          //   ),
+          //   // Removed the filter icons from here, they will be part of the bottom section
+          // ],
         ),
         body: loadingIndicator(),
       );
@@ -437,13 +457,40 @@ class _AttendanceSheetTableScreenState
               Navigator.of(context).pop(); // Navigate back
             },
           ),
-          title: const Text(
+          title: Text(
             'Attendance Table',
-            style: TextStyle(color: Colors.white),
+            style: AppTextStyles.heading1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.white,
+                fontSize: ResponsiveHelper.fontSize(context, 14),
+              ),
+            ),
           ),
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.file_download, color: AppColors.white),
+          //     tooltip: 'Export to Excel',
+          //     onPressed: () => exportToExcel(filteredData),
+          //   ),
+          //   IconButton(
+          //     icon: const Icon(Icons.picture_as_pdf, color: AppColors.white),
+          //     tooltip: 'Export to PDF',
+          //     onPressed: () => exportToPDF(filteredData),
+          //   ),
+          //   // Removed the filter icons from here, they will be part of the bottom section
+          // ],
         ),
-        body: const Center(
-          child: Text('No attendance data found for the selected filters.'),
+        body: Center(
+          child: Text(
+            'No attendance data found for the selected filters.',
+            style: AppTextStyles.heading2(
+              context,
+              overrideStyle: TextStyle(
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -458,9 +505,15 @@ class _AttendanceSheetTableScreenState
             Navigator.of(context).pop(); // Navigate back
           },
         ),
-        title: const Text(
+        title: Text(
           'Attendance Table',
-          style: TextStyle(color: Colors.white), // Set title text color
+          style: AppTextStyles.heading1(
+            context,
+            overrideStyle: TextStyle(
+              color: Colors.white,
+              fontSize: ResponsiveHelper.fontSize(context, 14),
+            ),
+          ),
         ),
         actions: [
           // Dropdown for Status Filter
@@ -471,21 +524,40 @@ class _AttendanceSheetTableScreenState
             icon: const Icon(Icons.filter_list, color: AppColors.white),
             // Filter icon for status
             items:
-            ['All', 'present', 'Absent'].map((status) {
-              return DropdownMenuItem(
-                value: status,
-                child: Text(
-                  status,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                  ), // Text color for dropdown items
-                ),
-              );
-            }).toList(),
+                ['All', 'present', 'Absent'].map((status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(
+                      status,
+                      style: AppTextStyles.heading1(
+                        context,
+                        overrideStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: ResponsiveHelper.fontSize(context, 12),
+                        ),
+                      ), // Text color for dropdown items
+                    ),
+                  );
+                }).toList(),
             onChanged: (val) => setState(() => selectedStatus = val!),
             dropdownColor:
-            AppColors.primary, // Background color of the dropdown menu
+                AppColors.primary, // Background color of the dropdown menu
           ),
+          // Dropdown for Date Filter
+          // DropdownButton<String>(
+          //   value: selectedDate,
+          //   underline: Container(), // Remove default underline
+          //   icon: const Icon(Icons.calendar_today, color: AppColors.white), // Calendar icon for date
+          //   items: allDates.map((d) => DropdownMenuItem(
+          //     value: d,
+          //     child: Text(
+          //       d,
+          //       style: const TextStyle(color: AppColors.black), // Text color for dropdown items
+          //     ),
+          //   )).toList(),
+          //   onChanged: (val) => setState(() => selectedDate = val!),
+          //   dropdownColor: AppColors.white, // Background color of the dropdown menu
+          // ),
           // Export to Excel Button
           IconButton(
             icon: const Icon(Icons.file_download, color: AppColors.white),
@@ -525,7 +597,7 @@ class _AttendanceSheetTableScreenState
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide:
-                      BorderSide.none, // Remove border for a cleaner look
+                          BorderSide.none, // Remove border for a cleaner look
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -647,6 +719,7 @@ class _AttendanceSheetTableScreenState
                         ),
                       ),
                     ),
+                    // const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.clear, color: AppColors.white),
                       tooltip: 'Clear Date Filters',
@@ -655,143 +728,327 @@ class _AttendanceSheetTableScreenState
                   ],
                 ),
               ),
+
+              // const SizedBox(height: 5),
             ],
           ),
         ),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            headingRowColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  return AppColors.primary; // Header color
-                }),
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'S.No',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 5.0, bottom: 15),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              dataRowColor: MaterialStateProperty.resolveWith<Color?>((
+                Set<MaterialState> states,
+              ) {
+                if (states.contains(MaterialState.selected)) {
+                  return Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.08);
+                }
+                // No need to calculate index here, as it's passed in the DataRow builder
+                return null; // Let the DataRow's color property handle the alternating colors
+              }),
+              headingRowColor: MaterialStateProperty.resolveWith<Color?>((
+                Set<MaterialState> states,
+              ) {
+                return Colors.black; // Header color
+              }),
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'S.No',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Name',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Name',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Email',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Email',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Mobile',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Mobile',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Date',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Date',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'CheckIn',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'CheckIn',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'CheckOut',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'CheckOut',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Working Hrs',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Working Hrs',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Over Time Hrs',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Over Time Hrs',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Status',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                DataColumn(
+                  label: Text(
+                    'Status',
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-            rows: List.generate(filteredData.length, (i) {
-              final item = filteredData[i];
-              final bool isHighlighted =
-                  searchQuery.isNotEmpty &&
-                      (item.name.toLowerCase().contains(
-                        searchQuery.toLowerCase(),
-                      ) ||
-                          item.email.toLowerCase().contains(
-                            searchQuery.toLowerCase(),
-                          ) ||
-                          item.mobile.contains(searchQuery));
+              ],
+              rows: List.generate(filteredData.length, (i) {
+                final item = filteredData[i];
+                final bool isHighlighted =
+                    searchQuery.isNotEmpty &&
+                    (item.name.toLowerCase().contains(
+                          searchQuery.toLowerCase(),
+                        ) ||
+                        item.email.toLowerCase().contains(
+                          searchQuery.toLowerCase(),
+                        ) ||
+                        item.mobile.contains(searchQuery));
 
-              Color statusColor;
-              Color textColor;
-              if (item.status == "Present") {
-                statusColor = Colors.green;
-                textColor = Colors.white;
-              } else if (item.status == "Absent") {
-                statusColor = Colors.red;
-                textColor = Colors.white;
-              } else {
-                statusColor = Colors.transparent; // No background color
-                textColor = Colors.black; // Default text color
-              }
-              return DataRow(
-                color: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
+                Color statusColor;
+                Color textColor;
+                if (item.status == "Present") {
+                  statusColor = Colors.green;
+                  textColor = Colors.white;
+                } else if (item.status == "Absent") {
+                  statusColor = Colors.red;
+                  textColor = Colors.white;
+                } else {
+                  statusColor = Colors.transparent; // No background color
+                  textColor = Colors.black; // Default text color
+                }
+                return DataRow(
+                  color: MaterialStateProperty.resolveWith<Color?>((
+                    Set<MaterialState> states,
+                  ) {
                     if (isHighlighted) {
                       return AppColors.primary.withOpacity(
                         0.1,
                       ); // Light background for highlighted rows
                     }
+                    // Use the index 'i' to alternate row colors
                     if (i % 2 == 0) {
                       return Colors.grey[100]; // Light grey for even rows
                     }
-                    return Colors.white; // White for odd rows
-                  },
-                ),
-                cells: [
-                  DataCell(Text('${i + 1}')),
-                  DataCell(Text(item.name)),
-                  DataCell(Text(item.email)),
-                  DataCell(Text(item.mobile)),
-                  DataCell(Text(item.date)),
-                  DataCell(Text(item.checkIn)),
-                  DataCell(Text(item.checkOut)),
-                  DataCell(Text(item.totalWorkingHours)),
-                  DataCell(Text(item.otTime)),
-                  DataCell(
-                    Container(
-                      color: statusColor,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 4.0),
-                      child: Text(
-                        item.status,
-                        style: TextStyle(color: textColor),
+                    return null; // Use default row color
+                  }),
+                  cells: [
+                    DataCell(
+                      Text(
+                        '${i + 1}',
+                        style: AppTextStyles.heading2(
+                          context,
+                          overrideStyle: TextStyle(
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            }),
+                    DataCell(
+                      Text(
+                        item.name,
+                        style: AppTextStyles.heading2(
+                          context,
+                          overrideStyle: TextStyle(
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.email,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.mobile,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.date,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.checkIn,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.checkOut,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.totalWorkingHours,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        item.otTime,
+                        style: AppTextStyles.heading3(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: AppColors.txtGreyColor,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // DataCell(Text(item.status)),
+                    DataCell(
+                      Container(
+                        color: statusColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
+                        ),
+                        child: Text(
+                          item.status,
+                          style: AppTextStyles.heading2(
+                            context,
+                            overrideStyle: TextStyle(
+                              color: textColor,
+                              fontSize: ResponsiveHelper.fontSize(context, 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
           ),
         ),
       ),

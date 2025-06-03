@@ -10,8 +10,7 @@ import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provide
 import 'package:hrms_management_code_crafter/screen/emp_attandance/controller/emp_attendance_chart_provider.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
-import 'package:hrms_management_code_crafter/screen/user_selection_screen.dart' show UserSelectionScreen;
-import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
+ import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
 import 'package:hrms_management_code_crafter/splash/screen/SplashScreen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/theme/app_theme.dart';

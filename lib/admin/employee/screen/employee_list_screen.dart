@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/employee_detail_screen.dart';
+import 'package:hrms_management_code_crafter/screen/nav_profile/screen/attandance_list_screen.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -56,10 +57,20 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             return loadingIndicator();
           }
           if (provider.errorMessage.isNotEmpty) {
-            return Center(child: Text(provider.errorMessage));
+            return Center(child: Text(provider.errorMessage,style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
+          ),));
           }
           if (provider.filteredEmployees.isEmpty) {
-            return const Center(child: Text('No employees found.'));
+            return  Center(child: Text('No employees found.',style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
+          ),));
           }
           return RefreshIndicator(
             onRefresh: () => provider.refreshEmployeeList(),
@@ -190,11 +201,12 @@ class EmployeeListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${employeData.name}",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          "${employeData.name}",style: AppTextStyles.heading1(
+                          context,
+                          overrideStyle: TextStyle(
+                            fontSize: ResponsiveHelper.fontSize(context, 14),
                           ),
+                        ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -270,6 +282,39 @@ class EmployeeListItem extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 8), // Add some space
+                        // --- Attendance Section ---
+                        InkWell(
+                          onTap: () {
+                            // Navigate to the Attendance Screen
+                            print("EmpIddd=>${ employeData.sId.toString()}");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AttendanceScreen(employeeId: employeData.sId.toString(),), // Pass employee ID if needed
+                              ),
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // To keep the row compact
+                            children: [
+                              Icon(Icons.calendar_month_outlined, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 5),
+                              Text(
+                                "Attendance",
+                                style: AppTextStyles.bodyText1(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: ResponsiveHelper.fontSize(context, 13),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

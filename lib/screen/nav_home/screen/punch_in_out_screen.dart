@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:animated_background/animated_background.dart';
 
 import '../../../ui_helper/app_colors.dart';
+import '../../../ui_helper/app_text_styles.dart';
+import '../../../util/responsive_helper_util.dart';
 import '../controller/punch_in_out_provider.dart';
 
 class PunchInOutScreen extends StatefulWidget {
@@ -56,12 +58,24 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
           // SizedBox(height: 30),
           Text(
             currentTime,
-            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+            style: AppTextStyles.heading2(
+              context,
+              overrideStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 30),
+              ),
+            ),
           ),
           SizedBox(height: 1),
           Text(
             formattedDate,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: AppTextStyles.heading3(
+              context,
+              overrideStyle: TextStyle(
+                color: AppColors.txtGreyColor,
+                fontSize: ResponsiveHelper.fontSize(context, 14),
+              ),
+            ),
           ),
           SizedBox(height: 20),
           Stack(
@@ -109,7 +123,13 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
                       SizedBox(height: 8),
                       Text(
                         provider.isPunchedIn ? "PUNCH OUT" : "PUNCH IN",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: AppTextStyles.heading2(
+                          context,
+                          overrideStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: ResponsiveHelper.fontSize(context, 14),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -129,7 +149,13 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
               ),
               child: Text(
                 "Minimum half day time reached",
-                style: TextStyle(color: Colors.orange[800], fontSize: 12),
+                style: AppTextStyles.heading2(
+                  context,
+                  overrideStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                  ),
+                ),
               ),
             ),
           SizedBox(height: 40),
@@ -172,10 +198,15 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
   }
 
   String formatTime(DateTime dt) {
-    final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
-    final minute = dt.minute.toString().padLeft(2, '0');
-    final suffix = dt.hour >= 12 ? "PM" : "AM";
-    return "$hour:$minute $suffix";
+    // final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    // final minute = dt.minute.toString().padLeft(2, '0');
+    // final suffix = dt.hour >= 12 ? "PM" : "AM";
+    // return "$hour:$minute $suffix";
+
+    // Add 5 hours and 30 minutes to UTC to get IST
+    final istTime = dt.add(Duration(hours: 5, minutes: 30));
+    // Format to 'hh:mm:ss a' (e.g., 09:30:00 AM)
+    return DateFormat('hh:mm a').format(istTime);
   }
   String _formatISTTime(DateTime utcTime) {
     final istTime = utcTime.toUtc().add(Duration(hours: 5, minutes: 30));

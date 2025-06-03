@@ -30,6 +30,12 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
   final FocusNode _endDateFocusNode = FocusNode();
 
   final _formKey = GlobalKey<FormState>();
+  // Internal format variables for API submission
+  String? _startDateForApi;
+  String? _endDateForApi;
+
+  final DateFormat uiDateFormat = DateFormat('dd-MM-yyyy');
+  final DateFormat apiDateFormat = DateFormat('yyyy/MM/dd');
 
   final List<String> breakDownList = ['full', 'first_haf', 'second_haf'];
   final Map<String, String> breakDownDisplayMap = {
@@ -59,8 +65,10 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
     FormData requestBodyAddEmployee = FormData.fromMap({
       "breakDown": selectedBreakDown,
       "leaveType": selectedLeaveType,
-      "startDate": startDateController.text.trim(),
-      "endDate": endDateController.text.trim(),
+      "startDate":  _startDateForApi ?? '',
+      "endDate": _endDateForApi ?? '',
+      // "startDate": startDateController.text.trim(),
+      // "endDate": endDateController.text.trim(),
       "description": leaveDescriptionController.text.trim(),
     });
     loginProvider.applyLeave(context, requestBodyAddEmployee);
@@ -95,7 +103,10 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy/MM/dd').format(pickedDate);
       setState(() {
-        startDateController.text = formattedDate;
+        // startDateController.text = formattedDate;
+
+        startDateController.text = uiDateFormat.format(pickedDate);
+        _startDateForApi = apiDateFormat.format(pickedDate);
       });
     }
   }
@@ -129,7 +140,9 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy/MM/dd').format(pickedDate);
       setState(() {
-        endDateController.text = formattedDate;
+        // endDateController.text = formattedDate;
+        endDateController.text = uiDateFormat.format(pickedDate);
+        _endDateForApi = apiDateFormat.format(pickedDate);
       });
     }
   }

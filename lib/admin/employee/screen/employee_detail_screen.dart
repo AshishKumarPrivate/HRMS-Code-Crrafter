@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
- import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
- import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/add_employee_bank_detail_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/add_employee_bank_detail_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/employee_bank_detail_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/update_employee_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/add_employee_work_screen.dart';
@@ -33,6 +33,7 @@ class EmployeeDetailScreen extends StatefulWidget {
 class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   @override
   void initState() {
+    print("EmployeeiddforFilter${widget.employeeId}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeApiProvider>(
@@ -46,12 +47,17 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBgColor,
+
+      appBar: DefaultCommonAppBar(
+        activityName: "Profile",
+        backgroundColor: AppColors.primary,
+      ),
       body: Stack(
         children: [
           // Curved header
           ClipPath(
             clipper: TopWaveClipper(),
-            child: Container(height: 350, color: AppColors.primary),
+            child: Container(height: 320, color: AppColors.primary),
           ),
           SafeArea(
             child: Consumer<EmployeeApiProvider>(
@@ -60,7 +66,18 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   return loadingIndicator();
                 }
                 if (provider.errorMessage.isNotEmpty) {
-                  return Center(child: Text(provider.errorMessage));
+                  return Center(
+                    child: Text(
+                      provider.errorMessage,
+                      style: AppTextStyles.heading2(
+                        context,
+                        overrideStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: ResponsiveHelper.fontSize(context, 12),
+                        ),
+                      ),
+                    ),
+                  );
                 }
                 final employee = provider.employeeListDetailModel?.data;
                 if (employee != null) {
@@ -68,12 +85,22 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                 }
 
                 if (employee == null) {
-                  return const Center(
-                    child: Text('No employee details found.'),
+                  return Center(
+                    child: Text(
+                      'No employee details found.',
+                      style: AppTextStyles.heading2(
+                        context,
+                        overrideStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: ResponsiveHelper.fontSize(context, 12),
+                        ),
+                      ),
+                    ),
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh:() => provider.getEmployeeDetail(widget.employeeId),
+                  onRefresh:
+                      () => provider.getEmployeeDetail(widget.employeeId),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -85,14 +112,30 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                               CircleAvatar(
                                 radius: 45,
                                 backgroundColor: Colors.white,
-                                backgroundImage: (employee.employeeImage!.secureUrl != null &&
-                                    employee.employeeImage!.secureUrl!.isNotEmpty)
-                                    ? NetworkImage(employee.employeeImage!.secureUrl!)
-                                    : null, // fallback tab null
-                                child: (employee.employeeImage!.secureUrl == null ||
-                                    employee.employeeImage!.secureUrl!.isEmpty)
-                                    ? Icon(Icons.person, size: 45, color: Colors.grey)
-                                    : null, // agar image hai toh child null
+                                backgroundImage:
+                                    (employee.employeeImage!.secureUrl !=
+                                                null &&
+                                            employee
+                                                .employeeImage!
+                                                .secureUrl!
+                                                .isNotEmpty)
+                                        ? NetworkImage(
+                                          employee.employeeImage!.secureUrl!,
+                                        )
+                                        : null, // fallback tab null
+                                child:
+                                    (employee.employeeImage!.secureUrl ==
+                                                null ||
+                                            employee
+                                                .employeeImage!
+                                                .secureUrl!
+                                                .isEmpty)
+                                        ? Icon(
+                                          Icons.person,
+                                          size: 45,
+                                          color: Colors.grey,
+                                        )
+                                        : null, // agar image hai toh child null
                               ),
 
                               const SizedBox(height: 10),
@@ -166,10 +209,12 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                             children: [
                               _ProfileField(
                                 label: "User Id",
-                                value: employee.sId?? 'N/A',
+                                value: employee.sId ?? 'N/A',
                               ),
-                              _ProfileField(label: "Work Email",
-                                value: employee.workEmail ?? 'N/A',),
+                              _ProfileField(
+                                label: "Work Email",
+                                value: employee.workEmail ?? 'N/A',
+                              ),
 
                               _ProfileField(
                                 label: "State",
@@ -192,14 +237,16 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                         // Update button
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child:  CustomButton(
+                          child: CustomButton(
                             text: "Update Profile",
                             textColor: Colors.black,
                             type: ButtonType.outlined,
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => UpdateEmployeeScreen()),
+                                MaterialPageRoute(
+                                  builder: (context) => UpdateEmployeeScreen(),
+                                ),
                               );
                             },
                           ),
@@ -212,7 +259,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                             text: "Delete Employee",
                             color: Colors.red,
                             onPressed: () {
-                              showDeleteBottomSheet(context ,widget.employeeId );
+                              showDeleteBottomSheet(context, widget.employeeId);
                               // Navigator.of(context).pop();
                             },
                           ),
@@ -224,7 +271,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   child: CustomButton(
                                     text: "🏦 Add Bank",
                                     textColor: Colors.black,
@@ -232,7 +281,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AddEmployeeBankDetailScreen()),
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  AddEmployeeBankDetailScreen(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -240,7 +293,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   child: CustomButton(
                                     text: "🏦 Bank Details",
                                     textColor: Colors.black,
@@ -248,7 +303,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => EmpBankDetailScreen()),
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  EmpBankDetailScreen(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -264,7 +323,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   child: CustomButton(
                                     text: "👔 Add Work",
                                     textColor: Colors.black,
@@ -272,7 +333,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AddEmployeeWorkScreen()),
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  AddEmployeeWorkScreen(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -280,7 +345,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   child: CustomButton(
                                     text: "👔 Work Details",
                                     textColor: Colors.black,
@@ -288,7 +355,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => EmpWorkDetailScreen()),
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  EmpWorkDetailScreen(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -296,8 +367,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                               ),
                             ],
                           ),
-                        )
-
+                        ),
                       ],
                     ),
                   ),
@@ -414,7 +484,7 @@ void showDeleteBottomSheet(BuildContext context, String employeeId) {
                     Provider.of<EmployeeApiProvider>(
                       context,
                       listen: false,
-                    ).deleteEmployee(context , employeeId);
+                    ).deleteEmployee(context, employeeId);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange, // Orange button
@@ -487,14 +557,28 @@ class _InfoItem extends StatelessWidget {
       children: [
         CircleAvatar(
           backgroundColor: Colors.blue.shade50,
-          child: Icon(icon, color: Colors.blue),
+          child: Icon(icon, color: AppColors.primary),
         ),
         const SizedBox(height: 8),
         Text(
           title,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
+          style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: ResponsiveHelper.fontSize(context, 9),
+            ),
+          ),
         ),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: AppTextStyles.heading1(
+            context,
+            overrideStyle: TextStyle(
+              fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
+          ),
+        ),
       ],
     );
   }

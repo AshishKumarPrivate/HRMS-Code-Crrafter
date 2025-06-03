@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/work_module/employee_work_api_provider.dart';
- import 'package:hrms_management_code_crafter/admin/employee/screen/bank_module/Update_employee_bank_detail_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/work_module/update_employee_work_details_screen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_text_styles.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
 import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/common_widget/default_common_app_bar.dart';
@@ -78,7 +76,12 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
 
             if (workDetailProvider.errorMessage.isNotEmpty) {
               return Center(
-                  child: Text(workDetailProvider.errorMessage));
+                  child: Text(workDetailProvider.errorMessage,   style: AppTextStyles.heading2(
+                    context,
+                    overrideStyle: TextStyle(
+                      fontSize: ResponsiveHelper.fontSize(context, 12),
+                    ),
+                  ),));
             }
 
             final workDetail = workDetailProvider.workDetailModel!.data;
@@ -150,9 +153,11 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
             flex: 3,
             child: Text(
               "$title:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+              style: AppTextStyles.heading2(
+                context,
+                overrideStyle: TextStyle(
+                  fontSize: ResponsiveHelper.fontSize(context, 14),
+                ),
               ),
             ),
           ),
@@ -160,8 +165,11 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
             flex: 5,
             child: Text(
               value ?? "N/A",
-              style: const TextStyle(
-                fontSize: 16,
+              style: AppTextStyles.heading2(
+                context,
+                overrideStyle: TextStyle(
+                  fontSize: ResponsiveHelper.fontSize(context, 14),
+                ),
               ),
             ),
           ),

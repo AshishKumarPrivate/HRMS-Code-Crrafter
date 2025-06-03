@@ -5,6 +5,8 @@ import 'package:hrms_management_code_crafter/admin/employee/screen/add_employee_
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/emp__leaves_request_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/add_company_policy_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/policy_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/home/attendance/attandance_sheet_list_screen.dart';
+import 'package:hrms_management_code_crafter/screen/nav_profile/screen/attandance_list_screen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_text_styles.dart';
 import 'package:hrms_management_code_crafter/util/responsive_helper_util.dart';
@@ -32,13 +34,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       _lastBackPressed = now;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Press back again to exit the app"),
+          content: const Text("Press back again to exit the app",),
           duration: const Duration(seconds: 2),
         ),
       );
       return false; // Prevent app from exiting
     }
     return true; // Allow app to exit
+  }
+
+  // Function to determine the greeting
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
   }
 
   @override
@@ -64,14 +78,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             TextSpan(
               children: [
                 TextSpan(
-                  text: "HRM &\n",
+                  text: "HRMS",
                   style: AppTextStyles.heading2(
                     context,
                     overrideStyle: TextStyle(color: Colors.white),
                   ),
                 ),
                 TextSpan(
-                  text: "Payroll Management",
+                  text: "",
                   style: AppTextStyles.heading2(
                     context,
                     overrideStyle: TextStyle(color: Colors.white),
@@ -199,11 +213,19 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   hasNotification: true,
                 ),
               ),
-              const CustomListTile(
-                title: 'Award',
-                icon: Icons.emoji_events_outlined,
-                color: Colors.deepPurple,
-                bgColor: Color(0xFFF3E6FA),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AttendanceSheetTableScreen()),
+                  );
+                },
+                child: const CustomListTile(
+                  title: 'Attendance Sheet',
+                  icon: Icons.calendar_month_outlined,
+                  color: Colors.deepPurple,
+                  bgColor: Color(0xFFF3E6FA),
+                ),
               ),
               InkWell(
                 onTap: () {

@@ -3,6 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../../../util/storage_util.dart';
+import '../../../ui_helper/app_text_styles.dart';
+import '../../../util/responsive_helper_util.dart';
 import '../controller/emp_attendance_chart_provider.dart';
 import '../model/emp_chart_attendance_model.dart';
 
@@ -50,7 +52,13 @@ class _AttendanceChartWidgetState extends State<AttendanceChartWidget> {
         }
 
         if (provider.errorMessage.isNotEmpty) {
-          return Center(child: Text(provider.errorMessage));
+          return Center(child: Text(provider.errorMessage, style: AppTextStyles.heading2(
+            context,
+            overrideStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
+          ),));
         }
 
         final chart = provider.chartModel?.chart ?? [];
@@ -60,9 +68,15 @@ class _AttendanceChartWidgetState extends State<AttendanceChartWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+               Text(
                 "Attendance Chart",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: AppTextStyles.heading1(
+                  context,
+                  overrideStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: ResponsiveHelper.fontSize(context, 16),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -100,7 +114,7 @@ class _AttendanceChartWidgetState extends State<AttendanceChartWidget> {
                               getTitlesWidget: (value, _) {
                                 switch (value.toInt()) {
                                   case 1:
-                                    return const Text('Absent');
+                                    return const Text('Absent',);
                                   case 2:
                                     return const Text('Half Day');
                                   case 3:
@@ -190,7 +204,13 @@ class LegendItem extends StatelessWidget {
       children: [
         Container(width: 12, height: 12, color: color),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(label,  style: AppTextStyles.heading2(
+          context,
+          overrideStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: ResponsiveHelper.fontSize(context, 10),
+          ),
+        ),),
       ],
     );
   }

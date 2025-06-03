@@ -13,9 +13,7 @@ import '../../../ui_helper/theme/theme_provider.dart';
 import '../../nav_profile/screen/attandance_list_screen.dart';
 import '../../nav_profile/screen/emp_my_all_leaves_list_screen.dart';
 import '../../nav_profile/widget/cell_profile_list_tile.dart';
-import '../widget/Info_card.dart';
 import 'punch_in_out_screen.dart';
-import '../widget/activity_tile.dart';
 
 class EmployeeHomeScreen extends StatefulWidget {
   const EmployeeHomeScreen({super.key});
@@ -25,7 +23,7 @@ class EmployeeHomeScreen extends StatefulWidget {
 }
 
 class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
-  String? empName, empEmail, empPhone;
+  String? empName, empEmail, empPhone,empLoginId;
 
   @override
   void initState() {
@@ -38,6 +36,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
     String? name = await StorageHelper().getEmpLoginName();
     String? email = await StorageHelper().getEmpLoginEmail();
     String? phone = await StorageHelper().getEmpLoginMobile();
+
+   empLoginId = await StorageHelper().getEmpLoginId();
 
     // NotificationService.initialize(context); // Initialize FCM
 
@@ -178,7 +178,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AttendanceScreen(),
+                          builder: (context) => AttendanceScreen(employeeId: empLoginId.toString(),),
                         ),
                       );
                     },
