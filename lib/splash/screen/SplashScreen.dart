@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../bottom_navigation_screen.dart';
 import '../../../ui_helper/app_colors.dart';
+import '../../admin/company_profile/controller/comp_profile_api_provider.dart';
 import '../../firebase/FirebaseNotificationService.dart';
 import '../../screen/user_selection_screen.dart';
 import '../../util/responsive_helper_util.dart';
@@ -38,8 +39,18 @@ class _SplashScreenState extends State<SplashScreen> {
     final isLoggedIn = StorageHelper().getBoolIsLoggedIn();
     final role =await StorageHelper().getUserRole();
     print("Role=> ${role}");
+
+    // If user is admin, preload company profile data silently
+    // if (isLoggedIn && role == "Admin") {
+    //   await Provider.of<CompanyProfileApiProvider>(context, listen: false)
+    //       .getCompProfileData(callFromSplash: true);
+    // }
+
     if (isLoggedIn) {
       if (role == "Admin") {
+        final compProfileProvider = Provider.of<CompanyProfileApiProvider>(context, listen: false);
+        await compProfileProvider.getCompProfileData(callFromSplash: true); // This fetches the data
+
         _navigateTo(const AdminHomeScreen());
       } else if (role == "employee") {
         _navigateTo(const UserBottomNavigationScreen());
@@ -52,8 +63,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateTo(Widget screen) {
-
-    NotificationService.initialize(context); // Initialize FCM
+    final  role = StorageHelper().getUserRole();
+    if(role == "employee")
+      NotificationService.initialize(context); // Initialize FCM
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => screen));
   }
 

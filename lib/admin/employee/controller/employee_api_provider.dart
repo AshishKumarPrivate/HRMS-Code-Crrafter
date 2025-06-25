@@ -20,7 +20,7 @@ class EmployeeApiProvider with ChangeNotifier {
   EmployeeListModelResponse? _employeeListModel;
   empDetailModel.EmployeeListDetailModelResponse? _employeeListDetailModel;
 
-  List<Data> _filteredEmployees = [];
+  List<AllData> _filteredEmployees = [];
 
   // Cache management
   DateTime? _lastFetchTime;
@@ -31,7 +31,7 @@ class EmployeeApiProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   EmployeeListModelResponse? get employeeListModel => _employeeListModel;
   empDetailModel.EmployeeListDetailModelResponse? get employeeListDetailModel => _employeeListDetailModel;
-  List<Data> get filteredEmployees => _filteredEmployees;
+  List<AllData> get filteredEmployees => _filteredEmployees;
 
   /// Set Loading State
   void _setLoadingState(bool loading) {
@@ -158,7 +158,7 @@ class EmployeeApiProvider with ChangeNotifier {
       // if (response.success == true && response.data != null) {
         print("✅ Employee list fetched successfully");
         _employeeListModel = response;
-        _filteredEmployees = _employeeListModel?.data ?? [];
+        _filteredEmployees = _employeeListModel?.data?.allData ?? [];
         _lastFetchTime = DateTime.now();
         _setLoadingState(false);
         return true;
@@ -248,9 +248,9 @@ class EmployeeApiProvider with ChangeNotifier {
   /// Filter Employees by Search Query
   void filterEmployees(String query) {
     if (_employeeListModel?.data == null || query.isEmpty) {
-      _filteredEmployees = _employeeListModel?.data ?? [];
+      _filteredEmployees = _employeeListModel?.data?.allData ?? [];
     } else {
-      _filteredEmployees = _employeeListModel!.data!
+      _filteredEmployees = _employeeListModel!.data!.allData!
           .where((employee) =>
       (employee.name?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
           (employee.email?.toLowerCase().contains(query.toLowerCase()) ?? false))

@@ -3,9 +3,12 @@ import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provide
 import 'package:provider/provider.dart';
 import '../../../bottom_navigation_screen.dart';
 import '../../../ui_helper/app_colors.dart';
+import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/common_widget/custom_text_field.dart';
 import '../../../ui_helper/common_widget/solid_rounded_button.dart';
 import '../../../util/loading_indicator.dart';
+import '../../../util/responsive_helper_util.dart';
+import '../emp_foreget_password_screen.dart';
 
 class LoginFormWidget extends StatefulWidget {
   LoginFormWidget();
@@ -83,6 +86,32 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   title: "Password",
                   errorMessage: "Invalid Password",
                 ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForgotPasswordScreen(),
+                          // builder: (context) => MyWishListScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Forget Password",
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.heading1(context,
+                          overrideStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          )),
+                    ),
+                  ),
+                ),
+                // const SizedBox(height: 10),
                 const SizedBox(height: 15),
                 Consumer<AuthAPIProvider>(
                   builder: (context, loginProvider, child) {

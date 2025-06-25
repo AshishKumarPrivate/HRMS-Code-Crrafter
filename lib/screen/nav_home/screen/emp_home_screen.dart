@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/widgets/emp_attendance_chart_widget.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/screen/apply_emp_leave_screen.dart';
-import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
-import 'package:hrms_management_code_crafter/util/storage_util.dart';
-import 'package:hrms_management_code_crafter/util/string_utils.dart';
+import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
+import 'package:hrms_management_code_crafter/screen/nav_home/screen/salary_slip_emp_side_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../admin/home/admin_home_screen.dart';
 import '../../../firebase/FirebaseNotificationService.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
-import '../../../ui_helper/theme/theme_provider.dart';
+import '../../../util/responsive_helper_util.dart';
+import '../../../util/storage_util.dart';
+import '../../nav_profile/screen/attandance_calender_view_screen.dart';
 import '../../nav_profile/screen/attandance_list_screen.dart';
 import '../../nav_profile/screen/emp_my_all_leaves_list_screen.dart';
 import '../../nav_profile/widget/cell_profile_list_tile.dart';
@@ -23,192 +24,205 @@ class EmployeeHomeScreen extends StatefulWidget {
 }
 
 class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
-  String? empName, empEmail, empPhone,empLoginId;
+  String? empLoginId;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     loadUserStorageData();
+    NotificationService.initialize(context); // Initialize FCM
+    // **Call the checkInStatus method here**
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Provider.of<PunchInOutProvider>(context, listen: false).checkInStatus(context);
+    // });
   }
 
   Future<void> loadUserStorageData() async {
-    String? name = await StorageHelper().getEmpLoginName();
-    String? email = await StorageHelper().getEmpLoginEmail();
-    String? phone = await StorageHelper().getEmpLoginMobile();
-
-   empLoginId = await StorageHelper().getEmpLoginId();
-
-    // NotificationService.initialize(context); // Initialize FCM
-
-    setState(() {
-      empName = name ?? "UserName";
-      empEmail = email ?? "eg@gmail.com";
-      empPhone = phone ?? "91xxxxxxxx";
-    });
+    empLoginId = await StorageHelper().getEmpLoginId();
+    setState(() {}); // Call setState to re-render after empLoginId is loaded
   }
+
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
+    // Calculate responsive crossAxisCount and childAspectRatio
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount;
+    double childAspectRatio;
 
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    if (screenWidth < 600) { // Small screens (phones)
+      crossAxisCount = 4; // Reduced number of items per row
+      childAspectRatio = 0.8; // Adjust aspect ratio for better fit
+    } else if (screenWidth < 900) { // Medium screens (tablets)
+      crossAxisCount = 4;
+      childAspectRatio = 0.9;
+    } else { // Large screens (desktops/large tablets)
+      crossAxisCount = 5;
+      childAspectRatio = 1.0;
+    }
 
     return SafeArea(
       top: false,
       child: Scaffold(
         backgroundColor: AppColors.lightBgColor,
         body: SingleChildScrollView(
-          child: Padding(padding: const EdgeInsets.only(
-            top: 50,
-            left: 15,
-            right: 15,
-            bottom: 10,
-          ),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 10,
+            ),
             child: Container(
+              color: AppColors.lightBlueColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Hello, ${StringUtils.capitalizeEachWord(empName.toString())} 🤟",
-                            style: AppTextStyles.heading3(context),
-                          ),
-                          // const SizedBox(height: 4),
-                          Text(
-                            "Email: ${empEmail.toString()},",
-                            // "Today: ${DateFormatter.formatToShortMonth(DateTime.now().toString())},",
-                            style: AppTextStyles.bodyText3(
-                              context,
-                              overrideStyle: TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Switch(
-                      //   value: isDark,
-                      //   onChanged: (val) => themeProvider.toggleTheme(val),
-                      // ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  PunchInOutScreen(),
-                  const SizedBox(height: 20),
-                  // Text(
-                  //   "Today's Activity",
-                  //   style: AppTextStyles.heading3(context),
-                  // ),
-                  // const SizedBox(height: 10),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     InfoCard(
-                  //       title: 'Check In',
-                  //       time: '08:30 am',
-                  //       subtitle: 'On time',
-                  //       points: '+150 pt',
-                  //       icon: Icons.login,
-                  //       color: Colors.green,
-                  //     ),
-                  //     InfoCard(
-                  //       title: 'Check Out',
-                  //       time: '05:10 pm',
-                  //       subtitle: 'On time',
-                  //       points: '+100 pt',
-                  //       icon: Icons.logout,
-                  //       color: Colors.pink,
-                  //     ),
-                  //   ],
-                  // ),
-                  // // const SizedBox(height: 12),
-                  // // Row(
-                  // //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // //   children: const [
-                  // //     InfoCard(
-                  // //       title: 'Start Overtime',
-                  // //       time: '06:01 pm',
-                  // //       subtitle: 'Project revision from...',
-                  // //       points: '',
-                  // //       icon: Icons.alarm,
-                  // //       color: Colors.deepPurple,
-                  // //     ),
-                  // //     InfoCard(
-                  // //       title: 'Finish Overtime',
-                  // //       time: '11:10 pm',
-                  // //       subtitle: '5h 00m',
-                  // //       points: '+\$120.00',
-                  // //       icon: Icons.nightlight_round,
-                  // //       color: Colors.orange,
-                  // //     ),
-                  // //   ],
-                  // // ),
                   // const SizedBox(height: 20),
-                  // Text(
-                  //   "Recent Activity",
-                  //   style: AppTextStyles.heading3(context),
-                  // ),
-                  const SizedBox(height: 10),
-                  // const SizedBox(height: 24),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ApplyEmpLeaveScreen(),
+                  PunchInOutScreen(),
+                  // const SizedBox(height: 10),
+                  Container(color: AppColors.lightBlueColor,height: 10,),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                    child:  Container(
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Management",
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.heading2(
+                                context,
+                                overrideStyle: TextStyle(
+                                  fontSize: ResponsiveHelper.fontSize(context, 14),
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            GridView.count(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              crossAxisCount: crossAxisCount, // 4 items per row as per screenshot
+                              crossAxisSpacing: 10, // Spacing between columns
+                              mainAxisSpacing: 10, // Spacing between rows
+                              shrinkWrap: true, // Important for GridView inside SingleChildScrollView
+                              physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+                              childAspectRatio: childAspectRatio,
+                              children: [
+                                ManagementGridItem(
+                                  title: 'Attendance Calendar', // Use full text
+                                  icon: Icons.calendar_month_outlined,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CalendarAttendanceScreen(
+                                          employeeId: empLoginId.toString(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'My Leave Requests',
+                                  icon: Icons.cake_outlined,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EmployeeLeaveListScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'Apply For Leave',
+                                  icon: Icons.description_outlined,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ApplyEmpLeaveScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'Salary Slip',
+                                  icon: Icons.money_outlined,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SalarySlipEmpSideScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'Attendance List View',
+                                  icon: Icons.calendar_month_outlined,
+                                  onTap: () {
+                                    // Handle Salary Slip tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AttendanceScreen(
+                                          employeeId: empLoginId.toString(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'My Team',
+                                  icon: Icons.people_alt_outlined,
+                                  onTap: () {
+                                    // Handle My Team tap
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'Suggestions',
+                                  icon: Icons.message_outlined,
+                                  onTap: () {
+                                    // Handle Suggestions tap
+                                  },
+                                ),
+                                ManagementGridItem(
+                                  title: 'Helpdesk',
+                                  icon: Icons.headset_mic_outlined,
+                                  onTap: () {
+                                    // Handle Helpdesk tap
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                    child: const CustomListTile(
-                      title: 'Apply Leave',
-                      icon: Icons.people_alt_outlined,
-                      color: Colors.lightBlue,
-                      bgColor: Color(0xFFE6F0FA),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AttendanceScreen(employeeId: empLoginId.toString(),),
-                        ),
-                      );
-                    },
-                    child: CustomListTile(
-                      title: "Attendance",
-                      icon: Icons.people_alt_outlined,
-                      color: Colors.lightBlue,
-                      bgColor: Color(0xFFE6F0FA),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ProfileListTile(
-                    title: "Leave",
-                    subtitle: "Check your Leave Request Status",
-                    leadingIcon: Icons.event_busy,
-                    backgroundColor: Colors.white,
-                    borderRadius: 16,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EmployeeLeaveListScreen(),
-                        ),
-                      );
-                    },
-                    titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
+
+                  Container(color: AppColors.lightBlueColor,height: 10,),
                   Container(
-                    width: double.infinity,
+                    // width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
                     // height: 300, // or use MediaQuery to size it dynamically
                     child: const AttendanceChartWidget(),
                   ),
@@ -241,6 +255,64 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+class ManagementGridItem extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const ManagementGridItem({
+    Key? key,
+    required this.title,
+    required this.icon,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.lightBlueColor, // Light grey background
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primary, // Darker icon color
+              size: ResponsiveHelper.fontSize(context, 24),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.heading3(
+                context,
+                overrideStyle: TextStyle(
+                  fontSize: ResponsiveHelper.fontSize(context, 10),
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

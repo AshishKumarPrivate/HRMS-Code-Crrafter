@@ -66,7 +66,8 @@ class _AttendanceSheetTableScreenState
   void initState() {
     super.initState();
     now = DateTime.now();
-    startDate = DateTime(now.year, now.month, 1); // First day of current month
+    // startDate = DateTime(now.year, now.month, 1); // First day of current month
+    startDate = now; // First day of current month
     endDate = now; // Today's date
     loadAttendanceData();
   }
@@ -116,9 +117,9 @@ class _AttendanceSheetTableScreenState
       context,
       listen: false,
     );
-    final apiData = provider.adminFilterAttendanceModel?.data ?? [];
+    final apiData = provider.adminFilterAttendanceModel?.attendanceData ?? [];
     final dates =
-        apiData.map((e) => _formatDateFromApi(e.date)).toSet().toList();
+    apiData.map((e) => _formatDateFromApi(e.date)).toSet().toList();
     dates.sort((a, b) {
       final d1 = _parseDate(a);
       final d2 = _parseDate(b);
@@ -132,7 +133,7 @@ class _AttendanceSheetTableScreenState
       context,
       listen: false,
     );
-    final apiData = provider.adminFilterAttendanceModel?.data ?? [];
+    final apiData = provider.adminFilterAttendanceModel?.attendanceData ?? [];
 
     // Helper function to convert UTC DateTime to IST formatted string
     String _formatISTTime(DateTime utcTime) {
@@ -144,47 +145,49 @@ class _AttendanceSheetTableScreenState
     }
 
     final List<AttendanceModel> attendanceList =
-        apiData.map((entry) {
-          return AttendanceModel(
-            name: entry.employee?.name ?? '',
-            email: entry.employee?.email ?? '',
-            mobile: entry.employee?.mobile ?? '',
-            date: _formatDateFromApi(entry.date),
-            checkIn:
-                entry.loginTime != null
-                    ? _formatISTTime(DateTime.parse(entry.loginTime.toString()))
-                    : '-',
-            // checkIn:  entry.loginTime ?? 'N/A',
-            // checkOut: entry.logoutTime ?? 'N/A',
-            checkOut:
-                entry.logoutTime != null
-                    ? _formatISTTime(
-                      DateTime.parse(entry.logoutTime.toString()),
-                    )
-                    : '-',
-            totalWorkingHours: entry.workingHours ?? '-',
-            otTime: entry.otTime ?? '-',
-            status:
-                entry.status == "present"
-                    ? "Present"
-                    : entry.status == "absent"
-                    ? "Absent"
-                    : "-",
-          );
-        }).toList();
+    apiData.map((entry) {
+      return AttendanceModel(
+        name: entry.employeeId?.name ?? '',
+        email: entry.employeeId?.email ?? '',
+        mobile: entry.employeeId?.mobile ?? '',
+        date: _formatDateFromApi(entry.date),
+        checkIn:
+        entry.loginTime != null
+            ? _formatISTTime(DateTime.parse(entry.loginTime.toString()))
+            : '-',
+        // checkIn:  entry.loginTime ?? 'N/A',
+        // checkOut: entry.logoutTime ?? 'N/A',
+        checkOut:
+        entry.logoutTime != null
+            ? _formatISTTime(
+          DateTime.parse(entry.logoutTime.toString()),
+        )
+            : '-',
+        totalWorkingHours: entry.workingHours ?? '-',
+        otTime: entry.otTime ?? '-',
+        status:
+        entry.status == "present"
+            ? "Present"
+            : entry.status == "absent"
+            ? "Absent"
+            : entry.status == "wfh"
+            ? "WFH"
+            : "-",
+      );
+    }).toList();
 
     return attendanceList.where((item) {
       final matchesStatus =
           selectedStatus == 'All' ||
-          item.status.toLowerCase() == selectedStatus.toLowerCase();
+              item.status.toLowerCase() == selectedStatus.toLowerCase();
 
       final matchesDate = selectedDate == 'All' || item.date == selectedDate;
 
       final matchesSearch =
           searchQuery.isEmpty ||
-          item.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          item.email.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          item.mobile.contains(searchQuery);
+              item.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+              item.email.toLowerCase().contains(searchQuery.toLowerCase()) ||
+              item.mobile.contains(searchQuery);
 
       bool matchesDateRange = true;
       if (startDate != null) {
@@ -269,9 +272,9 @@ class _AttendanceSheetTableScreenState
     final dir = await getDownloadDirectory();
     final filePath = '${dir?.path}/attendance_report.xlsx';
     final file =
-        File(filePath)
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(excel.encode()!);
+    File(filePath)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(excel.encode()!);
 
     await Share.shareXFiles([
       XFile(file.path),
@@ -294,55 +297,55 @@ class _AttendanceSheetTableScreenState
       pw.MultiPage(
         build:
             (context) => [
-              pw.Center(
-                child: pw.Text(
-                  'Attendance Report',
-                  style: pw.TextStyle(
-                    fontSize: 22,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
+          pw.Center(
+            child: pw.Text(
+              'Attendance Report',
+              style: pw.TextStyle(
+                fontSize: 22,
+                fontWeight: pw.FontWeight.bold,
               ),
-              pw.SizedBox(height: 20),
-              pw.Table.fromTextArray(
-                headers: [
-                  'S.No',
-                  'Name',
-                  'Email',
-                  'Mobile',
-                  'Date',
-                  'CheckIn',
-                  'CheckOut',
-                  'Working Hours',
-                  'Over Time Hrs',
-                  'Status',
-                ],
-                data: List<List<String>>.generate(
-                  data.length,
-                  (i) => [
-                    '${i + 1}',
-                    data[i].name,
-                    data[i].email,
-                    data[i].mobile,
-                    data[i].date,
-                    data[i].checkIn,
-                    data[i].checkOut,
-                    data[i].totalWorkingHours,
-                    data[i].otTime,
-                    data[i].status,
-                  ],
-                ),
-              ),
+            ),
+          ),
+          pw.SizedBox(height: 20),
+          pw.Table.fromTextArray(
+            headers: [
+              'S.No',
+              'Name',
+              'Email',
+              'Mobile',
+              'Date',
+              'CheckIn',
+              'CheckOut',
+              'Working Hours',
+              'Over Time Hrs',
+              'Status',
             ],
+            data: List<List<String>>.generate(
+              data.length,
+                  (i) => [
+                '${i + 1}',
+                data[i].name,
+                data[i].email,
+                data[i].mobile,
+                data[i].date,
+                data[i].checkIn,
+                data[i].checkOut,
+                data[i].totalWorkingHours,
+                data[i].otTime,
+                data[i].status,
+              ],
+            ),
+          ),
+        ],
       ),
     );
 
     final dir = await getDownloadDirectory();
     final filePath = '${dir?.path}/attendance_report.pdf';
     final file =
-        File(filePath!)
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(await pdf.save());
+    File(filePath!)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(await pdf.save());
 
     await Share.shareXFiles([XFile(file.path)], text: 'Attendance PDF Report');
     ScaffoldMessenger.of(
@@ -391,7 +394,8 @@ class _AttendanceSheetTableScreenState
 
   void _clearDateFilters() {
     setState(() {
-      startDate = DateTime(now.year, now.month, 1);
+      // startDate = DateTime(now.year, now.month, 1);
+      startDate = now;
       endDate = now;
       loadAttendanceData(); // Reload data after clearing filters
     });
@@ -524,24 +528,24 @@ class _AttendanceSheetTableScreenState
             icon: const Icon(Icons.filter_list, color: AppColors.white),
             // Filter icon for status
             items:
-                ['All', 'present', 'Absent'].map((status) {
-                  return DropdownMenuItem(
-                    value: status,
-                    child: Text(
-                      status,
-                      style: AppTextStyles.heading1(
-                        context,
-                        overrideStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: ResponsiveHelper.fontSize(context, 12),
-                        ),
-                      ), // Text color for dropdown items
+            ['All', 'present', 'Absent'].map((status) {
+              return DropdownMenuItem(
+                value: status,
+                child: Text(
+                  status,
+                  style: AppTextStyles.heading1(
+                    context,
+                    overrideStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: ResponsiveHelper.fontSize(context, 12),
                     ),
-                  );
-                }).toList(),
+                  ), // Text color for dropdown items
+                ),
+              );
+            }).toList(),
             onChanged: (val) => setState(() => selectedStatus = val!),
             dropdownColor:
-                AppColors.primary, // Background color of the dropdown menu
+            AppColors.primary, // Background color of the dropdown menu
           ),
           // Dropdown for Date Filter
           // DropdownButton<String>(
@@ -597,7 +601,7 @@ class _AttendanceSheetTableScreenState
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide:
-                          BorderSide.none, // Remove border for a cleaner look
+                      BorderSide.none, // Remove border for a cleaner look
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -742,8 +746,8 @@ class _AttendanceSheetTableScreenState
             scrollDirection: Axis.horizontal,
             child: DataTable(
               dataRowColor: MaterialStateProperty.resolveWith<Color?>((
-                Set<MaterialState> states,
-              ) {
+                  Set<MaterialState> states,
+                  ) {
                 if (states.contains(MaterialState.selected)) {
                   return Theme.of(
                     context,
@@ -753,8 +757,8 @@ class _AttendanceSheetTableScreenState
                 return null; // Let the DataRow's color property handle the alternating colors
               }),
               headingRowColor: MaterialStateProperty.resolveWith<Color?>((
-                Set<MaterialState> states,
-              ) {
+                  Set<MaterialState> states,
+                  ) {
                 return Colors.black; // Header color
               }),
               columns: [
@@ -883,13 +887,13 @@ class _AttendanceSheetTableScreenState
                 final item = filteredData[i];
                 final bool isHighlighted =
                     searchQuery.isNotEmpty &&
-                    (item.name.toLowerCase().contains(
+                        (item.name.toLowerCase().contains(
                           searchQuery.toLowerCase(),
                         ) ||
-                        item.email.toLowerCase().contains(
-                          searchQuery.toLowerCase(),
-                        ) ||
-                        item.mobile.contains(searchQuery));
+                            item.email.toLowerCase().contains(
+                              searchQuery.toLowerCase(),
+                            ) ||
+                            item.mobile.contains(searchQuery));
 
                 Color statusColor;
                 Color textColor;
@@ -905,8 +909,8 @@ class _AttendanceSheetTableScreenState
                 }
                 return DataRow(
                   color: MaterialStateProperty.resolveWith<Color?>((
-                    Set<MaterialState> states,
-                  ) {
+                      Set<MaterialState> states,
+                      ) {
                     if (isHighlighted) {
                       return AppColors.primary.withOpacity(
                         0.1,

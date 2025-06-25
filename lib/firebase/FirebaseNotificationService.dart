@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hrms_management_code_crafter/firebase/firebase_api_controller.dart';
 import 'package:hrms_management_code_crafter/util/storage_util.dart';
  import 'package:provider/provider.dart';
  import '../main.dart';
@@ -105,15 +106,15 @@ class NotificationService {
 
 
       // ✅ Direct API call (Even if context is null)
-      // await DeliveryOrdersProvider().sendFcmToken(token);
-      // // 🟢 Get context using global navigation key
-      // final context = navigatorKey.currentContext;
-      // if (context != null) {
-      //   print("📤 Context not null and  Token send to Backend: $token");
-      //   Provider.of<DeliveryOrdersProvider>(context, listen: false).sendFcmToken(token);
-      // } else {
-      //   print("⚠️ Context is null, couldn't send FCM token to backend.");
-      // }
+      await FirebaeApiProvider().sendFcmToken(token.toString());
+      // 🟢 Get context using global navigation key
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        print("📤 Context not null and  Token send to Backend: $token");
+        Provider.of<FirebaeApiProvider>(context, listen: false).sendFcmToken(token.toString());
+      } else {
+        print("⚠️ Context is null, couldn't send FCM token to backend.");
+      }
 
     } catch (e) {
       print("❌ Error sending token to backend: $e");

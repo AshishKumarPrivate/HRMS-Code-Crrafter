@@ -102,10 +102,10 @@ class _AddEmployeeBankDetailScreenState extends State<AddEmployeeBankDetailScree
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: DefaultCommonAppBar(
-        activityName: "Add Employee Bank",
-        backgroundColor: AppColors.primary,
-      ),
+      // appBar: DefaultCommonAppBar(
+      //   activityName: "Add Employee Bank",
+      //   backgroundColor: AppColors.primary,
+      // ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),

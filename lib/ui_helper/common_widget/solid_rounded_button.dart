@@ -11,7 +11,7 @@ class CustomButton extends StatelessWidget {
   final double borderRadius;
   final double heightPercentage;
   final double widthPercentage;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final TextStyle? textStyle;
   final EdgeInsetsGeometry padding;
   final IconData? iconData;
@@ -83,7 +83,7 @@ class CustomButton extends StatelessWidget {
             if (iconData != null) SizedBox(width: 8.0),
             Text(
               text,
-              style: AppTextStyles.heading3(context, overrideStyle: TextStyle(color: textColor)) ??
+              style: AppTextStyles.heading3(context, overrideStyle: TextStyle(color: textColor,fontSize: 14)) ??
                   TextStyle(
                     fontSize: 14,
                     color: textColor,

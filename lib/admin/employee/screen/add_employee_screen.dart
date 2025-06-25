@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
- import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/util/custom_snack_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -87,7 +87,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       "maritalStatus": selectedMaritalStatus,
       "children": "",
       "emergencyContact": "",
-       if (_image != null) "photo": await MultipartFile.fromFile(_image!.path, filename: "profile.jpg"),      // use MultipartFile.fromFile(...) if you have a file
+      if (_image != null) "photo": await MultipartFile.fromFile(_image!.path, filename: "profile.jpg"),      // use MultipartFile.fromFile(...) if you have a file
       "document": "",
       "idCard": "",
       "role": roleController.text.trim(),
@@ -362,13 +362,13 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                           children: [
                             TextSpan(
                               text: "I agree to the ",
-                                style: AppTextStyles.bodyText2(
-                                  context,
-                                  overrideStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: ResponsiveHelper.fontSize(context, 12),
-                                  ),
+                              style: AppTextStyles.bodyText2(
+                                context,
+                                overrideStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: ResponsiveHelper.fontSize(context, 12),
                                 ),
+                              ),
                             ),
                             TextSpan(
                               text: "Terms & Conditions & Privacy Policy",
@@ -404,21 +404,21 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                     return loginProvider.isLoading
                         ? loadingIndicator() // Show loader
                         : CustomButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              if (_isAgreed) {
-                                handleSubmit();
-                              } else {
-                                CustomSnackbarHelper.customShowSnackbar(
-                                  context: context,
-                                  backgroundColor: Colors.red,
-                                  message: "Please agree to the terms.",
-                                );
-                              }
-                            }
-                          },
-                          text: 'Add Employee',
-                        );
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          if (_isAgreed) {
+                            handleSubmit();
+                          } else {
+                            CustomSnackbarHelper.customShowSnackbar(
+                              context: context,
+                              backgroundColor: Colors.red,
+                              message: "Please agree to the terms.",
+                            );
+                          }
+                        }
+                      },
+                      text: 'Add Employee',
+                    );
                   },
                 ),
                 const SizedBox(height: 20),
@@ -500,31 +500,31 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
             ),
             child: Column(
               children:
-                  gender
-                      .map(
-                        (item) => ListTile(
-                          title: Text(
-                            item,
-                            style: AppTextStyles.bodyText1(
-                              context,
-                              overrideStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: ResponsiveHelper.fontSize(
-                                  context,
-                                  13,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              selectedGender = item;
-                              showGender = false;
-                            });
-                          },
+              gender
+                  .map(
+                    (item) => ListTile(
+                  title: Text(
+                    item,
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ResponsiveHelper.fontSize(
+                          context,
+                          13,
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      selectedGender = item;
+                      showGender = false;
+                    });
+                  },
+                ),
+              )
+                  .toList(),
             ),
           ),
       ],
@@ -603,31 +603,31 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
             ),
             child: Column(
               children:
-                  maritalStatus
-                      .map(
-                        (item) => ListTile(
-                          title: Text(
-                            item,
-                            style: AppTextStyles.bodyText1(
-                              context,
-                              overrideStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: ResponsiveHelper.fontSize(
-                                  context,
-                                  13,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              selectedMaritalStatus = item;
-                              showMaritalStatus = false;
-                            });
-                          },
+              maritalStatus
+                  .map(
+                    (item) => ListTile(
+                  title: Text(
+                    item,
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ResponsiveHelper.fontSize(
+                          context,
+                          13,
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      selectedMaritalStatus = item;
+                      showMaritalStatus = false;
+                    });
+                  },
+                ),
+              )
+                  .toList(),
             ),
           ),
       ],

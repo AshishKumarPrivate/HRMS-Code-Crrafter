@@ -12,16 +12,27 @@ import '../../../util/custom_snack_bar.dart';
 import '../../../util/full_screen_loader_utiil.dart';
 import '../../../util/storage_util.dart';
 import '../../user_selection_screen.dart';
-import '../model/user_login_model.dart';
 
 class AuthAPIProvider with ChangeNotifier {
   final Repository _repository = Repository();
   bool _isLoading = false;
 
+  bool _isOtpSent = false; // Added to track OTP state
   bool get isLoading => _isLoading;
+  bool get isOtpSent => _isOtpSent;
 
   void _setLoading(bool value) {
     _isLoading = value;
+    notifyListeners();
+  }
+
+  void setOtpSent(bool value) {
+    _isOtpSent = value;
+    notifyListeners();
+  }
+  // ✅ Reset method
+  void resetForgotPassword() {
+    _isOtpSent = false;
     notifyListeners();
   }
 
@@ -55,7 +66,7 @@ class AuthAPIProvider with ChangeNotifier {
         } else if (response.data!.role == "employee") {
 
           await setLoginUserData(response);
-          print("EmploginData=>>${response.employeeeData!.name.toString()} ");
+          print("EmploginData=>>${response.employeeeData!.sId.toString()} ");
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const UserBottomNavigationScreen()),
                 (Route<dynamic> route) => false,
@@ -101,17 +112,84 @@ class AuthAPIProvider with ChangeNotifier {
     }
   }
 
-  // void logoutUser(BuildContext context) {
-  //   FullScreenLoader.show(context, message: "Logout");
-  //   Future.delayed(Duration(seconds: 5), () {
-  //     StorageHelper().logout();
-  //     FullScreenLoader.hide(context);
-  //     Navigator.of(context).pushAndRemoveUntil(
-  //       MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-  //       (route) => false,
-  //     );
-  //   });
-  // }
+
+  Future<bool> forgetPassword(BuildContext context, String email) async {
+    _setLoading(true);
+    try {
+      Map<String, dynamic> requestBody = {"email": email};
+      var response = await _repository.forgetPassword(requestBody);
+
+      // if (response["message"] == "OTP sent successfully to your email") {
+      if (response["success"] == true) {
+        setOtpSent(true);
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response["message"] ?? "Reset link sent to your email!",
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        );
+        return true;
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response["message"] ?? "Failed to send reset link!",
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+
+    } on DioException catch (e) {
+      _handleDioErrors(context, e);
+    } catch (e) {
+      _handleUnexpectedErrors(context, e, "Something went wrong!");
+    } finally {
+      _setLoading(false);
+    }
+    return false;
+  }
+
+  Future<bool> resetPassword(
+      BuildContext context, String email, String code, String newPassword) async {
+    _setLoading(true);
+    try {
+      Map<String, dynamic> requestBody = {
+        "email": email,
+        "otp": code,
+        "newPassword": newPassword,
+      };
+
+      var response = await _repository.resetPassword(requestBody);
+
+      if (response["success"] == true) {
+        setOtpSent(false); // Update OTP sent state
+        // StorageHelper().setPassword(newPassword);
+        Navigator.of(context).pop();
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => UserBottomNavigationScreen()));
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response["message"] ?? "Password reset successfully!",
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        );
+        return true;
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response["message"] ?? "Password reset failed!",
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } on DioException catch (e) {
+      _handleDioErrors(context, e);
+    } catch (e) {
+      _handleUnexpectedErrors(context, e, "Something went wrong!");
+    } finally {
+      _setLoading(false);
+    }
+    return false;
+  }
+
   void logoutUser(BuildContext context) {
     // _setLoading(true);
     FullScreenLoader.show(context, message: "Logout");

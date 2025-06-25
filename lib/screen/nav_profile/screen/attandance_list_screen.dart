@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/network_manager/repository.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
-import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +15,6 @@ import '../../nav_home/controller/punch_in_out_provider.dart';
 
 class AttendanceScreen extends StatefulWidget {
   // const AttendanceScreen({Key? key, required String employeeId}) : super(key: key);
-
 
   late String employeeId; // Replace with actual ID
   AttendanceScreen({Key? key, required this.employeeId}) : super(key: key);
@@ -40,7 +38,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     _fetchAndGenerateData();
   }
 
-// Helper function to convert UTC DateTime to IST formatted string
+  // Helper function to convert UTC DateTime to IST formatted string
   String _formatISTTime(DateTime utcTime) {
     // Convert to UTC first, then add the IST offset.
     // This ensures consistent conversion even if DateTime.parse
@@ -72,9 +70,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           responseData.map<AttendanceData>((item) {
             final dateTime = DateTime.parse(item.date ?? '');
             final loginTime =
-                item.loginTime != null
-                    ? DateTime.parse(item.loginTime!)
-                    : null;
+                item.loginTime != null ? DateTime.parse(item.loginTime!) : null;
             final logoutTime =
                 item.logoutTime != null
                     ? DateTime.parse(item.logoutTime!)
@@ -86,7 +82,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               loginTime: loginTime != null ? _formatISTTime(loginTime) : '-',
               logOutTime: logoutTime != null ? _formatISTTime(logoutTime) : '-',
               workingHours: item.workingHours ?? '-',
-              status: item.status ?? '',
+              status: "present" ?? '',
               isFullDay: item.isFullDay ?? false,
               isHalfDay: item.isFullDay ?? false,
               isCheckIN: item.isFullDay ?? false,
@@ -113,7 +109,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     // Repository().baseUrl.toString();
     try {
       final response = await http.post(
-        Uri.parse(Repository().baseUrl.toString()),
+        Uri.parse(Repository.baseUrl.toString()),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "employeeId": widget.employeeId,
@@ -140,12 +136,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           return AttendanceData(
             date: dateTime.day.toString(),
             day: DateFormat('EEE').format(dateTime).toUpperCase(),
-            loginTime:
-                loginTime != null
-                    ? _formatISTTime(loginTime) : '-',
-            logOutTime:
-                logoutTime != null
-                    ? _formatISTTime(logoutTime) : '-',
+            loginTime: loginTime != null ? _formatISTTime(loginTime) : '-',
+            logOutTime: logoutTime != null ? _formatISTTime(logoutTime) : '-',
             workingHours: item['workingHours'] ?? '-',
             status: item['status'] ?? '',
           );
@@ -201,7 +193,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         label = "Full Day Leave";
         break;
       case "first_half":
-        color =  Colors.amberAccent; // Light Yellow
+        color = Colors.amberAccent; // Light Yellow
         label = "Half Day";
         break;
       case "second_half":
@@ -320,7 +312,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: tileColor,
         borderRadius: BorderRadius.circular(14),
@@ -329,13 +321,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
-            width: 40,
-            padding: const EdgeInsets.only(right: 10),
+            width: 50,
+            decoration: BoxDecoration(
+              color: tileColor,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+              ],
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 10),
                 Text(
                   attendance.date,
                   style: AppTextStyles.heading3(
@@ -343,20 +343,34 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     overrideStyle: const TextStyle(color: AppColors.primary),
                   ),
                 ),
-                Text(
-                  attendance.day,
-                  style: AppTextStyles.heading3(
-                    context,
-                    overrideStyle: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.primary,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1), // Your desired background color
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    attendance.day,
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.heading3(
+                      context,
+                      overrideStyle: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 10),
+          )
+          ,
+          const SizedBox(width: 30),
           if (centerText != null)
             Expanded(
               child: Center(
@@ -366,58 +380,82 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           else
             Expanded(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        attendance.loginTime ?? '-',
-                        style: AppTextStyles.heading3(
-                          context,
-                          overrideStyle: const TextStyle(
-                            height: 1.5,
-                            letterSpacing: 1,
-                            fontSize: 12,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          attendance.loginTime ?? '-',
+                          style: AppTextStyles.heading3(
+                            context,
+                            overrideStyle: const TextStyle(
+                              height: 1.5,
+                              letterSpacing: 1,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                      ),
-                      Text("Check In", style: AppTextStyles.caption(context,overrideStyle: TextStyle(fontSize: 11))),
-                    ],
+                        Text(
+                          "Check In",
+                          style: AppTextStyles.caption(
+                            context,
+                            overrideStyle: TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        attendance.logOutTime ?? '-',
-                        style: AppTextStyles.heading3(
-                          context,
-                          overrideStyle: const TextStyle(
-                            height: 1.5,
-                            letterSpacing: 1,
-                            fontSize: 12,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          attendance.logOutTime ?? '-',
+                          style: AppTextStyles.heading3(
+                            context,
+                            overrideStyle: const TextStyle(
+                              height: 1.5,
+                              letterSpacing: 1,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                      ),
-                      Text("Check Out", style: AppTextStyles.caption(context,overrideStyle: TextStyle(fontSize: 11))),
-                    ],
+                        Text(
+                          "Check Out",
+                          style: AppTextStyles.caption(
+                            context,
+                            overrideStyle: TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        attendance.workingHours ?? '-',
-                        style: AppTextStyles.heading3(
-                          context,
-                          overrideStyle: const TextStyle(
-                            height: 1.5,
-                            letterSpacing: 1,
-                            fontSize: 12,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          attendance.workingHours ?? '-',
+                          style: AppTextStyles.heading3(
+                            context,
+                            overrideStyle: const TextStyle(
+                              height: 1.5,
+                              letterSpacing: 1,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                      ),
-                      Text("Total Hrs", style: AppTextStyles.caption(context,overrideStyle: TextStyle(fontSize: 11))),
-                    ],
+                        Text(
+                          "Total Hrs",
+                          style: AppTextStyles.caption(
+                            context,
+                            overrideStyle: TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

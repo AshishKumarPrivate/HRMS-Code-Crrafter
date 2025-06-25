@@ -1,0 +1,204 @@
+class EmpSalarySlipEmpSideModel {
+  bool? success;
+  String? message;
+  Data? data;
+
+  EmpSalarySlipEmpSideModel({this.success, this.message, this.data});
+
+  EmpSalarySlipEmpSideModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['message'] = this.message;
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
+    }
+    return data;
+  }
+}
+
+class Data {
+  EmployeeData? employeeData;
+  Null? workData;
+  int? salary;
+  int? absentDays;
+  int? totalDays;
+  int? presentDays;
+  int? estimateSalary;
+
+  Data(
+      {this.employeeData,
+        this.workData,
+        this.salary,
+        this.absentDays,
+        this.totalDays,
+        this.presentDays,
+        this.estimateSalary});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    employeeData = json['employeeData'] != null
+        ? new EmployeeData.fromJson(json['employeeData'])
+        : null;
+    workData = json['work_data'];
+    salary = json['salary'];
+    absentDays = json['absentDays'];
+    totalDays = json['totalDays'];
+    presentDays = json['presentDays'];
+    estimateSalary = json['estimate_salary'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.employeeData != null) {
+      data['employeeData'] = this.employeeData!.toJson();
+    }
+    data['work_data'] = this.workData;
+    data['salary'] = this.salary;
+    data['absentDays'] = this.absentDays;
+    data['totalDays'] = this.totalDays;
+    data['presentDays'] = this.presentDays;
+    data['estimate_salary'] = this.estimateSalary;
+    return data;
+  }
+}
+
+class EmployeeData {
+  EmployeeImage? employeeImage;
+  EmployeeImage? employeeIdCard;
+  EmployeeImage? employeeDocument;
+  String? sId;
+  String? name;
+  String? email;
+  String? workEmail;
+  String? mobile;
+  String? dob;
+  String? gender;
+  String? address;
+  String? state;
+  String? city;
+  String? qualification;
+  String? experience;
+  String? maritalStatus;
+  String? role;
+  String? token;
+  String? fcmToken;
+  String? createdAt;
+  String? updatedAt;
+  int? iV;
+  String? registrationId;
+
+  EmployeeData(
+      {this.employeeImage,
+        this.employeeIdCard,
+        this.employeeDocument,
+        this.sId,
+        this.name,
+        this.email,
+        this.workEmail,
+        this.mobile,
+        this.dob,
+        this.gender,
+        this.address,
+        this.state,
+        this.city,
+        this.qualification,
+        this.experience,
+        this.maritalStatus,
+        this.role,
+        this.token,
+        this.fcmToken,
+        this.createdAt,
+        this.updatedAt,
+        this.iV,
+        this.registrationId});
+
+  EmployeeData.fromJson(Map<String, dynamic> json) {
+    employeeImage = json['employeeImage'] != null
+        ? new EmployeeImage.fromJson(json['employeeImage'])
+        : null;
+    employeeIdCard = json['employeeIdCard'] != null
+        ? new EmployeeImage.fromJson(json['employeeIdCard'])
+        : null;
+    employeeDocument = json['employeeDocument'] != null
+        ? new EmployeeImage.fromJson(json['employeeDocument'])
+        : null;
+    sId = json['_id'];
+    name = json['name'];
+    email = json['email'];
+    workEmail = json['workEmail'];
+    mobile = json['mobile'];
+    dob = json['dob'];
+    gender = json['gender'];
+    address = json['address'];
+    state = json['state'];
+    city = json['city'];
+    qualification = json['qualification'];
+    experience = json['experience'];
+    maritalStatus = json['maritalStatus'];
+    role = json['role'];
+    token = json['token'];
+    fcmToken = json['fcmToken'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    iV = json['__v'];
+    registrationId = json['registrationId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.employeeImage != null) {
+      data['employeeImage'] = this.employeeImage!.toJson();
+    }
+    if (this.employeeIdCard != null) {
+      data['employeeIdCard'] = this.employeeIdCard!.toJson();
+    }
+    if (this.employeeDocument != null) {
+      data['employeeDocument'] = this.employeeDocument!.toJson();
+    }
+    data['_id'] = this.sId;
+    data['name'] = this.name;
+    data['email'] = this.email;
+    data['workEmail'] = this.workEmail;
+    data['mobile'] = this.mobile;
+    data['dob'] = this.dob;
+    data['gender'] = this.gender;
+    data['address'] = this.address;
+    data['state'] = this.state;
+    data['city'] = this.city;
+    data['qualification'] = this.qualification;
+    data['experience'] = this.experience;
+    data['maritalStatus'] = this.maritalStatus;
+    data['role'] = this.role;
+    data['token'] = this.token;
+    data['fcmToken'] = this.fcmToken;
+    data['createdAt'] = this.createdAt;
+    data['updatedAt'] = this.updatedAt;
+    data['__v'] = this.iV;
+    data['registrationId'] = this.registrationId;
+    return data;
+  }
+}
+
+class EmployeeImage {
+  String? publicId;
+  String? secureUrl;
+
+  EmployeeImage({this.publicId, this.secureUrl});
+
+  EmployeeImage.fromJson(Map<String, dynamic> json) {
+    publicId = json['public_id'];
+    secureUrl = json['secure_url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['public_id'] = this.publicId;
+    data['secure_url'] = this.secureUrl;
+    return data;
+  }
+}

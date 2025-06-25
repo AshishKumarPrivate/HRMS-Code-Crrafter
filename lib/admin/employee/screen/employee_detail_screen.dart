@@ -19,6 +19,7 @@ import '../../../ui_helper/common_widget/default_common_app_bar.dart';
 import '../../../ui_helper/common_widget/solid_rounded_button.dart';
 import '../../../util/responsive_helper_util.dart';
 import '../model/employee_list_model.dart';
+import 'emp_document_module/add_employee_documents_screen.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {
   final String employeeId;
@@ -30,11 +31,23 @@ class EmployeeDetailScreen extends StatefulWidget {
   State<EmployeeDetailScreen> createState() => _EmployeeDetailScreenState();
 }
 
-class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
+class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final List<Map<String, dynamic>> _tabs = [
+    {"name": "Personal Information", "icon": Icons.person},
+    // {"name": "Address Details", "icon": Icons.home_outlined},
+    {"name": "Work Details", "icon": Icons.work_history_outlined},
+    {"name": "Bank Details", "icon": Icons.account_balance},
+    {"name": "Add Documents", "icon": Icons.file_download_outlined},
+  ];
+
   @override
   void initState() {
     print("EmployeeiddforFilter${widget.employeeId}");
     super.initState();
+    _tabController = TabController(length: _tabs.length, vsync: this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeApiProvider>(
         context,
@@ -44,335 +57,630 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+  }
+
+  final List<Color> avatarBgColors = [
+    Colors.blue.shade50,
+    Colors.green.shade50,
+    Colors.pink.shade50,
+    Colors.orange.shade50,
+    Colors.purple.shade50,
+    Colors.teal.shade50,
+    Colors.amber.shade50,
+  ];
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBgColor,
-
       appBar: DefaultCommonAppBar(
         activityName: "Profile",
         backgroundColor: AppColors.primary,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          // Curved header
-          ClipPath(
-            clipper: TopWaveClipper(),
-            child: Container(height: 320, color: AppColors.primary),
+          // Tab Bar
+          Container(
+            color: AppColors.primary,
+            child: TabBar(
+              tabAlignment: TabAlignment.start,
+              controller: _tabController,
+              isScrollable: true,
+              labelColor: AppColors.white,
+              unselectedLabelColor: AppColors.white.withOpacity(0.7),
+              indicatorColor: AppColors.white,
+              indicatorWeight: 4.0,
+              labelStyle: AppTextStyles.heading1(
+                context,
+                overrideStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+              unselectedLabelStyle: AppTextStyles.heading1(
+                context,
+                overrideStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+              tabs:
+                  _tabs
+                      .map((tab) => Row(children: [Tab(text: tab["name"])]))
+                      .toList(),
+            ),
           ),
-          SafeArea(
-            child: Consumer<EmployeeApiProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return loadingIndicator();
-                }
-                if (provider.errorMessage.isNotEmpty) {
-                  return Center(
-                    child: Text(
-                      provider.errorMessage,
-                      style: AppTextStyles.heading2(
-                        context,
-                        overrideStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveHelper.fontSize(context, 12),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                final employee = provider.employeeListDetailModel?.data;
-                if (employee != null) {
-                  StorageHelper().saveEmployeeData(employee);
-                }
-
-                if (employee == null) {
-                  return Center(
-                    child: Text(
-                      'No employee details found.',
-                      style: AppTextStyles.heading2(
-                        context,
-                        overrideStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveHelper.fontSize(context, 12),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                return RefreshIndicator(
-                  onRefresh:
-                      () => provider.getEmployeeDetail(widget.employeeId),
-                  child: SingleChildScrollView(
-                    child: Column(
+          // Tab Bar View
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: List.generate(_tabs.length, (index) {
+                // Return different widgets based on the tab name
+                // Use a single if-else if-else or switch statement
+                switch (index) {
+                  case 0: // Personal Information
+                    return Stack(
                       children: [
-                        // Header section
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                radius: 45,
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    (employee.employeeImage!.secureUrl !=
-                                                null &&
-                                            employee
-                                                .employeeImage!
-                                                .secureUrl!
-                                                .isNotEmpty)
-                                        ? NetworkImage(
-                                          employee.employeeImage!.secureUrl!,
-                                        )
-                                        : null, // fallback tab null
-                                child:
-                                    (employee.employeeImage!.secureUrl ==
-                                                null ||
-                                            employee
-                                                .employeeImage!
-                                                .secureUrl!
-                                                .isEmpty)
-                                        ? Icon(
-                                          Icons.person,
-                                          size: 45,
-                                          color: Colors.grey,
-                                        )
-                                        : null, // agar image hai toh child null
-                              ),
-
-                              const SizedBox(height: 10),
-                              Text(
-                                employee.name ?? 'N/A',
-                                style: AppTextStyles.heading3(
-                                  context,
-                                  overrideStyle: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              Text(
-                                employee.email ?? 'N/A',
-                                style: AppTextStyles.bodyText3(
-                                  context,
-                                  overrideStyle: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
+                        // Curved header
+                        ClipPath(
+                          clipper: TopWaveClipper(),
+                          child: Container(
+                            height: 30,
+                            color: Colors.transparent,
                           ),
                         ),
-                        // Card with info icons
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _InfoItem(
-                                icon: Icons.phone_android,
-                                title: "Phone",
-                                value: employee.mobile ?? 'N/A',
-                              ),
-                              _InfoItem(
-                                icon: Icons.person_outline,
-                                title: "Profile",
-                                value:
-                                    StringUtils.capitalizeFirstLetter(
-                                      employee.role!.toString(),
-                                    ) ??
-                                    'N/A',
-                              ),
-                              _InfoItem(
-                                icon: Icons.group,
-                                title: "DOB",
-                                value:
-                                    "${DateFormatter.formatCustomDdMmYyyy(employee.dob.toString())}",
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        SafeArea(
+                          child: Consumer<EmployeeApiProvider>(
+                            builder: (context, provider, child) {
+                              if (provider.isLoading) {
+                                return loadingIndicator();
+                              }
+                              if (provider.errorMessage.isNotEmpty) {
+                                return Center(
+                                  child: Text(
+                                    provider.errorMessage,
+                                    style: AppTextStyles.heading2(
+                                      context,
+                                      overrideStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: ResponsiveHelper.fontSize(
+                                          context,
+                                          12,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              final employee =
+                                  provider.employeeListDetailModel?.data;
+                              if (employee != null) {
+                                StorageHelper().saveEmployeeData(employee);
+                              }
 
-                        // Details section
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          decoration: const BoxDecoration(color: Colors.white),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _ProfileField(
-                                label: "User Id",
-                                value: employee.sId ?? 'N/A',
-                              ),
-                              _ProfileField(
-                                label: "Work Email",
-                                value: employee.workEmail ?? 'N/A',
-                              ),
+                              if (employee == null) {
+                                return Center(
+                                  child: Text(
+                                    'No employee details found.',
+                                    style: AppTextStyles.heading2(
+                                      context,
+                                      overrideStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: ResponsiveHelper.fontSize(
+                                          context,
+                                          12,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return RefreshIndicator(
+                                onRefresh:
+                                    () => provider.getEmployeeDetail(
+                                      widget.employeeId,
+                                    ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: 10),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            0,
+                                          ),
+                                          // boxShadow: [
+                                          //   BoxShadow(
+                                          //     color: Colors.black12,
+                                          //     blurRadius: 10,
+                                          //     offset: Offset(0, 4),
+                                          //   ),
+                                          // ],
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            children: [
+                                              // Header section
+                                              SizedBox(width: 10),
+                                              Container(
+                                                padding: const EdgeInsets.all(
+                                                  4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      avatarBgColors[index %
+                                                          avatarBgColors
+                                                              .length],
+                                                  // 👈 rotate colors
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 40,
+                                                  backgroundColor: Colors.white,
+                                                  backgroundImage:
+                                                      (employee
+                                                                      .employeeImage!
+                                                                      .secureUrl !=
+                                                                  null &&
+                                                              employee
+                                                                  .employeeImage!
+                                                                  .secureUrl!
+                                                                  .isNotEmpty)
+                                                          ? NetworkImage(
+                                                            employee
+                                                                .employeeImage!
+                                                                .secureUrl!,
+                                                          )
+                                                          : null,
+                                                  // fallback tab null
+                                                  child:
+                                                      (employee
+                                                                      .employeeImage!
+                                                                      .secureUrl ==
+                                                                  null ||
+                                                              employee
+                                                                  .employeeImage!
+                                                                  .secureUrl!
+                                                                  .isEmpty)
+                                                          ? Icon(
+                                                            Icons.person,
+                                                            size: 45,
+                                                            color: Colors.grey,
+                                                          )
+                                                          : null, // agar image hai toh child null
+                                                ),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    employee.name ?? 'N/A',
+                                                    style:
+                                                        AppTextStyles.heading3(
+                                                          context,
+                                                          overrideStyle:
+                                                              TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                              ),
+                                                        ),
+                                                  ),
+                                                  Text(
+                                                    employee.email ?? 'N/A',
+                                                    style:
+                                                        AppTextStyles.bodyText3(
+                                                          context,
+                                                          overrideStyle:
+                                                              TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                              ),
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      // Card with info icons
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric( horizontal: 20, ),
+                                        decoration: const BoxDecoration( color: Colors.white, ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              "Personal Details",
+                                              style: AppTextStyles.heading3(
+                                                context,
+                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            _ProfileField(
+                                              label: "Phone",
+                                              value: (employee.mobile != null && employee.mobile!.trim().isNotEmpty)
+                                                    ? employee.mobile!
+                                                    : "-",
+                                            ),
 
-                              _ProfileField(
-                                label: "State",
-                                value: employee.state ?? 'N/A',
-                              ),
-                              _ProfileField(
-                                label: "City",
-                                value: employee.city ?? 'N/A',
-                              ),
-                              _ProfileField(
-                                label: "Address",
-                                value: employee.address ?? 'N/A',
-                              ),
-                            ],
-                          ),
-                        ),
+                                            _ProfileField(
+                                              label: "Gender",
+                                              value: (employee.gender != null && employee.gender!.trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter( employee.gender!.toString())
+                                                  : "-",
+                                            ),
 
-                        const SizedBox(height: 20),
+                                            _ProfileField(
+                                              label: "Date of Birth",
+                                              value: (employee.dob != null && employee.dob!.trim().isNotEmpty)
+                                                  ? DateFormatter.formatCustomDdMmYyyy(employee.dob.toString())
+                                                  : "-",
+                                            ),
 
-                        // Update button
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: CustomButton(
-                            text: "Update Profile",
-                            textColor: Colors.black,
-                            type: ButtonType.outlined,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UpdateEmployeeScreen(),
+                                            _ProfileField(
+                                              label: "Marital Status",
+                                              value: (employee.maritalStatus != null && employee.maritalStatus!.trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter(  employee.maritalStatus!.toString())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Qualification",
+                                              value: (employee.qualification != null && employee.qualification!.trim().isNotEmpty)
+                                                  ? StringUtils.toUpperCase(  employee.qualification!.toString())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "State",
+                                              value: (employee.state != null && employee.state!.trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter(  employee.state!.toString())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "City",
+                                              value: (employee.city != null && employee.city!.trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter(  employee.city!.toString())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Address",
+                                              value: (employee.address != null && employee.address.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord(  employee.address.toString())
+                                                  : "-",
+                                            ),
+
+
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      // Details section
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              "Official Details",
+                                              style: AppTextStyles.heading3(
+                                                context,
+                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            _ProfileField(
+                                              label: "User Id",
+                                              value: employee.sId ?? 'N/A',
+                                            ),
+                                            _ProfileField(
+                                              label: "Work Email",
+                                              value:
+                                                  employee.workEmail ?? 'N/A',
+                                            ),
+                                            _ProfileField(
+                                              label: "Experience",
+                                              value: "${employee.experience} yrs" ?? 'N/A',
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Role",
+                                              value: (employee.role != null && employee.role.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter(  employee.role.toString())
+                                                  : "-",
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      // const SizedBox(height: 20),
+                                      // Details section
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              "Your Company Details",
+                                              style: AppTextStyles.heading3(
+                                                context,
+                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            _ProfileField(
+                                              label: "Name",
+                                              value: (employee.workId?.company != null && employee.workId!.company.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeFirstLetter( employee.workId!.company!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Department",
+                                              value: (employee.workId?.department != null && employee.workId!.department.toString().trim().isNotEmpty)
+                                                  ? StringUtils.toUpperCase( employee.workId!.department!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Position",
+                                              value: (employee.workId?.jobPosition != null && employee.workId!.jobPosition.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord( employee.workId!.jobPosition!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Joining Date",
+                                              value: (employee.workId?.joiningDate != null && employee.workId!.joiningDate.toString().trim().isNotEmpty)
+                                                  ? DateFormatter.formatToLongDate(employee.workId?.joiningDate.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Reporting To",
+                                              value: (employee.workId?.reportingManager != null && employee.workId!.reportingManager.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord( employee.workId!.reportingManager!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Your Salary",
+                                              value: (employee.workId?.salary != null && employee.workId!.salary.toString().trim().isNotEmpty)
+                                                  ? "₹ ${StringUtils.capitalizeEachWord(employee.workId!.salary!.toString().trim())}/-"
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Employment Type",
+                                              value: (employee.workId?.shipInformation != null && employee.workId!.shipInformation.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord( employee.workId!.shipInformation!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Work Type",
+                                              value: (employee.workId?.workType != null && employee.workId!.workType.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord( employee.workId!.workType!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                            _ProfileField(
+                                              label: "Work Location",
+                                              value: (employee.workId?.workLocation != null && employee.workId!.workLocation.toString().trim().isNotEmpty)
+                                                  ? StringUtils.capitalizeEachWord( employee.workId!.workLocation!.toString().trim())
+                                                  : "-",
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 20),
+                                      // Update button
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        child: CustomButton(
+                                          text: "Update Profile",
+                                          textColor: Colors.black,
+                                          type: ButtonType.outlined,
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        UpdateEmployeeScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 15),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        child: CustomButton(
+                                          text: "Delete Employee",
+                                          color: Colors.red,
+                                          onPressed: () {
+                                            showDeleteBottomSheet(
+                                              context,
+                                              widget.employeeId,
+                                            );
+                                            // Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(height: 40),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                    ),
+                                                child: CustomButton(
+                                                  text: "🏦 Add Bank",
+                                                  textColor: Colors.black,
+                                                  type: ButtonType.outlined,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                AddEmployeeBankDetailScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                    ),
+                                                child: CustomButton(
+                                                  text: "🏦 Bank Details",
+                                                  textColor: Colors.black,
+                                                  type: ButtonType.outlined,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                EmpBankDetailScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                    ),
+                                                child: CustomButton(
+                                                  text: "👔 Add Work",
+                                                  textColor: Colors.black,
+                                                  type: ButtonType.outlined,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                AddEmployeeWorkScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                    ),
+                                                child: CustomButton(
+                                                  text: "👔 Work Details",
+                                                  textColor: Colors.black,
+                                                  type: ButtonType.outlined,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                EmpWorkDetailScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 15),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
                           ),
                         ),
-
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: CustomButton(
-                            text: "Delete Employee",
-                            color: Colors.red,
-                            onPressed: () {
-                              showDeleteBottomSheet(context, widget.employeeId);
-                              // Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: CustomButton(
-                                    text: "🏦 Add Bank",
-                                    textColor: Colors.black,
-                                    type: ButtonType.outlined,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  AddEmployeeBankDetailScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: CustomButton(
-                                    text: "🏦 Bank Details",
-                                    textColor: Colors.black,
-                                    type: ButtonType.outlined,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  EmpBankDetailScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: CustomButton(
-                                    text: "👔 Add Work",
-                                    textColor: Colors.black,
-                                    type: ButtonType.outlined,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  AddEmployeeWorkScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: CustomButton(
-                                    text: "👔 Work Details",
-                                    textColor: Colors.black,
-                                    type: ButtonType.outlined,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  EmpWorkDetailScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
-                    ),
-                  ),
-                );
-              },
+                    );
+                  case 1: // Address Details
+                    return const AddEmployeeWorkScreen();
+                  case 2: // Address Details
+                    return AddEmployeeBankDetailScreen();
+                  case 3: // Address Details
+                    return AddEmpDocumentUploadWidget(empId: widget.employeeId);
+                  default:
+                    return AddEmployeeWorkScreen();
+                }
+              }),
             ),
           ),
         ],
@@ -541,41 +849,38 @@ class TopWaveClipper extends CustomClipper<Path> {
 }
 
 class _InfoItem extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String title;
   final String value;
 
-  const _InfoItem({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+  const _InfoItem({this.icon, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.blue.shade50,
-          child: Icon(icon, color: AppColors.primary),
-        ),
+        icon != null
+            ? CircleAvatar(
+              backgroundColor: Colors.blue.shade50,
+              child: Icon(icon, color: AppColors.primary),
+            )
+            : SizedBox.shrink(),
         const SizedBox(height: 8),
-        Text(
-          title,
-          style: AppTextStyles.heading2(
-            context,
-            overrideStyle: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: ResponsiveHelper.fontSize(context, 9),
+        Expanded(
+          child: Text(
+            title,
+            style: AppTextStyles.heading3(
+              context,
+              overrideStyle: TextStyle(color: Colors.black, fontSize: 14),
             ),
           ),
         ),
-        Text(
-          value,
-          style: AppTextStyles.heading1(
-            context,
-            overrideStyle: TextStyle(
-              fontSize: ResponsiveHelper.fontSize(context, 12),
+        Expanded(
+          child: Text(
+            value,
+            style: AppTextStyles.bodyText3(
+              context,
+              overrideStyle: TextStyle(color: Colors.black, fontSize: 14),
             ),
           ),
         ),
@@ -595,6 +900,7 @@ class _ProfileField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 2,

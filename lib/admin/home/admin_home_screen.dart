@@ -1,19 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/screen/add_company_profile_screen.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/widget/announcement_slider_widgets.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/add_employee_screen.dart';
- import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/emp__leaves_request_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/add_company_policy_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/policy_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/salary_slip/Admin_all_emp_salary_slip_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/home/attendance/attandance_sheet_list_screen.dart';
-import 'package:hrms_management_code_crafter/screen/nav_profile/screen/attandance_list_screen.dart';
+import 'package:hrms_management_code_crafter/admin/home/widget/admin_service_card_widget.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_text_styles.dart';
+import 'package:hrms_management_code_crafter/util/image_loader_util.dart';
 import 'package:hrms_management_code_crafter/util/responsive_helper_util.dart';
-import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../screen/auth/controller/auth_provider.dart';
+import '../../util/string_utils.dart';
+import '../announcement/cmp_announcement_model.dart';
+import '../company_profile/controller/comp_profile_api_provider.dart';
+import '../company_profile/screen/view_cmp_profile_screen.dart';
+import '../company_profile/widget/announcement_tab_widget.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -30,203 +41,366 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final now = DateTime.now();
     if (_lastBackPressed == null ||
         now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
-      // Show snackbar message to press again
       _lastBackPressed = now;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Press back again to exit the app",),
+          content: const Text("Press back again to exit the app"),
           duration: const Duration(seconds: 2),
         ),
       );
-      return false; // Prevent app from exiting
+      return false;
     }
-    return true; // Allow app to exit
+    return true;
   }
 
-  // Function to determine the greeting
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Good Morning';
-    } else if (hour < 17) {
-      return 'Good Afternoon';
-    } else {
-      return 'Good Evening';
-    }
+  List<Announcement> companyAnnouncements = [
+    Announcement(
+      id: '001',
+      title: 'Important System Maintenance',
+      description:
+          'Our systems will undergo scheduled maintenance on 25th July from 10 PM to 1 AM IST. Services may be intermittently unavailable during this period. We apologize for any inconvenience.',
+    ),
+    Announcement(
+      id: '002',
+      title: 'New HR Policy Update',
+      description:
+          'Please review the updated HR policy document available on the employee portal. Key changes include revised leave application procedures and remote work guidelines. Effective 1st August.',
+    ),
+    Announcement(
+      id: '003',
+      title: 'Company Picnic Rescheduled',
+      description:
+          'Due to unforeseen weather conditions, the annual company picnic has been rescheduled to 15th August. Further details regarding the venue and activities will be shared soon.',
+    ),
+    Announcement(
+      id: '004',
+      title: 'Quarterly Town Hall Meeting',
+      description:
+          'Join us for our Q3 Town Hall meeting on 5th September at 2 PM in the main auditorium. We\'ll discuss recent achievements, upcoming goals, and open floor for Q&A.',
+    ),
+    Announcement(
+      id: '005',
+      title: 'Mandatory Fire Safety Drill',
+      description:
+          'A mandatory fire safety drill will be conducted on 10th August at 11 AM. Please follow all instructions from the safety team during the drill.',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount;
+    double childAspectRatio;
+
+    if (screenWidth < 600) {
+      crossAxisCount = 4; // Reduced number of items per row
+      childAspectRatio = 0.8; // Adjust aspect ratio for better fit
+    } else if (screenWidth < 900) {
+      crossAxisCount = 4;
+      childAspectRatio = 0.9;
+    } else {
+      crossAxisCount = 5;
+      childAspectRatio = 1.0;
+    }
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
-        // if (!didPop) {
         final shouldExit = await _onBackPressed();
         if (shouldExit) {
-          SystemNavigator.pop(); // Force exit
+          SystemNavigator.pop();
         }
-        // }
+
       },
       child: Scaffold(
-        backgroundColor: AppColors.lightBgColor,
+        backgroundColor: AppColors.white,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           elevation: 0,
+          toolbarHeight: 70,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
           ),
-          title: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: "HRMS",
-                  style: AppTextStyles.heading2(
-                    context,
-                    overrideStyle: TextStyle(color: Colors.white),
-                  ),
-                ),
-                TextSpan(
-                  text: "",
-                  style: AppTextStyles.heading2(
-                    context,
-                    overrideStyle: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TopProfileHeader(empEmail: "c", empName: 'xx'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.notifications, color: Colors.white),
+                onPressed: () {},
+              ),
+            ],
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
-              onPressed: () {},
-            ),
+
           ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+              // announcement slider
+              AnnouncementSliderWidget(),
+              Container(color: AppColors.lightBlueColor,height: 10,),
+              SizedBox(height: 20),
+              Text(
+                "Employee Management",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.heading1(
+                  context,
+                  overrideStyle: TextStyle(
+                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddEmployeeScreen(),
-                        ),
-                      );
-                    },
-                    child: DashboardCard(
-                      title: 'Add\nEmployee',
-                      icon: Icons.person,
-                      color: Colors.deepPurple,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddEmployeeScreen(),
+                          ),
+                        );
+                      },
+                      child:AdminServiceCardWidget(
+                        title: 'Add\nEmployee',
+                        icon: Icons.person,
+                        color: Colors.deepPurple,
+                      )
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddCompanyPolicyScreen(),
-                        ),
-                      );
-                    },
-                    child: DashboardCard(
-                      title: 'Add\nCompany Policy',
-                      icon: Icons.calculate,
-                      color: Colors.pinkAccent,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddCompanyPolicyScreen(),
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'Add\nPolicy',
+                        icon: Icons.calculate,
+                        color: Colors.pinkAccent,
+                      ),
                     ),
                   ),
-                  DashboardCard(
-                    title: 'Payroll Management',
-                    icon: Icons.monetization_on,
-                    color: Colors.cyan,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    EmpSalarySlipListScreen(), // Corrected name based on import
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'Payroll Management',
+                        icon: Icons.monetization_on,
+                        color: Colors.cyan,
+                      ),
+                    ),
                   ),
-                  DashboardCard(
-                    title: 'File Management',
-                    icon: Icons.folder,
-                    color: Colors.green,
+                  Expanded(
+                    child: const AdminServiceCardWidget(
+                      title: 'File Management',
+                      icon: Icons.folder,
+                      color: Colors.green,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EmployeeListScreen()),
-                  );
-                },
-                child: const CustomListTile(
-                  title: 'All Employees',
-                  icon: Icons.people_alt_outlined,
-                  color: Colors.lightBlue,
-                  bgColor: Color(0xFFE6F0FA),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => EmpBankDetailScreen()),
-                // );
-              },
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PolicyListScreen(),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EmployeeListScreen(),
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'All\nEmployee',
+                        icon: Icons.people_alt_outlined,
+                        color: Colors.lightBlue,
                       ),
-                    );
-                  },
-                  child: const CustomListTile(
-                    title: 'View Company Policy',
-                    icon: Icons.description_outlined,
-                    color: Colors.deepOrange,
-                    bgColor: Color(0xFFFFF1E6),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PolicyListScreen(),
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'View\nPolicy',
+                        icon: Icons.description_outlined,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    EmployeeLeaveRequestListScreen(), // Corrected name based on import
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'Leave\nRequest',
+                        icon: Icons.notifications_active_outlined,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    AttendanceSheetTableScreen(), // Corrected name based on import
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'Attendance Sheet',
+                        icon: Icons.calendar_month_outlined,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Container(color: AppColors.lightBlueColor,height: 10,),
+              const SizedBox(height: 20),
+              Text(
+                "Company Profile Management",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.heading1(
+                  context,
+                  overrideStyle: TextStyle(
+                    fontSize: ResponsiveHelper.fontSize(context, 12),
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EmployeeLeaveRequestListScreen()),
-                  );
-                },
-                child: const CustomListTile(
-                  title: 'Leave Request',
-                  icon: Icons.notifications_active_outlined,
-                  color: Colors.green,
-                  bgColor: Color(0xFFE6FAF0),
-                  hasNotification: true,
-                ),
+
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddCompanyProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: const AdminServiceCardWidget(
+                        title: 'Add\nProfile',
+                        icon: Icons.person,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10), // Spacing between cards
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => AddCompanyPolicyScreen(),
+                        //   ),
+                        // );
+                      },
+                      child: Visibility(
+                        visible: false,
+                        child: const AdminServiceCardWidget(
+                          title: 'Add\nPolicy',
+                          icon: Icons.calculate,
+                          color: Colors.pinkAccent,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10), // Spacing between cards
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+
+                      },
+                      child: Visibility(
+                        visible: false,
+                        child: const AdminServiceCardWidget(
+                          title: 'Payroll Management',
+                          icon: Icons.monetization_on,
+                          color: Colors.cyan,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10), // Spacing between cards
+                  Expanded(
+                    child: Visibility(
+                      visible: false,
+                      child: AdminServiceCardWidget(
+                        title: 'File Management',
+                        icon: Icons.folder,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AttendanceSheetTableScreen()),
-                  );
-                },
-                child: const CustomListTile(
-                  title: 'Attendance Sheet',
-                  icon: Icons.calendar_month_outlined,
-                  color: Colors.deepPurple,
-                  bgColor: Color(0xFFF3E6FA),
-                ),
-              ),
+              const SizedBox(height: 20),
+              Container(color: AppColors.lightBlueColor,height: 10,),
               InkWell(
                 onTap: () {
                   // Navigator.push(
@@ -236,7 +410,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 },
                 child: GestureDetector(
                   onTap: () {
-                    showLogoutBottomSheet(context );
+                    showLogoutBottomSheet(context);
                   },
                   child: const CustomListTile(
                     title: 'Logout',
@@ -254,8 +428,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 }
 
-
-
 void showLogoutBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -265,201 +437,207 @@ void showLogoutBottomSheet(BuildContext context) {
     backgroundColor: Colors.white,
     builder: (context) {
       return Builder(
-        builder: (innerContext) => Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// Drag Handle
-              Container(
-                width: 100,
-                height: 5,
-                color: Colors.grey[400],
-              ),
+        builder:
+            (innerContext) => Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// Drag Handle
+                  Container(width: 100, height: 5, color: Colors.grey[400]),
 
-              /// Warning Icon & Message
-              Container(
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 50,
+                  /// Warning Icon & Message
+                  Container(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 50,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            "Sign out from Account",
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Are you sure you would like to logout of your Account",
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Sign out from Account",
-                        style: AppTextStyles.bodyText1(context,
+                    ),
+                  ),
+
+                  /// Cancel & Logout Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Cancel Button
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(innerContext),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.lightBrown_color,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 0,
+                          ),
+                        ),
+                        child: Text(
+                          "Cancel",
+                          style: AppTextStyles.heading1(
+                            context,
                             overrideStyle: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            )),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Are you sure you would like to logout of your Account",
-                        style: AppTextStyles.bodyText1(context,
+
+                      // Logout Button
+                      ElevatedButton(
+                        onPressed: () {
+                          print("Logout button clicked");
+                          // Use the correct context with Provider
+                          Provider.of<AuthAPIProvider>(
+                            innerContext,
+                            listen: false,
+                          ).logoutUser(innerContext);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 0,
+                          ),
+                        ),
+                        child: Text(
+                          "Logout",
+                          style: AppTextStyles.heading1(
+                            context,
                             overrideStyle: TextStyle(
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            )),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 20),
                     ],
                   ),
-                ),
-              ),
 
-              /// Cancel & Logout Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Cancel Button
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(innerContext),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lightBrown_color,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 0),
-                    ),
-                    child: Text(
-                      "Cancel",
-                      style: AppTextStyles.heading1(context,
-                          overrideStyle: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          )),
-                    ),
-                  ),
-
-                  // Logout Button
-                  ElevatedButton(
-                    onPressed: () {
-                      print("Logout button clicked");
-                      // Use the correct context with Provider
-                      Provider.of<AuthAPIProvider>(innerContext, listen: false)
-                          .logoutUser(innerContext);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 0),
-                    ),
-                    child: Text(
-                      "Logout",
-                      style: AppTextStyles.heading1(context,
-                          overrideStyle: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          )),
-                    ),
-                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
-
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
+            ),
       );
     },
   );
 }
 
-class DashboardCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
+class TopProfileHeader extends StatelessWidget {
+  final String empName;
+  final String empEmail;
 
-  const DashboardCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.color,
-  });
+  const TopProfileHeader({
+    Key? key,
+    required this.empName,
+    required this.empEmail,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(30),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Left side colored bar
-          Container(
-            width: 6,
-            // height: double.infinity,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
+    final companyProfileProvider = context.watch<CompanyProfileApiProvider>();
+    final overview = companyProfileProvider.compProfileDataModel?.data?.overviewData;
+
+    final companyName = overview?.companyName ?? "Company Name";
+    final companyEmail = overview?.companyOfficialEmail ?? "email@example.com";
+    final logoUrl = overview?.logo?.secureUrl;
+
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Profile section
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CompanyProfileScreen(),
+                  ),
+                );
+              },
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.white,
+                child: ImageLoaderUtil.assetImage("assets/images/code_crafter_logo.png"),
               ),
             ),
-          ),
-
-          // Space between bar and content
-          const SizedBox(width: 8),
-          // Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+            const SizedBox(width: 12),
+            Expanded(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Icon(icon, color: color, size: 30),
-                  ),
-                  const SizedBox(height: 10),
                   Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.heading3(
+                    StringUtils.capitalizeEachWord(companyName),
+                    style: AppTextStyles.heading1(
                       context,
-                      overrideStyle: TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12)),
+                      overrideStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    companyEmail,
+                    style: AppTextStyles.bodyText3(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: AppColors.white,
+                        fontSize: ResponsiveHelper.fontSize(context, 10),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+
+      ],
     );
   }
 }
@@ -527,3 +705,4 @@ class CustomListTile extends StatelessWidget {
     );
   }
 }
+

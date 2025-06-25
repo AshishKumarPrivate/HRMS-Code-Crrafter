@@ -190,7 +190,6 @@ class AddEmployeeBankDetailApiProvider with ChangeNotifier {
     }
   }
 
-
   void _handleUnexpectedErrors( BuildContext context,   dynamic e,  String message,  ) {
     CustomSnackbarHelper.customShowSnackbar(
       context: context,

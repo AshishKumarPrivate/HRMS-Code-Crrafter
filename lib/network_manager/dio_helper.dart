@@ -13,8 +13,8 @@ class DioHelper {
         receiveDataWhenStatusError: true,
         // contentType: "application/json",
         contentType: isMultipart ? 'multipart/form-data' : 'application/json',
-        sendTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
         headers: {
           "Authorization": 'Bearer ${StorageHelper().getUserAccessToken()}',
         },
@@ -188,6 +188,17 @@ class DioHelper {
       }
 
       return response.data;
+    } on DioException catch (e) {
+      return _handleError(e);
+      // ❌ If DioException, check if it contains a response
+      if (e.response != null) {
+        print("❌ API Error Response: ${e.response?.data}");
+
+        return e.response?.data; // ✅ Return error response from API
+      } else {
+        print("❌ Network Error: ${e.message}");
+        return null; // ✅ Return null for network errors
+      }
     } catch (error) {
       return null;
     }

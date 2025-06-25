@@ -61,10 +61,41 @@ dependencies:
   pdf: ^3.10.4
   printing: ^5.12.0
   device_info_plus: ^9.1.1
+  geolocator: ^12.0.0 # Use the latest stable version
+  geocoding: ^3.0.0 # Use the latest stable version
+  flutter_native_splash: ^2.4.4
+  smooth_page_indicator: ^1.2.1
+  file_picker: ^8.0.0+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_native_splash:
+  color: "#ffffff" # White background
+  image: "assets/images/launcher_icon.png" # Your SHANYA logo
+
+  # New additions from your provided image:
+  background_image: "assets/images/launcher_icon.png" # You'll need to create this image
+  #  branding: "assets/branding.png" # You'll need to create this image
+
+  # Dark mode specific assets (optional, uncomment if you plan to use dark mode)
+  # background_image_dark: "assets/background_dark.png"
+  # image_dark: "assets/logo_dark.png"
+  # branding_dark: "assets/branding_dark.png"
+
+  # Android 12 specific configuration
+  android_12:
+    color: "#ffffff" # The specific color from your image
+    image: "assets/images/launcher_icon.png" # You'll need to create this image for Android 12
+  #    branding: "assets/images/simple_logo.png" # You'll need to create this image for Android 12
+
+  # Other existing settings from your previous configuration:
+  android: true
+  ios: true
+  web : true
+  fullscreen: true
+  android_gravity: center
 
 flutter_launcher_icons:
 #  android: true

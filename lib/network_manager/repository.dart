@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/add_cmp_announcement_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/announcement_list_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/company_profile_data_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/add_employee_admin_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/add_emp_bank_detail_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/emp_bank_detail_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/update_emp_bank_model.dart';
+import 'package:hrms_management_code_crafter/admin/employee/model/emp_document_module/add_emp_document_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/employee_list_detail_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/employee_list_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/policy/add_cmp_policy_model_response.dart';
@@ -17,6 +23,7 @@ import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/model/emp_leave_rejected_model.dart';
 import 'package:hrms_management_code_crafter/admin/home/attendance/model/admin_filter_attendance_model.dart';
 import 'package:hrms_management_code_crafter/screen/auth/model/user_and_admin_login_model.dart';
+import 'package:hrms_management_code_crafter/screen/emp_attandance/model/check_status_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_attandance_detail_model_response.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_chart_attendance_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_check_in_model_response.dart';
@@ -25,6 +32,8 @@ import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_mon
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_single_profile_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/model/apply_leave_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/model/my_all_leave_model.dart';
+import 'package:hrms_management_code_crafter/admin/employee/screen/salary_slip/model/payroll_salary_slip_list_admin_side_model.dart';
+import 'package:hrms_management_code_crafter/screen/nav_home/model/emp_salary_slip_emp_side_model.dart';
 
 import '../screen/auth/model/user_login_model.dart';
 import 'dio_error_handler.dart' show DioErrorHandler;
@@ -32,7 +41,7 @@ import 'dio_helper.dart';
 
 class Repository {
   final DioHelper _dioHelper = DioHelper();
-  String baseUrl = "https://hr-management-codecrafter-1.onrender.com";
+  static const String baseUrl = "https://hr-management-codecrafter-1.onrender.com";
 
   /// ✅✅✅✅✅✅✅✅✅✅  HRMS EMPLOYEE API   ✅✅✅✅✅✅✅✅✅✅
 
@@ -69,6 +78,60 @@ class Repository {
       );
     }
   }
+
+  // Forget Password
+  Future<Map<String, dynamic>> forgetPassword(Map<String, dynamic> requestBody) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/admin/send/otp',
+        requestBody: requestBody,
+      );
+      print("✅ Forget Password API Response: $response");
+      if (response == null) {
+        return {"success": false, "message": "No response from server"};
+      }
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
+    } catch (e) {
+      return {"success": false, "message": "Reset code not sent to email"};
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(Map<String, dynamic> requestBody) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/admin/verify-otp',
+        requestBody: requestBody,
+      );
+
+      print("✅ Forget Password API Response: $response");
+
+      if (response == null) {
+        return {"success": false, "message": "No response from server"};
+      }
+
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
+    } catch (e) {
+      return {"success": false, "message": "Unexpected error occurred"};
+    }
+  }
+
+
 
   Future<ApplyLeaveModelResponse> applyLeave(FormData  requestBody, String empID ) async {
     try {
@@ -181,17 +244,10 @@ class Repository {
   }
 
   /// Check in out api
-  // Future<EmpPunchInModel> empCheckIn(String employeeRegistrationId) async {
-  //   Map<String, dynamic> response = await _dioHelper.post(
-  //       url: '$baseUrl/api/v1/employee/attendance/checkIn/${employeeRegistrationId}');
-  //   return EmpPunchInModel.fromJson(response);
-  // }
-
-  /// Check in out api
-  Future<EmpPunchInModel> empCheckIn(String employeeRegistrationId ) async {
+  Future<EmpPunchInModel> empCheckIn(String employeeRegistrationId , Object requestBody ) async {
     try {
       Map<String, dynamic>? response = await _dioHelper.post(
-          url: '$baseUrl/api/v1/employee/attendance/checkIn/${employeeRegistrationId}' );
+          url: '$baseUrl/api/v1/employee/attendance/checkIn/${employeeRegistrationId}', requestBody: requestBody );
       print("✅ Add Employee API Response: $response");
 
       if (response == null) {
@@ -234,8 +290,7 @@ class Repository {
         );
       }
       if (response["success"] == false) {
-        String errorMessage =
-            response["message"] ?? "Failed to Check OUT!";
+        String errorMessage =response["message"] ?? "Failed to Check OUT!";
         return EmpCheckOUTModelResponse(success: false, message: errorMessage);
       }
       return EmpCheckOUTModelResponse.fromJson(response);
@@ -296,6 +351,38 @@ class Repository {
     // return LogInModel.fromJson(response);
   }
 
+  Future<CheckInStatusModelResponse> checkInStatusApi(String employeeRegistrationId ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.get(
+          url: '$baseUrl/api/v1/employee/attendance/today/CheckinData/${employeeRegistrationId}' );
+      print("✅ CheckInStatus API Response: $response");
+
+      if (response == null) {
+        return CheckInStatusModelResponse(
+          success: false,
+          // message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage = response["message"] ?? "Failed to Check In!";
+        return CheckInStatusModelResponse(success: false);
+      }
+      return CheckInStatusModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return CheckInStatusModelResponse(
+        success: false,
+        // message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return CheckInStatusModelResponse(
+        success: false,
+        // message: "Unexpected error occurred",
+      );
+    }
+  }
+
 
   Future<EmpSingleProfileModel> empSingleProfile(String empLoginID ) async {
     try {
@@ -328,6 +415,31 @@ class Repository {
         message: "Unexpected error occurred",
       );
     }
+  }
+
+
+  Future<Map<String, dynamic>> sendFcmToken(Object requestBody) async {
+
+    try{
+      Map<String, dynamic> response = await _dioHelper.post(
+          url: '$baseUrl/api/v1/employee/save/fcmtoken', requestBody: requestBody);
+
+      print("✅ Send fcm token API Response: $response");
+
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
+    }on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
+    } catch (e) {
+      return {"success": false, "message": "Unexpected error occurred"};
+    }
+
+    // return FirebaseModel.fromJson(response);
   }
 
 
@@ -653,5 +765,226 @@ class Repository {
     return AdminFilterAttendanceModel.fromJson(response);
   }
 /// !!!!!!!!!!!!!!!!!!!!!!!! ATTENDANCE CHART END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+  Future<PayrollSalarySlipListAdminSideModel> getAllEmpSalarySlipList() async {
+    Map<String, dynamic> response = await _dioHelper.get(
+      url: '$baseUrl/api/v1/payroll/view/list',
+    );
+    return PayrollSalarySlipListAdminSideModel.fromJson(response);
+  }
+
+
+  Future<EmpSalarySlipEmpSideModel> getEmpSalarySlipEmpSide(Map<String, dynamic>? queryParameters,String employeeRegistrationId) async {
+    Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/payroll/employee/view/list/${employeeRegistrationId}',queryParams: queryParameters
+    );
+    return EmpSalarySlipEmpSideModel.fromJson(response);
+  }
+
+
+  /// !!!!!!!!!!!!!!!!!!!!!!!! COMPANY PROFILE END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+  Future<AddEmployeeModelResponse> addCompProfileOverview(
+      FormData  requestBody,
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/compay/profile/add/overview',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Profile API Response: $response");
+
+      if (response == null) {
+        return AddEmployeeModelResponse(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Profile!";
+        return AddEmployeeModelResponse(success: false, message: errorMessage);
+      }
+      return AddEmployeeModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return AddEmployeeModelResponse(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return AddEmployeeModelResponse(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+  Future<AddEmployeeModelResponse> addCompCorporateAddress(
+      Object  requestBody,
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/compay/profile/add/address/corporate',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Corporate Address API Response: $response");
+
+      if (response == null) {
+        return AddEmployeeModelResponse(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Corporate Address!";
+        return AddEmployeeModelResponse(success: false, message: errorMessage);
+      }
+      return AddEmployeeModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return AddEmployeeModelResponse(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return AddEmployeeModelResponse(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+
+  Future<AddCompanyAnnouncementModel> addCompAnnouncement(
+      Object  requestBody,
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/compay/profile/add/announcement',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Corporate Address API Response: $response");
+
+      if (response == null) {
+        return AddCompanyAnnouncementModel(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Corporate Address!";
+        return AddCompanyAnnouncementModel(success: false, message: errorMessage);
+      }
+      return AddCompanyAnnouncementModel.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return AddCompanyAnnouncementModel(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return AddCompanyAnnouncementModel(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+  Future<CompanyProfileDataModel> getCompanyProfileData() async {
+    Map<String, dynamic> response = await _dioHelper.get(
+      url: '$baseUrl/api/v1/compay/profile/get/all/data',
+    );
+    return CompanyProfileDataModel.fromJson(response);
+  }
+
+
+  Future<AnnouncementListModel> getAllAnnouncementData() async {
+    Map<String, dynamic> response = await _dioHelper.get(
+      url: '$baseUrl/api/v1/compay/profile/get/all/announcements',
+    );
+    return AnnouncementListModel.fromJson(response);
+  }
+
+
+  Future<AddEmpDocumentModelResponse> uploadDocuments({
+    required Map<String, File> documents,
+    required String empId,
+  }) async {
+    try {
+      final formData = FormData();
+
+      // Backend expected field keys
+      final fieldKeyMapping = {
+        'PAN Card': 'pan',
+        'Aadhaar Card': 'aadhaar',
+        'Bank Passbook': 'passbook',
+        'High School Degree': 'highSchool',
+        'Graduation Degree': 'graduation',
+      };
+      // Add files dynamically
+      documents.forEach((label, file) {
+
+        final fieldKey = fieldKeyMapping[label] ?? label.replaceAll(' ', '_');
+        formData.files.add(
+          MapEntry(
+            fieldKey, // This must match the backend's Multer config
+            /// docType.replaceAll(" ", "_").toLowerCase(), // e.g., pan_card
+            MultipartFile.fromFileSync(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
+          ),
+        );
+      });
+
+      // Add additional field
+      // formData.fields.add(MapEntry("employee_id", empId));
+
+      print("✅ employeeiddd : $empId");
+      final response = await _dioHelper.post(
+        url: "$baseUrl/api/v1/employee/document/add/${empId}", // Replace with actual URL
+        requestBody: formData,
+      );
+
+      print("✅ Upload Documents Response: $response");
+
+      if (response == null) {
+        return AddEmpDocumentModelResponse(
+          success: false,
+          message: "No response from server",
+        );
+      }
+
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to upload documents.";
+        return AddEmpDocumentModelResponse(
+          success: false,
+          message: errorMessage,
+        );
+      }
+
+      return AddEmpDocumentModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data["message"] ?? e.message;
+      return AddEmpDocumentModelResponse(
+        success: false,
+        message: errorMsg,
+      );
+    } catch (e) {
+      print("❌ Unexpected error: $e");
+      return AddEmpDocumentModelResponse(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
 
 }

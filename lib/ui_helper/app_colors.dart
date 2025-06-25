@@ -10,4 +10,5 @@ class AppColors {
   static final txtGreyColor = Color(0xff575757);
   static final lightBgColor = Color(0xFFF8F8F8);
   static final lightBrown_color = Color(0xFFFFE8E2);
+  static final lightBlueColor = Color(0xE5F4F9FB);
 }

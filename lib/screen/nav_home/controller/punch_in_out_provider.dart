@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:hrms_management_code_crafter/screen/emp_attandance/model/check_status_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_attandance_detail_model_response.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_check_in_model_response.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_check_out_model_response.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_monthly_attendance_history_model.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/model/emp_single_profile_model.dart';
+import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:hrms_management_code_crafter/util/full_screen_loader_utiil.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +17,7 @@ import '../../../network_manager/api_exception.dart';
 import '../../../network_manager/dio_error_handler.dart';
 import '../../../network_manager/repository.dart';
 import '../../../util/custom_snack_bar.dart';
+import '../../../util/location_service_utils.dart';
 import '../../../util/storage_util.dart';
 
 class PunchInOutProvider extends ChangeNotifier {
@@ -22,10 +25,7 @@ class PunchInOutProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   String _errorMessage = "";
-
-  /// Getters for UI
   bool get isLoading => _isLoading;
-
   String get errorMessage => _errorMessage;
 
   EmpPunchInModel? _empPunchInModel;
@@ -33,15 +33,14 @@ class PunchInOutProvider extends ChangeNotifier {
   EmpAttancanceDetailModelResponse? _empAttendanceDetailModel;
   EmpMonthlyAttancanceHistoryModel? _empMonthlyAttendanceModel;
   EmpSingleProfileModel? _empSingleProfileDetailModel;
+  CheckInStatusModelResponse? _empCheckInStatusModel;
 
   EmpPunchInModel? get empPunchInModel => _empPunchInModel;
   EmpCheckOUTModelResponse? get empPunchOutModel => _empPunchOutModel;
-  EmpAttancanceDetailModelResponse? get empAttendanceDetailModel =>
-      _empAttendanceDetailModel;
-  EmpMonthlyAttancanceHistoryModel? get empMonthlyAttendanceModel =>
-      _empMonthlyAttendanceModel;
-  EmpSingleProfileModel? get empSingleProfileDetailModel =>
-      _empSingleProfileDetailModel;
+  EmpAttancanceDetailModelResponse? get empAttendanceDetailModel => _empAttendanceDetailModel;
+  EmpMonthlyAttancanceHistoryModel? get empMonthlyAttendanceModel =>_empMonthlyAttendanceModel;
+  EmpSingleProfileModel? get empSingleProfileDetailModel =>  _empSingleProfileDetailModel;
+  CheckInStatusModelResponse? get empCheckInStatusModel =>  _empCheckInStatusModel;
 
   DateTime? punchInTime; // Stored as UTC
   DateTime? punchOutTime; // Stored as UTC
@@ -120,6 +119,9 @@ class PunchInOutProvider extends ChangeNotifier {
     }
   }
 
+  Color get progressColor {
+    return workingDuration >= fullDay ? Colors.green : AppColors.primary;
+  }
   void _updateProgress() {
     if (fullDay.inSeconds == 0) return;
     double ratio = workingDuration.inSeconds / fullDay.inSeconds;
@@ -168,31 +170,50 @@ class PunchInOutProvider extends ChangeNotifier {
   Future<void> empCheckIn(BuildContext context) async {
     _setLoadingState(true);
     FullScreenLoader.show(context, message: "Please Wait");
-    final employeeRegistrationId =
-    await StorageHelper().getEmpLoginRegistrationId();
+    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
     print("employeeRegistrationId--- ${employeeRegistrationId}");
     _empPunchInModel = null;
     try {
+      final locationService = LocationService();
+      await locationService.getLocationAndAddress();
+      final position = locationService.currentPosition;
+
+      if (position == null) {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message:  'Failed to Punch In! Location not available. Please enable GPS.',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+        return;
+        // throw Exception("Location not available. Please enable GPS.");
+      }
+
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+      print("Lat: $latitude, Lon: $longitude");
+
+      Map<String, dynamic> requestBody = {
+        "latitude": latitude.toString(),
+        "longitude": longitude.toString(),
+      };
+
       var response = await _repository.empCheckIn(
         employeeRegistrationId.toString(),
+          requestBody
       );
 
       if (response.success == true) {
         _empPunchInModel = response;
         final String? utcLoginTime = _empPunchInModel?.addEmployee?.loginTime;
-        print(
-            "Login time (UTC from API): $utcLoginTime | Login time (Local): ${DateFormatter.formatUtcToReadable(utcLoginTime)}");
+        print("Login time (UTC from API): $utcLoginTime | Login time (Local): ${DateFormatter.formatUtcToReadable(utcLoginTime)}");
 
         try {
           final parsedLoginTimeUtc = DateTime.parse(utcLoginTime ?? '');
           // Convert UTC to IST (UTC+5:30)
           final parsedLoginTimeIst = parsedLoginTimeUtc.add(Duration(hours: 5, minutes: 30));
-          // Format to Indian format with AM/PM
           final formattedLoginTimeIst = DateFormat('hh:mm:ss a').format(parsedLoginTimeIst);
-
           print("Login time (IST converted and formatted): $formattedLoginTimeIst");
-
-          // Call punchIn with the UTC time from the API as you store it as UTC
           await punchIn(apiPunchInTime: parsedLoginTimeUtc.toUtc());
 
           CustomSnackbarHelper.customShowSnackbar(
@@ -251,8 +272,7 @@ class PunchInOutProvider extends ChangeNotifier {
   /// api call for check in check out
   Future<void> empCheckOut(BuildContext context) async {
     FullScreenLoader.show(context, message: "Please Wait");
-    final employeeRegistrationId =
-    await StorageHelper().getEmpLoginRegistrationId();
+    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
     print("employeeRegistrationId--- ${employeeRegistrationId}");
     _empPunchOutModel = null;
     try {
@@ -263,8 +283,7 @@ class PunchInOutProvider extends ChangeNotifier {
       if (response.success == true) {
         _empPunchOutModel = response;
         final String? utcLogoutTime = _empPunchOutModel?.data?.logoutTime;
-        print(
-            "Logout time (UTC from API): $utcLogoutTime | Logout time (Local): ${DateFormatter.formatUtcToReadable(utcLogoutTime)}");
+        print( "Logout time (UTC from API): $utcLogoutTime | Logout time (Local): ${DateFormatter.formatUtcToReadable(utcLogoutTime)}");
 
         try {
           final parsedLogoutTime = DateTime.parse(utcLogoutTime ?? '');
@@ -329,6 +348,78 @@ class PunchInOutProvider extends ChangeNotifier {
     }
   }
 
+
+  Future<void> checkInStatus(BuildContext context) async {
+    // _setLoadingState(true);
+    FullScreenLoader.show(context, message: "Please Wait"); // Loader can be controlled here
+
+    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
+    print("employeeRegistrationId--- ${employeeRegistrationId}");
+    _empCheckInStatusModel = null;
+
+    try {
+      var response = await _repository.checkInStatusApi(
+        employeeRegistrationId.toString(),
+      );
+
+      if (response.success == true  && response.data != null) {
+        _empCheckInStatusModel = response;
+
+        try {
+          final String? utcLoginTime = _empCheckInStatusModel?.data?.loginTime;
+          final parsedLoginTimeUtc = DateTime.parse(utcLoginTime ?? '');
+          // Convert UTC to IST (UTC+5:30)
+          final parsedLoginTimeIst = parsedLoginTimeUtc.add(Duration(hours: 5, minutes: 30));
+          final formattedLoginTimeIst = DateFormat('hh:mm:ss a').format(parsedLoginTimeIst);
+          print("Login time (IST converted and formatted): $formattedLoginTimeIst");
+          await punchIn(apiPunchInTime: parsedLoginTimeUtc.toUtc());
+
+          CustomSnackbarHelper.customShowSnackbar(
+            context: context,
+            message: 'Already Checked In',
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          );
+
+        } catch (e) {
+          print("Error parsing loginTime from API: $e. Falling back to current UTC time.");
+          // await punchIn(apiPunchInTime: DateTime.now().toUtc());
+          CustomSnackbarHelper.customShowSnackbar(
+            context: context,
+            message: 'Failed to Check Status!',
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          );
+        }
+
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: 'Not Checked In',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } on DioException catch (e) {
+      final ApiException apiError = DioErrorHandler.handle(e);
+      CustomSnackbarHelper.customShowSnackbar(
+        context: context,
+        message: apiError.message,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "Something went wrong! Please try again later.",
+      );
+    } finally {
+      FullScreenLoader.hide(context); // Hide loader here
+      // _setLoadingState(false);
+    }
+  }
+
   Future<void> empAttendanceDetail(BuildContext context) async {
     _setLoadingState(true);
     // FullScreenLoader.show(context, message: "Please Wait"); // Loader can be controlled here
@@ -340,7 +431,7 @@ class PunchInOutProvider extends ChangeNotifier {
         empLoginId.toString(),
       );
 
-      if (response.success == true) {
+      if (response.success == true  && response.data != null) {
         _empAttendanceDetailModel = response;
         CustomSnackbarHelper.customShowSnackbar(
           context: context,

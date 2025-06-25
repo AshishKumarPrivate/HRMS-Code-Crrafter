@@ -35,7 +35,7 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
   String? _endDateForApi;
 
   final DateFormat uiDateFormat = DateFormat('dd-MM-yyyy');
-  final DateFormat apiDateFormat = DateFormat('yyyy/MM/dd');
+  final DateFormat apiDateFormat = DateFormat('yyyy-MM-dd');
 
   final List<String> breakDownList = ['full', 'first_haf', 'second_haf'];
   final Map<String, String> breakDownDisplayMap = {
@@ -189,9 +189,55 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                breakDownDropdown(),
+                _buildDropdownFormField(
+                  title: "Break Down",
+                  value: selectedBreakDown,
+                  items: breakDownList.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        breakDownDisplayMap[value] ?? value,
+                        style: AppTextStyles.bodyText1(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.black87,
+                            fontSize: ResponsiveHelper.fontSize(context, 13),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedBreakDown = newValue;
+                    });
+                  },
+                ),
                 const SizedBox(height: 10),
-                leaveTypeDropdown(),
+                _buildDropdownFormField(
+                  title: "Leave Type",
+                  value: selectedLeaveType,
+                  items: leaveTypeList.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        leaveTypeDisplayMap[value] ?? value,
+                        style: AppTextStyles.bodyText1(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.black87,
+                            fontSize: ResponsiveHelper.fontSize(context, 13),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedLeaveType = newValue;
+                    });
+                  },
+                ),
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () => _selectStartDate(context),
@@ -251,6 +297,78 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDropdownFormField({
+    required String title,
+    required String? value,
+    required List<DropdownMenuItem<String>> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text(
+            title,
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: Offset(0, 0),
+              ),
+            ],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: DropdownButtonFormField<String>(
+            value: value,
+            decoration: InputDecoration(
+              border: InputBorder.none, // Remove default border
+              contentPadding: EdgeInsets.zero, // Remove default padding
+            ),
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+            isExpanded: true,
+            onChanged: onChanged,
+            items: items,
+            // Added menuMaxHeight to control dropdown menu's maximum height
+            menuMaxHeight: MediaQuery.of(context).size.height * 0.4, // Max 40% of screen height
+            // Added dropdownColor for better visual distinction of the menu
+            dropdownColor: Colors.white,
+            validator: (String? val) {
+              if (val == null || val.isEmpty) {
+                return 'Please select a $title';
+              }
+              return null;
+            },
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black87,
+                fontSize: ResponsiveHelper.fontSize(context, 13),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

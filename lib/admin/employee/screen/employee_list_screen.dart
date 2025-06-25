@@ -3,14 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/employee_detail_screen.dart';
-import 'package:hrms_management_code_crafter/screen/nav_profile/screen/attandance_list_screen.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
+import '../../../screen/nav_profile/screen/attandance_calender_view_screen.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/common_widget/default_common_app_bar.dart';
 import '../../../util/responsive_helper_util.dart';
+import '../../../util/string_utils.dart';
 import '../model/employee_list_model.dart';
 
 class EmployeeListScreen extends StatefulWidget {
@@ -90,7 +91,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 }
 
 class EmployeeListItem extends StatelessWidget {
-  final Data employeData;
+  final AllData employeData;
   final int index;
 
    EmployeeListItem({
@@ -118,12 +119,6 @@ class EmployeeListItem extends StatelessWidget {
         child: InkWell(
           onTap: () async {
             print("Employee Detail ID: ${employeData.sId}", );
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => EmployeeDetailScreen(employeeId:  employeData.sId.toString()),
-            //   ),
-            // );
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
@@ -201,7 +196,11 @@ class EmployeeListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${employeData.name}",style: AppTextStyles.heading1(
+                          StringUtils.capitalizeEachWord(
+                            employeData.name ?? "N/A",
+                          ),
+                          // "${employeData.name}",
+                          style: AppTextStyles.heading1(
                           context,
                           overrideStyle: TextStyle(
                             fontSize: ResponsiveHelper.fontSize(context, 14),
@@ -292,7 +291,7 @@ class EmployeeListItem extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AttendanceScreen(employeeId: employeData.sId.toString(),), // Pass employee ID if needed
+                                builder: (context) => CalendarAttendanceScreen(employeeId: employeData.sId.toString(),), // Pass employee ID if needed
                               ),
                             );
                           },

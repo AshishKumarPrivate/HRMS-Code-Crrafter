@@ -7,6 +7,9 @@ class  StorageHelper {
   static final StorageHelper _singleton = StorageHelper._internal();
   static const String _employeeDataKey = 'employee_data';
 
+  static const String _imagePathKey = 'last_captured_image_path';
+
+
   factory StorageHelper() {
     return _singleton;
   }
@@ -19,6 +22,18 @@ class  StorageHelper {
   }
    Future<void> savePunchIn(DateTime? time) async {
     await prefs.setString('punchIn', time?.toIso8601String() ?? '');
+  }
+
+  static Future<void> saveImagePath(String imagePath) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_imagePathKey, imagePath);
+  }
+
+  /// Loads the saved image path from SharedPreferences.
+  /// Returns the image path if found, otherwise returns null.
+  static Future<String?> loadImagePath() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_imagePathKey);
   }
 
    Future<void> savePunchOut(DateTime? time) async {
