@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/screen/emp_attandance/widgets/emp_attendance_chart_widget.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/screen/apply_emp_leave_screen.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
+import 'package:hrms_management_code_crafter/screen/nav_home/screen/emp_documents_screen.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/screen/salary_slip_emp_side_screen.dart';
 import 'package:provider/provider.dart';
+import '../../../admin/employee/screen/emp_document_module/add_employee_documents_screen.dart';
 import '../../../admin/home/admin_home_screen.dart';
 import '../../../firebase/FirebaseNotificationService.dart';
 import '../../../ui_helper/app_colors.dart';
@@ -181,10 +183,18 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                                   },
                                 ),
                                 ManagementGridItem(
-                                  title: 'My Team',
+                                  title: 'Your\nDocuments',
                                   icon: Icons.people_alt_outlined,
                                   onTap: () {
                                     // Handle My Team tap
+                                    print("clik ");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EmpDocumentsScreen(empId: empLoginId.toString(),),
+                                      ),
+                                    );
+                                    // AddEmpDocumentUploadWidget(empId: empLoginId.toString(),);
                                   },
                                 ),
                                 ManagementGridItem(

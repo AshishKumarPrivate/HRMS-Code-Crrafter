@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+
+import 'dart:typed_data';
+import 'package:http_parser/http_parser.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/model/add_cmp_announcement_model.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/model/announcement_list_model.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/model/company_profile_data_model.dart';
@@ -9,6 +12,7 @@ import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/ad
 import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/emp_bank_detail_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/update_emp_bank_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/emp_document_module/add_emp_document_model.dart';
+import 'package:hrms_management_code_crafter/admin/employee/model/emp_document_module/get_emp_document_list_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/employee_list_detail_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/employee_list_model.dart';
 import 'package:hrms_management_code_crafter/admin/employee/model/policy/add_cmp_policy_model_response.dart';
@@ -983,6 +987,150 @@ class Repository {
       return AddEmpDocumentModelResponse(
         success: false,
         message: "Unexpected error occurred",
+      );
+    }
+  }
+
+
+  Future<AddEmpDocumentModelResponse> UpdateEmpDocuments({
+    required Map<String, File> documents,
+    required String empId,
+  }) async {
+    try {
+      final formData = FormData();
+
+      // Backend expected field keys
+      final fieldKeyMapping = {
+        'PAN Card': 'pan',
+        'Aadhaar Card': 'aadhaar',
+        'Bank Passbook': 'passbook',
+        'High School Degree': 'highSchool',
+        'Graduation Degree': 'graduation',
+      };
+      // Add files dynamically
+      documents.forEach((label, file) {
+
+        final fieldKey = fieldKeyMapping[label] ?? label.replaceAll(' ', '_');
+        formData.files.add(
+          MapEntry(
+            fieldKey, // This must match the backend's Multer config
+            /// docType.replaceAll(" ", "_").toLowerCase(), // e.g., pan_card
+            MultipartFile.fromFileSync(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
+          ),
+        );
+      });
+
+      // Add additional field
+      // formData.fields.add(MapEntry("employee_id", empId));
+
+      print("✅ employeeiddd : $empId");
+      final response = await _dioHelper.put(
+        url: "$baseUrl/api/v1/employee/document/update/${empId}", // Replace with actual URL
+        requestBody: formData,
+      );
+
+      print("✅ Upload Documents Response: $response");
+
+      if (response == null) {
+        return AddEmpDocumentModelResponse(
+          success: false,
+          message: "No response from server",
+        );
+      }
+
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to upload documents.";
+        return AddEmpDocumentModelResponse(
+          success: false,
+          message: errorMessage,
+        );
+      }
+
+      return AddEmpDocumentModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data["message"] ?? e.message;
+      return AddEmpDocumentModelResponse(
+        success: false,
+        message: errorMsg,
+      );
+    } catch (e) {
+      print("❌ Unexpected error: $e");
+      return AddEmpDocumentModelResponse(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+
+
+
+  Future<GetAllEmpDocuemtsListModel> getEmpDocumentsList( String empId) async {
+    Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/employee/document/get/$empId');
+    return GetAllEmpDocuemtsListModel.fromJson(response);
+  }
+
+// MODIFIED: `deleteSingleEmpDocument` to accept String documentType
+  Future<GetAllEmpDocuemtsListModel> deleteSingleEmpDocument({
+    required String documentType, // Now accepting String for document type
+    required String fileName, // Now accepting String for document type
+    required String empId,
+  }) async {
+    try {
+      final formData = FormData();
+      // Add the documentType as a field in the form data
+      // This key 'documentType' should match what your backend expects
+      formData.files.add(MapEntry(documentType, MultipartFile.fromBytes(
+        Uint8List(0), // An empty byte array
+        filename: fileName, // Crucially, provide the original filename
+        contentType: MediaType('application', 'octet-stream'), // Generic binary type
+      ),));
+
+
+      print("✅ employeeId for delete : $empId");
+      print("✅ documentType for delete : $documentType");
+
+      final response = await _dioHelper.put(
+        url: "$baseUrl/api/v1/employee/document/delete-one/${empId}", // Your delete endpoint
+        requestBody: formData, // Send form data containing documentType
+        // options: Options(headers: {"Content-Type": "multipart/form-data"}),
+      );
+
+      print("✅ Delete Documents Response: $response");
+
+      if (response == null) {
+        return GetAllEmpDocuemtsListModel(
+          success: false,
+          message: "No response from server",
+        );
+      }
+
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to delete documents.";
+        return GetAllEmpDocuemtsListModel(
+          success: false,
+          message: errorMessage,
+        );
+      }
+
+      return GetAllEmpDocuemtsListModel.fromJson(response);
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data["message"] ?? e.message;
+      return GetAllEmpDocuemtsListModel(
+        success: false,
+        message: errorMsg,
+      );
+    } catch (e) {
+      print("❌ Unexpected delete error: $e");
+      return GetAllEmpDocuemtsListModel(
+        success: false,
+        message: "Unexpected error occurred during deletion",
       );
     }
   }

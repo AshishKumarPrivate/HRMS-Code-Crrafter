@@ -1,630 +1,439 @@
 // import 'dart:io';
-//
-// import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:file_picker/file_picker.dart';
 // import 'package:flutter/material.dart';
-// import 'package:hrms_management_code_crafter/screen/nav_home/model/emp_salary_slip_emp_side_model.dart';
-// import 'package:pdf/widgets.dart' as pw;
-// import 'package:permission_handler/permission_handler.dart';
+// import 'package:hrms_management_code_crafter/admin/employee/screen/emp_document_module/view_emp_documents_list_widget.dart';
+// import 'package:hrms_management_code_crafter/ui_helper/common_widget/solid_rounded_button.dart';
+// import 'package:hrms_management_code_crafter/util/storage_util.dart'; // Make sure this path is correct
 // import 'package:provider/provider.dart';
-//
-// import 'package:hrms_management_code_crafter/admin/employee/screen/salary_slip/controller/admin_emp_salary_slip_api_provider.dart';
 // import '../../../../ui_helper/app_colors.dart';
 // import '../../../../ui_helper/app_text_styles.dart';
-// import '../../../../ui_helper/common_widget/default_common_app_bar.dart';
-// import '../../../util/responsive_helper_util.dart';
-// import '../../../util/storage_util.dart';
+// import '../../../../util/custom_snack_bar.dart';
+// import '../../../../util/responsive_helper_util.dart';
+// import '../../controller/emp_document_module/emp_doc_api_provider.dart';
+// import '../../model/emp_document_module/get_emp_document_list_model.dart'; // Make sure this path is correct for your models
 //
-// class SalarySlipEmpSideScreen extends StatefulWidget {
-//   const SalarySlipEmpSideScreen({super.key});
+// // Ensure your models (GetAllEmpDocuemtsListModel, Data, Pan) are correctly defined and imported
+// // For demonstration, I'm assuming they are in 'get_emp_document_list_model.dart' as per your import.
+//
+// class AddEmpDocumentsContent extends StatefulWidget {
+//   final String empId;
+//
+//   const AddEmpDocumentsContent({super.key, required this.empId});
 //
 //   @override
-//   State<SalarySlipEmpSideScreen> createState() =>
-//       _SalarySlipEmpSideScreenState();
+//   State<AddEmpDocumentsContent> createState() => _AddEmpDocumentsContentState();
 // }
 //
-// class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
-//   DateTime? startDate;
-//   DateTime? endDate;
-//   late DateTime now;
-//   String? employeeRegistrationId;
+// class _AddEmpDocumentsContentState extends State<AddEmpDocumentsContent> {
+//   // This map will now hold either a File (for newly selected) or a Pan object (for existing from API)
+//   final Map<String, dynamic?> _documents = {
+//     'pan': null,
+//     'aadhaar': null,
+//     'passbook': null,
+//     'highSchool': null,
+//     'graduation': null,
+//     'salarySlip': null, // Make sure to include all document types from your Data model
+//   };
+//
+//   final Map<String, String> _documentTitles = {
+//     'pan': 'PAN Card',
+//     'aadhaar': 'Aadhaar Card',
+//     'passbook': 'Bank Passbook',
+//     'highSchool': 'High School Certificate',
+//     'graduation': 'Graduation Certificate',
+//     'salarySlip': 'Salary Slip', // Add title for salary slip
+//   };
+//
+//   bool _isLoading = true;
 //
 //   @override
 //   void initState() {
 //     super.initState();
-//     now = DateTime.now();
-//     startDate = DateTime(now.year, now.month, 1); // First day of current month
-//     endDate = now; // Today's date
-//     loadSalarySlipData();
+//     _fetchAndSetExistingDocuments(); // Call this to fetch and populate documents on initialization
 //   }
 //
-//   Future<void> loadSalarySlipData() async {
-//     employeeRegistrationId = await StorageHelper().getEmpLoginRegistrationId();
-//
-//     if (employeeRegistrationId != null) {
-//       final String formattedStartDate =
-//           "${startDate!.year}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.day.toString().padLeft(2, '0')}";
-//
-//       final String formattedEndDate =
-//           "${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.day.toString().padLeft(2, '0')}";
-//
-//       WidgetsBinding.instance.addPostFrameCallback((_) {
-//         final provider = Provider.of<AdminEmpSalarySlipApiProvider>(
-//           context,
-//           listen: false,
-//         );
-//         provider.empSalarySlipEmpSide(
-//           startDate: formattedStartDate,
-//           endDate: formattedEndDate,
-//         );
-//       });
-//     }
-//   }
-//
-//   Future<void> _pickStartDate() async {
-//     DateTime? picked = await showDatePicker(
-//       context: context,
-//       initialDate: startDate ?? DateTime.now(),
-//       firstDate: DateTime(2000),
-//       lastDate: endDate ?? DateTime.now(),
-//     );
-//     if (picked != null) {
-//       setState(() {
-//         startDate = picked;
-//         if (endDate != null && picked.isAfter(endDate!)) {
-//           endDate = null;
-//         }
-//         loadSalarySlipData(); // Reload data with new start date
-//       });
-//     }
-//   }
-//
-//   Future<void> _pickEndDate() async {
-//     DateTime initialDate = endDate ?? DateTime.now();
-//     DateTime firstDate = startDate ?? DateTime(2000);
-//
-//     DateTime? picked = await showDatePicker(
-//       context: context,
-//       initialDate: initialDate,
-//       firstDate: firstDate,
-//       lastDate: DateTime.now(),
-//     );
-//     if (picked != null) {
-//       setState(() {
-//         endDate = picked;
-//         if (startDate != null && picked.isBefore(startDate!)) {
-//           startDate = null;
-//         }
-//         loadSalarySlipData(); // Reload data with new end date
-//       });
-//     }
-//   }
-//
-//   void _clearDateFilters() {
+//   Future<void> _fetchAndSetExistingDocuments() async {
 //     setState(() {
-//       startDate = DateTime(now.year, now.month, 1);
-//       endDate = now;
-//       loadSalarySlipData(); // Reload data after clearing filters
+//       _isLoading = true; // Show loading indicator
+//     });
+//     try {
+//       final provider = Provider.of<DocumentUploadProvider>(
+//         context,
+//         listen: false,
+//       );
+//
+//       // Call the API to get documents. Assuming getEmployeeDocumentsList updates a model in the provider.
+//       await provider.getEmployeeDocumentsList(widget.empId);
+//
+//       // Now access the data from the provider's model
+//       final Data? empDocumentsData = provider.getAllEmpDocuemtsListModel?.data;
+//
+//       if (empDocumentsData != null) {
+//         setState(() {
+//           // Populate _documents with existing data from the API
+//           // Only if secureUrl is not empty, means the document exists
+//           if (empDocumentsData.pan?.secureUrl?.isNotEmpty == true) {
+//             _documents['pan'] = empDocumentsData.pan;
+//           }
+//           if (empDocumentsData.aadhaar?.secureUrl?.isNotEmpty == true) {
+//             _documents['aadhaar'] = empDocumentsData.aadhaar;
+//           }
+//           if (empDocumentsData.passbook?.secureUrl?.isNotEmpty == true) {
+//             _documents['passbook'] = empDocumentsData.passbook;
+//           }
+//           if (empDocumentsData.highSchool?.secureUrl?.isNotEmpty == true) {
+//             _documents['highSchool'] = empDocumentsData.highSchool;
+//           }
+//           if (empDocumentsData.graduation?.secureUrl?.isNotEmpty == true) {
+//             _documents['graduation'] = empDocumentsData.graduation;
+//           }
+//           if (empDocumentsData.salarySlip?.secureUrl?.isNotEmpty == true) {
+//             _documents['salarySlip'] = empDocumentsData.salarySlip;
+//           }
+//         });
+//       } else {
+//         // Optionally show a message if no documents are found
+//         // CustomSnackbarHelper.customShowSnackbar(
+//         //   context: context,
+//         //   backgroundColor: Colors.orange,
+//         //   message: "No existing documents found for this employee.",
+//         // );
+//       }
+//     } catch (e) {
+//       CustomSnackbarHelper.customShowSnackbar(
+//         context: context,
+//         backgroundColor: Colors.red,
+//         message: "Error fetching documents: $e",
+//       );
+//     } finally {
+//       setState(() {
+//         _isLoading = false; // Hide loading indicator
+//       });
+//     }
+//   }
+//
+//   Future<void> _pickFile(String docType) async {
+//     FilePickerResult? result = await FilePicker.platform.pickFiles(
+//       type: FileType.custom,
+//       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+//     );
+//
+//     if (result != null && result.files.single.path != null) {
+//       setState(() {
+//         _documents[docType] = File(result.files.single.path!); // Store as File object
+//       });
+//     } else {
+//       CustomSnackbarHelper.customShowSnackbar(
+//         context: context,
+//         backgroundColor: Colors.orange,
+//         message: "No file selected for ${docType.toUpperCase()}.",
+//       );
+//     }
+//   }
+//
+//   void _clearFile(String docType) {
+//     setState(() {
+//       _documents[docType] = null; // Set to null to clear
 //     });
 //   }
 //
-//   String _formatDate(DateTime? date) {
-//     if (date == null) return 'Select';
-//     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+//   bool _isImageFile(String? fileName) {
+//     if (fileName == null) return false;
+//     final lower = fileName.toLowerCase();
+//     return lower.endsWith('.jpg') ||
+//         lower.endsWith('.jpeg') ||
+//         lower.endsWith('.png');
 //   }
 //
-//   Future<bool> checkStoragePermission() async {
-//     if (Platform.isAndroid) {
-//       final androidInfo = await DeviceInfoPlugin().androidInfo;
-//       final sdkInt = androidInfo.version.sdkInt;
+//   void _submitDocuments(bool isUpdate) async {
+//     final Map<String, File> filesToUpload = {};
 //
-//       if (sdkInt >= 30) {
-//         final status = await Permission.manageExternalStorage.request();
-//         return status.isGranted;
-//       } else {
-//         final status = await Permission.storage.request();
-//         return status.isGranted;
+//     // Iterate through the _documents map and collect only the File objects
+//     _documents.forEach((key, value) {
+//       if (value is File) {
+//         filesToUpload[key] = value;
 //       }
-//     }
-//     return true;
-//   }
+//     });
 //
-//   // Future<void> exportToPDF(List<EmpSalarySlipEmpSideModel> data) async {
-//   //
-//   //   if (!await checkStoragePermission()) {
-//   //     ScaffoldMessenger.of(context).showSnackBar(
-//   //       const SnackBar(content: Text("Storage permission denied")),
-//   //     );
-//   //     return;
-//   //   }
-//   //
-//   //   final pdf = pw.Document();
-//   //   pdf.addPage(
-//   //     pw.MultiPage(
-//   //       build:
-//   //           (context) => [
-//   //             pw.Center(
-//   //               child: pw.Text(
-//   //                 'Attendance Report',
-//   //                 style: pw.TextStyle(
-//   //                   fontSize: 22,
-//   //                   fontWeight: pw.FontWeight.bold,
-//   //                 ),
-//   //               ),
-//   //             ),
-//   //             pw.SizedBox(height: 20),
-//   //             pw.Table.fromTextArray(
-//   //               headers: [
-//   //                 'S.No',
-//   //                 'Name',
-//   //                 'Email',
-//   //                 'Mobile',
-//   //                 'Date',
-//   //                 'CheckIn',
-//   //                 'CheckOut',
-//   //                 'Working Hours',
-//   //                 'Over Time Hrs',
-//   //                 'Status',
-//   //               ],
-//   //               data: List<List<String>>.generate(
-//   //                 data.length,
-//   //                 (i) => [
-//   //                   '${i + 1}',
-//   //                   data[i].name,
-//   //                   data[i].email,
-//   //                   data[i].mobile,
-//   //                   data[i].date,
-//   //                   data[i].checkIn,
-//   //                   data[i].checkOut,
-//   //                   data[i].totalWorkingHours,
-//   //                   data[i].otTime,
-//   //                   data[i].status,
-//   //                 ],
-//   //               ),
-//   //             ),
-//   //           ],
-//   //     ),
-//   //   );
-//   //
-//   //   final dir = await getDownloadDirectory();
-//   //   final filePath = '${dir?.path}/attendance_report.pdf';
-//   //   final file =
-//   //       File(filePath!)
-//   //         ..createSync(recursive: true)
-//   //         ..writeAsBytesSync(await pdf.save());
-//   //
-//   //   await Share.shareXFiles([XFile(file.path)], text: 'Attendance PDF Report');
-//   //   ScaffoldMessenger.of(
-//   //     context,
-//   //   ).showSnackBar(SnackBar(content: Text('PDF saved to: $filePath')));
-//   // }
+//     if (filesToUpload.isEmpty) {
+//       CustomSnackbarHelper.customShowSnackbar(
+//         context: context,
+//         backgroundColor: Colors.red,
+//         message: "Please select at least one new document to upload/update.",
+//       );
+//       return;
+//     }
+//
+//     final provider = Provider.of<DocumentUploadProvider>(
+//       context,
+//       listen: false,
+//     );
+//
+//     if (isUpdate) {
+//       await provider.updateEmployeeDocuments(
+//         documents: filesToUpload,
+//         empId: widget.empId,
+//         context: context,
+//       );
+//     } else {
+//       await provider.uploadEmployeeDocuments(
+//         documents: filesToUpload,
+//         empId: widget.empId,
+//         context: context,
+//       );
+//     }
+//     // After successful upload/update, re-fetch documents to update the UI
+//     await _fetchAndSetExistingDocuments();
+//   }
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     final provider = context.watch<AdminEmpSalarySlipApiProvider>();
-//     final model = provider.empSalarySlipEmpSideModel?.data;
-//     final employee = model?.employeeData;
+//     print("employeeId = ${widget.empId}");
 //
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFF4F6FA),
+//     // Show loading indicator while fetching documents
+//     if (_isLoading) {
+//       return const Center(child: CircularProgressIndicator());
+//     }
 //
-//       appBar: AppBar(
-//         backgroundColor: AppColors.primary,
-//         // Set AppBar background color
-//         leading: IconButton(
-//           icon: Icon(Icons.arrow_back, color: Colors.white), // Back button
-//           onPressed: () {
-//             Navigator.of(context).pop(); // Navigate back
-//           },
-//         ),
-//         title: Text(
-//           'Salary Slip',
-//           style: AppTextStyles.heading1(
-//             context,
-//             overrideStyle: TextStyle(
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.all(15.0),
+//       child: Column(
+//         children: [
+//           // Iterate through all possible document types
+//           ..._documents.keys.map((docType) {
+//             final dynamic document = _documents[docType]; // Can be File, Pan, or null
+//             String? fileName;
+//             String? fileUrl;
+//             bool isLocalFile = false;
+//
+//             if (document is File) {
+//               isLocalFile = true;
+//               fileName = document.path.split('/').last;
+//             } else if (document is Pan) {
+//               fileName = document.secureUrl?.split('/').last;
+//               fileUrl = document.secureUrl;
+//             }
+//
+//             return Card(
+//               margin: const EdgeInsets.symmetric(vertical: 10),
+//               elevation: 0,
 //               color: Colors.white,
-//               fontSize: ResponsiveHelper.fontSize(context, 14),
-//             ),
-//           ),
-//         ),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.picture_as_pdf, color: AppColors.white),
-//             onPressed: () => (),
-//             // onPressed: () => exportToPDF(filteredData),
-//           ),
-//         ],
-//         bottom: PreferredSize(
-//           preferredSize: const Size.fromHeight(50),
-//           child: Column(
-//             children: [
-//               const SizedBox(height: 5),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 18,
-//                   vertical: 4,
-//                 ),
-//                 child: Row(
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(15),
+//               ),
+//               child: Padding(
+//                 padding: const EdgeInsets.all(16.0),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
 //                   children: [
-//                     Expanded(
-//                       child: OutlinedButton(
-//                         onPressed: _pickStartDate,
-//                         style: OutlinedButton.styleFrom(
-//                           // backgroundColor: AppColors.white, // Still want white background
-//                           foregroundColor: AppColors.primary,
-//                           // Text color
-//                           side: const BorderSide(color: AppColors.white),
-//                           // Add a border with primary color
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(8),
-//                           ),
-//                           padding: const EdgeInsets.symmetric(vertical: 1),
-//                         ),
-//                         child: Column(
-//                           children: [
-//                             Text(
-//                               'Start Date',
-//                               style: AppTextStyles.heading1(
-//                                 context,
-//                                 overrideStyle: TextStyle(
-//                                   color: Colors.white,
-//                                   fontSize: ResponsiveHelper.fontSize(
-//                                     context,
-//                                     12,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                             Text(
-//                               '${_formatDate(startDate)}',
-//                               style: AppTextStyles.heading1(
-//                                 context,
-//                                 overrideStyle: TextStyle(
-//                                   color: Colors.white,
-//                                   fontSize: ResponsiveHelper.fontSize(
-//                                     context,
-//                                     12,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
+//                     Text(
+//                       _documentTitles[docType] ?? docType,
+//                       style: AppTextStyles.heading1(
+//                         context,
+//                         overrideStyle: TextStyle(
+//                           color: AppColors.primary,
+//                           fontWeight: FontWeight.bold,
+//                           fontSize: ResponsiveHelper.fontSize(context, 16),
 //                         ),
 //                       ),
 //                     ),
-//                     const SizedBox(width: 8),
-//                     Expanded(
-//                       child: OutlinedButton(
-//                         onPressed: _pickEndDate,
-//                         style: OutlinedButton.styleFrom(
-//                           // backgroundColor: AppColors.white, // Still want white background
-//                           foregroundColor: AppColors.primary,
-//                           // Text color
-//                           side: const BorderSide(color: AppColors.white),
-//                           // Add a border with primary color
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(8),
-//                           ),
-//                           padding: const EdgeInsets.symmetric(vertical: 1),
-//                         ),
-//                         child: Column(
-//                           children: [
-//                             Text(
-//                               'End Date',
-//                               style: AppTextStyles.heading1(
-//                                 context,
-//                                 overrideStyle: TextStyle(
-//                                   color: Colors.white,
-//                                   fontSize: ResponsiveHelper.fontSize(
-//                                     context,
-//                                     12,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                             Text(
-//                               '${_formatDate(endDate)}',
-//                               style: AppTextStyles.heading1(
-//                                 context,
-//                                 overrideStyle: TextStyle(
-//                                   color: Colors.white,
-//                                   fontSize: ResponsiveHelper.fontSize(
-//                                     context,
-//                                     12,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
+//                     const SizedBox(height: 15),
+//                     Container(
+//                       width: double.infinity,
+//                       height: document == null ? 100 : 200,
+//                       decoration: BoxDecoration(
+//                         color: Colors.grey[200],
+//                         borderRadius: BorderRadius.circular(10),
+//                         border: Border.all(color: Colors.grey.shade300),
 //                       ),
+//                       child: document == null
+//                           ? Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Icon(
+//                             Icons.cloud_upload,
+//                             size: 40,
+//                             color: Colors.grey[600],
+//                           ),
+//                           const SizedBox(height: 8),
+//                           Text(
+//                             'No file selected',
+//                             style: AppTextStyles.bodyText2(context),
+//                           ),
+//                         ],
+//                       )
+//                           : isLocalFile
+//                           ? _isImageFile(fileName)
+//                           ? ClipRRect(
+//                         borderRadius: BorderRadius.circular(10),
+//                         child: Image.file(
+//                           document as File,
+//                           fit: BoxFit.cover,
+//                           width: double.infinity,
+//                           height: double.infinity,
+//                         ),
+//                       )
+//                           : Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Icon(
+//                             Icons.description,
+//                             size: 40,
+//                             color: Colors.grey[600],
+//                           ),
+//                           const SizedBox(height: 8),
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(
+//                               horizontal: 8.0,
+//                             ),
+//                             child: Text(
+//                               fileName ?? 'Document',
+//                               textAlign: TextAlign.center,
+//                               style: AppTextStyles.bodyText1(
+//                                 context,
+//                                 overrideStyle: const TextStyle(
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                               maxLines: 2,
+//                               overflow: TextOverflow.ellipsis,
+//                             ),
+//                           ),
+//                         ],
+//                       )
+//                           : // Display from URL (Pan object)
+//                       fileUrl != null
+//                           ? _isImageFile(fileName)
+//                           ? ClipRRect(
+//                         borderRadius: BorderRadius.circular(10),
+//                         child: Image.network(
+//                           fileUrl,
+//                           fit: BoxFit.cover,
+//                           width: double.infinity,
+//                           height: double.infinity,
+//                           loadingBuilder: (context, child, loadingProgress) {
+//                             if (loadingProgress == null) return child;
+//                             return Center(
+//                               child: CircularProgressIndicator(
+//                                 value: loadingProgress.expectedTotalBytes != null
+//                                     ? loadingProgress.cumulativeBytesLoaded /
+//                                     loadingProgress.expectedTotalBytes!
+//                                     : null,
+//                               ),
+//                             );
+//                           },
+//                           errorBuilder: (context, error, stackTrace) {
+//                             return const Center(
+//                               child: Icon(Icons.broken_image, size: 40, color: Colors.red),
+//                             );
+//                           },
+//                         ),
+//                       )
+//                           : Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Icon(
+//                             Icons.insert_drive_file, // Generic file icon for non-images
+//                             size: 40,
+//                             color: Colors.grey[600],
+//                           ),
+//                           const SizedBox(height: 8),
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(
+//                               horizontal: 8.0,
+//                             ),
+//                             child: Text(
+//                               fileName ?? 'Document',
+//                               textAlign: TextAlign.center,
+//                               style: AppTextStyles.bodyText1(
+//                                 context,
+//                                 overrideStyle: const TextStyle(
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                               ),
+//                               maxLines: 2,
+//                               overflow: TextOverflow.ellipsis,
+//                             ),
+//                           ),
+//                           Text(
+//                             '(Previously uploaded)',
+//                             style: AppTextStyles.bodyText2(context)?.copyWith(
+//                               fontStyle: FontStyle.italic,
+//                               color: Colors.grey[700],
+//                             ),
+//                           ),
+//                         ],
+//                       )
+//                           : const SizedBox.shrink(), // Should not happen if Pan object but secureUrl is null
 //                     ),
-//                     // const SizedBox(width: 8),
-//                     IconButton(
-//                       icon: const Icon(Icons.clear, color: AppColors.white),
-//                       tooltip: 'Clear Date Filters',
-//                       onPressed: _clearDateFilters,
+//                     const SizedBox(height: 15),
+//                     Row(
+//                       children: [
+//                         Expanded(
+//                           child: CustomButton(
+//                             onPressed: () => _pickFile(docType),
+//                             type: ButtonType.outlined,
+//                             text: 'Select File',
+//                             textColor: AppColors.primary,
+//                           ),
+//                         ),
+//                         const SizedBox(width: 10),
+//                         Expanded(
+//                           child: CustomButton(
+//                             onPressed: document == null
+//                                 ? null
+//                                 : () => _clearFile(docType),
+//                             text: 'Clear',
+//                             color: document == null ? Colors.grey : Colors.red,
+//                             textColor: Colors.white,
+//                           ),
+//                         ),
+//                       ],
 //                     ),
 //                   ],
 //                 ),
 //               ),
-//
-//               // const SizedBox(height: 5),
-//             ],
-//           ),
-//         ),
-//       ),
-//       body:
-//       provider.isLoading
-//           ? const Center(child: CircularProgressIndicator())
-//           : provider.empSalarySlipEmpSideModel == null
-//           ? const Center(child: Text("❌ Failed to load salary data."))
-//           : SingleChildScrollView(
-//         padding: const EdgeInsets.all(16),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             _header(context),
-//             const SizedBox(height: 16),
-//             _employeeInfoCard(context, employee),
-//             const SizedBox(height: 16),
-//             _ctcBreakdownCard(context, model?.salary ?? 0),
-//             const SizedBox(height: 16),
-//             _salaryDetailsCard(context),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _header(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         color: AppColors.primary,
-//         borderRadius: BorderRadius.circular(12),
-//       ),
-//       child: Row(
-//         children: [
-//           const Icon(Icons.attach_money, color: Colors.white, size: 40),
-//           const SizedBox(width: 12),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   "Comprehensive\nCTC Details",
-//                   style: AppTextStyles.bodyText1(
-//                     context,
-//                     overrideStyle: const TextStyle(
-//                       color: Colors.white,
-//                       fontWeight: FontWeight.bold,
-//                       fontSize: 18,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 4),
-//                 Text(
-//                   "Easily access detailed CTC breakdowns and insights.",
-//                   style: AppTextStyles.bodyText2(
-//                     context,
-//                     overrideStyle: const TextStyle(
-//                       color: Colors.white,
-//                       fontSize: 12,
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _employeeInfoCard(BuildContext context, dynamic employee) {
-//     return Container(
-//       padding: const EdgeInsets.all(16),
-//       decoration: _cardDecoration(),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             "Employee Info",
-//             style: AppTextStyles.heading1(
-//               context,
-//               overrideStyle: const TextStyle(fontSize: 16),
-//             ),
-//           ),
-//           const SizedBox(height: 12),
-//           _infoRow(context, "Name", employee?.name ?? "N/A"),
-//           _infoRow(context, "Email", employee?.email ?? "N/A"),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _ctcBreakdownCard(BuildContext context, int totalSalary) {
-//     return Container(
-//       padding: const EdgeInsets.all(16),
-//       decoration: _cardDecoration(),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
+//             );
+//           }).toList(),
+//           const SizedBox(height: 20),
 //           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //             children: [
-//               Text(
-//                 "Total Gross Pay",
-//                 style: AppTextStyles.heading1(
-//                   context,
-//                   overrideStyle: const TextStyle(fontSize: 16),
+//               Expanded(
+//                 child: CustomButton(
+//                   onPressed: _documents.values.any((doc) => doc is File)
+//                       ? () => _submitDocuments(false)
+//                       : null,
+//                   text: 'Save',
+//                   textColor: Colors.white,
+//                   color: _documents.values.any((doc) => doc is File)
+//                       ? AppColors.primary
+//                       : Colors.grey,
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 20,
+//                     vertical: 15,
+//                   ),
 //                 ),
 //               ),
-//               Text(
-//                 "₹ $totalSalary",
-//                 style: AppTextStyles.heading2(
-//                   context,
-//                   overrideStyle: const TextStyle(fontSize: 16),
+//               const SizedBox(width: 10), // Add some space between buttons
+//               Expanded(
+//                 child: CustomButton(
+//                   onPressed: _documents.values.any((doc) => doc is File) ||
+//                       _documents.values.any((doc) => doc is Pan)
+//                       ? () => _submitDocuments(true)
+//                       : null, // Allow update if any document (new or existing) is present
+//                   text: 'Update',
+//                   textColor: Colors.white,
+//                   color: _documents.values.any((doc) => doc is File) ||
+//                       _documents.values.any((doc) => doc is Pan)
+//                       ? AppColors.primary
+//                       : Colors.grey,
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 20,
+//                     vertical: 15,
+//                   ),
 //                 ),
 //               ),
 //             ],
-//           ),
-//           const SizedBox(height: 4),
-//           Text(
-//             "Effective from: Apr 2025",
-//             style: AppTextStyles.bodyText2(
-//               context,
-//               overrideStyle: const TextStyle(
-//                 fontWeight: FontWeight.bold,
-//                 fontSize: 12,
-//                 color: Colors.grey,
-//               ),
-//             ),
-//           ),
-//           const Divider(height: 24),
-//           _ctcRow(context, "Gross benefits", totalSalary ~/ 2, Colors.green),
-//           _ctcRow(context, "Other benefits", totalSalary ~/ 4, Colors.orange),
-//           _ctcRow(context, "Contributions", totalSalary ~/ 8, Colors.yellow),
-//           _ctcRow(
-//             context,
-//             "Recurring Deduction",
-//             totalSalary ~/ 8,
-//             Colors.purple,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _ctcRow(
-//       BuildContext context,
-//       String label,
-//       int? value,
-//       Color dotColor,
-//       ) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6),
-//       child: Row(
-//         children: [
-//           Container(
-//             width: 8,
-//             height: 8,
-//             decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
-//           ),
-//           const SizedBox(width: 8),
-//           Expanded(
-//             child: Text(
-//               label,
-//               style: AppTextStyles.heading2(
-//                 context,
-//                 overrideStyle: const TextStyle(fontSize: 14),
-//               ),
-//             ),
-//           ),
-//           Text(
-//             "₹ ${value ?? 0}",
-//             style: AppTextStyles.heading2(
-//               context,
-//               overrideStyle: const TextStyle(fontSize: 14),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _salaryDetailsCard(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.all(16),
-//       decoration: _cardDecoration(),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: const [
-//           Text(
-//             "Salary Details",
-//             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-//           ),
-//           SizedBox(height: 12),
-//           _StaticInfoRow("Salary revision month", "April"),
-//           _StaticInfoRow("Arrear effect from", "April"),
-//           _StaticInfoRow("Pay group", "A1"),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _infoRow(BuildContext context, String title, String value) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Text(
-//             title,
-//             style: AppTextStyles.bodyText1(
-//               context,
-//               overrideStyle: const TextStyle(
-//                 fontWeight: FontWeight.bold,
-//                 fontSize: 14,
-//               ),
-//             ),
-//           ),
-//           Text(
-//             value,
-//             style: AppTextStyles.bodyText1(
-//               context,
-//               overrideStyle: const TextStyle(
-//                 fontWeight: FontWeight.bold,
-//                 fontSize: 14,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   BoxDecoration _cardDecoration() {
-//     return BoxDecoration(
-//       color: Colors.white,
-//       borderRadius: BorderRadius.circular(12),
-//       boxShadow: const [
-//         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-//       ],
-//     );
-//   }
-// }
-//
-// class _StaticInfoRow extends StatelessWidget {
-//   final String title;
-//   final String value;
-//
-//   const _StaticInfoRow(this.title, this.value);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Text(
-//             title,
-//             style: AppTextStyles.bodyText2(
-//               context,
-//               overrideStyle: const TextStyle(
-//                 fontWeight: FontWeight.bold,
-//                 fontSize: 14,
-//                 color: Colors.grey,
-//               ),
-//             ),
-//           ),
-//           Text(
-//             value,
-//             style: AppTextStyles.heading2(
-//               context,
-//               overrideStyle: const TextStyle(fontSize: 14),
-//             ),
 //           ),
 //         ],
 //       ),

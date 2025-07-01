@@ -219,7 +219,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: CircleAvatar(
-                                                  radius: 40,
+                                                  radius: 30,
                                                   backgroundColor: Colors.white,
                                                   backgroundImage:
                                                       (employee
@@ -255,37 +255,34 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                                 ),
                                               ),
                                               SizedBox(width: 15),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    employee.name ?? 'N/A',
-                                                    style:
-                                                        AppTextStyles.heading3(
-                                                          context,
-                                                          overrideStyle:
-                                                              TextStyle(
-                                                                color:
-                                                                    Colors
-                                                                        .black,
-                                                              ),
-                                                        ),
-                                                  ),
-                                                  Text(
-                                                    employee.email ?? 'N/A',
-                                                    style:
-                                                        AppTextStyles.bodyText3(
-                                                          context,
-                                                          overrideStyle:
-                                                              TextStyle(
-                                                                color:
-                                                                    Colors
-                                                                        .black,
-                                                              ),
-                                                        ),
-                                                  ),
-                                                ],
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      employee.name ?? 'N/A',
+                                                      style:
+                                                          AppTextStyles.heading3(
+                                                            context,
+                                                            overrideStyle:
+                                                                TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                ),
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      employee.email ?? 'N/A',
+                                                      style:
+                                                          AppTextStyles.bodyText3(context,
+                                                            overrideStyle: TextStyle( color:Colors.black,fontSize: 14
+                                                                ),
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
