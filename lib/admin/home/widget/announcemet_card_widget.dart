@@ -2,7 +2,7 @@
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../util/responsive_helper_util.dart';
-import '../../announcement/cmp_announcement_model.dart';
+import '../../announcement/model/cmp_announcement_model.dart';
 import 'package:flutter/material.dart';
 
 

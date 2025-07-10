@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:hrms_management_code_crafter/admin/announcement/controller/announcement_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/model/announcement_list_model.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:provider/provider.dart';
@@ -9,14 +10,12 @@ import '../../../../ui_helper/app_colors.dart';
 import '../../../../ui_helper/app_text_styles.dart';
 import '../../../../util/loading_indicator.dart';
 import '../../../../util/responsive_helper_util.dart';
-import '../controller/comp_profile_api_provider.dart';
 
 class AnnouncementSliderWidget extends StatefulWidget {
   const AnnouncementSliderWidget({super.key});
 
   @override
-  State<AnnouncementSliderWidget> createState() =>
-      _AnnouncementSliderWidgetState();
+  State<AnnouncementSliderWidget> createState() => _AnnouncementSliderWidgetState();
 }
 
 class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
@@ -49,9 +48,8 @@ class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
   }
 
   void _initAsync() async {
-    final provider = context.read<CompanyProfileApiProvider>();
-
-    await provider.getCompAnnouncementListData(context); // always fetch
+    final provider = context.read<CompanyAnnouncementApiProvider>();
+    await provider.getAllAnnouncementList(); // always fetch
 
     if (mounted) {
       _startAutoPlay(); // Start auto scroll after data loaded
@@ -62,14 +60,14 @@ class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
     _timer?.cancel(); // prevent multiple timers
     final announcements =
         context
-            .read<CompanyProfileApiProvider>()
+            .read<CompanyAnnouncementApiProvider>()
             .compAnnouncementListModel
             ?.data ??
         [];
 
     if (announcements.isEmpty) return;
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // final announcements = context.read<CompanyProfileApiProvider>().compAnnouncementListModel?.data ?? [];
+      // final announcements = context.read<CompanyAnnouncementApiProvider>().compAnnouncementListModel?.data ?? [];
       if (_pageController.hasClients && announcements.isNotEmpty) {
         _currentPage = (_currentPage + 1) % announcements.length;
         if (mounted) {
@@ -90,9 +88,87 @@ class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
     super.dispose();
   }
 
+  // Function to handle the delete action
+  Future<void> _deleteTermsCondition(String? id) async {
+    if (id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Terms Condition ID is missing.')),
+      );
+      return;
+    }
+
+    final bool confirmDelete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text('Confirm Delete', style: AppTextStyles.heading1(
+          context,
+          overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 14),
+          ),
+        ),),
+        content: Text('Are you sure you want to delete this Terms & Condition?', style: AppTextStyles.bodyText2(
+          context,
+          overrideStyle: TextStyle(
+            fontSize: ResponsiveHelper.fontSize(context, 12),
+          ),
+        ),),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel', style: AppTextStyles.heading2(
+              context,
+              overrideStyle: TextStyle(
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Delete', style: AppTextStyles.bodyText2(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.red,
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),),
+          ),
+        ],
+      ),
+    ) ?? false; // Default to false if dialog is dismissed
+
+    if (confirmDelete) {
+      final provider = context.read<CompanyAnnouncementApiProvider>();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Deleting...')),
+      );
+      await provider.deleteAnnouncement(context, id);
+      if (!provider.isLoading && provider.errorMessage!.isEmpty) {
+        if (_currentPage >= (provider.compAnnouncementListModel?.data?.length ?? 0) && _currentPage > 0) {
+          setState(() {
+            _currentPage = (provider.compAnnouncementListModel?.data?.length ?? 0) - 1;
+            if (_pageController.hasClients) {
+              _pageController.jumpToPage(_currentPage);
+            }
+          });
+        }
+        _startAutoPlay();
+      } else {
+        SnackBar(
+          content: Text(
+            (provider.errorMessage ?? '').isNotEmpty
+                ? provider.errorMessage!
+                : 'Failed to delete terms condition.',
+          ),
+        );
+
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<CompanyProfileApiProvider>();
+    final provider = context.watch<CompanyAnnouncementApiProvider>();
     final List<Data> announcements =
         provider.compAnnouncementListModel?.data ?? [];
 
@@ -130,7 +206,8 @@ class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
                 });
               },
               itemBuilder: (context, index) {
-                return AnnouncementCard(announcement: announcements[index]);
+                return AnnouncementCard(announcement: announcements[index],
+                  onDelete: _deleteTermsCondition,);
               },
             ),
           ),
@@ -156,9 +233,15 @@ class _AnnouncementSliderWidgetState extends State<AnnouncementSliderWidget> {
 
 class AnnouncementCard extends StatelessWidget {
   final Data announcement;
+  final Function(String?) onDelete;
 
-  const AnnouncementCard({Key? key, required this.announcement})
-    : super(key: key);
+  // const AnnouncementCard({Key? key, required this.announcement,})
+  //   : super(key: key);
+  const AnnouncementCard({
+    Key? key,
+    required this.announcement,
+    required this.onDelete, // Required callback
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -191,25 +274,28 @@ class AnnouncementCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.teal.withOpacity(0.1),
+                      color: Colors.red.withAlpha(30),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      'ID: ${announcement.sId?.substring(0, 5) ?? "N/A"}',
-                      style: AppTextStyles.heading1(
-                        context,
-                        overrideStyle: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: ResponsiveHelper.fontSize(context, 12),
-                        ),
-                      ),
+                    child:  IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                      onPressed: () => onDelete(announcement.sId.toString()), // Call the callback
                     ),
+
+                    // Text(
+                    //   'ID: ${termsConditinos.sId?.substring(0, 5) ?? "N/A"}',
+                    //   style: AppTextStyles.heading1(
+                    //     context,
+                    //     overrideStyle: TextStyle(
+                    //       color: AppColors.primary,
+                    //       fontSize: ResponsiveHelper.fontSize(context, 12),
+                    //     ),
+                    //   ),
+                    // ),
                   ),
                 ],
               ),

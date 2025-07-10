@@ -8,7 +8,6 @@ import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -26,7 +25,7 @@ class AttendanceSheetTableScreen extends StatefulWidget {
       _AttendanceSheetTableScreenState();
 }
 
-class AttendanceModel {
+class CombinationAttendanceModel {
   final String name,
       email,
       mobile,
@@ -37,7 +36,7 @@ class AttendanceModel {
       otTime,
       status;
 
-  AttendanceModel({
+  CombinationAttendanceModel({
     required this.name,
     required this.email,
     required this.mobile,
@@ -81,13 +80,21 @@ class _AttendanceSheetTableScreenState
       final String formattedEndDate =
           "${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.day.toString().padLeft(2, '0')}";
 
-      Provider.of<AttendanceChartProvider>(
-        context,
-        listen: false,
-      ).filterAttendanceExcel(
+      // Use `listen: false` when calling the method, but ensure the provider
+      // internally calls `notifyListeners()` after data is fetched.
+      final provider = Provider.of<AttendanceChartProvider>(context, listen: false);
+      await provider.filterAttendanceExcel(
         startDate: formattedStartDate,
         endDate: formattedEndDate,
       );
+
+      // Provider.of<AttendanceChartProvider>(
+      //   context,
+      //   listen: false,
+      // ).filterAttendanceExcel(
+      //   startDate: formattedStartDate,
+      //   endDate: formattedEndDate,
+      // );
     }
   }
 
@@ -117,9 +124,9 @@ class _AttendanceSheetTableScreenState
       context,
       listen: false,
     );
-    final apiData = provider.adminFilterAttendanceModel?.attendanceData ?? [];
+    final apiData = provider.adminFilterAttendanceModel?.attendanceData!;
     final dates =
-    apiData.map((e) => _formatDateFromApi(e.date)).toSet().toList();
+    apiData!.map((e) => _formatDateFromApi(e.date)).toSet().toList();
     dates.sort((a, b) {
       final d1 = _parseDate(a);
       final d2 = _parseDate(b);
@@ -128,13 +135,16 @@ class _AttendanceSheetTableScreenState
     return ['All'] + dates;
   }
 
-  List<AttendanceModel> get filteredData {
+  List<CombinationAttendanceModel> get filteredData {
     final provider = Provider.of<AttendanceChartProvider>(
       context,
       listen: false,
     );
-    final apiData = provider.adminFilterAttendanceModel?.attendanceData ?? [];
-
+    final apiData = provider.adminFilterAttendanceModel?.attendanceData;
+    // Handle null apiData gracefully
+    if (apiData == null) {
+      return []; // Return an empty list if data is null to prevent error
+    }
     // Helper function to convert UTC DateTime to IST formatted string
     String _formatISTTime(DateTime utcTime) {
       // Convert to UTC first, then add the IST offset.
@@ -144,9 +154,9 @@ class _AttendanceSheetTableScreenState
       return DateFormat('hh:mm a').format(istTime);
     }
 
-    final List<AttendanceModel> attendanceList =
-    apiData.map((entry) {
-      return AttendanceModel(
+    final List<CombinationAttendanceModel> attendanceList =
+    apiData!.map((entry) {
+      return CombinationAttendanceModel(
         name: entry.employeeId?.name ?? '',
         email: entry.employeeId?.email ?? '',
         mobile: entry.employeeId?.mobile ?? '',
@@ -229,7 +239,7 @@ class _AttendanceSheetTableScreenState
     return true;
   }
 
-  Future<void> exportToExcel(List<AttendanceModel> data) async {
+  Future<void> exportToExcel(List<CombinationAttendanceModel> data) async {
     if (!await checkStoragePermission()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Storage permission denied")),
@@ -284,7 +294,7 @@ class _AttendanceSheetTableScreenState
     ).showSnackBar(SnackBar(content: Text('Excel saved to: $filePath')));
   }
 
-  Future<void> exportToPDF(List<AttendanceModel> data) async {
+  Future<void> exportToPDF(List<CombinationAttendanceModel> data) async {
     if (!await checkStoragePermission()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Storage permission denied")),
@@ -409,7 +419,8 @@ class _AttendanceSheetTableScreenState
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AttendanceChartProvider>(context);
-    final data = provider.adminFilterAttendanceModel?.data ?? [];
+    final data = provider.adminFilterAttendanceModel?.data;
+    final attendaceData = provider.adminFilterAttendanceModel?.attendanceData;
 
     if (provider.isLoading) {
       return Scaffold(
@@ -450,7 +461,7 @@ class _AttendanceSheetTableScreenState
       );
     }
 
-    if (data.isEmpty && !provider.isLoading) {
+    if (data == null && attendaceData == null ) {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.primary, // Set AppBar background color
@@ -1059,9 +1070,3 @@ class _AttendanceSheetTableScreenState
     );
   }
 }
-
-// Ensure you have the AdminFilterAttendanceModel, Data, and Employee classes
-// either in a separate file and imported, or defined directly here.
-// For example, if it's in 'lib/path_to_your_models/admin_filter_attendance_model.dart':
-// then the import at the top should be:
-// import 'package:your_project_name/path_to_your_models/admin_filter_attendance_model.dart';

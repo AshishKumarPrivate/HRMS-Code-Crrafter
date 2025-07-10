@@ -62,7 +62,17 @@ class  StorageHelper {
 
     return prefs.getInt('workingSeconds') ?? 0;
   }
+  Future<void> removePunchIn() async {
+    await prefs.remove("punchIn");
+  }
 
+  Future<void> removePunchOut() async {
+    await prefs.remove("punchOut");
+  }
+
+  Future<void> removeWorkingSeconds() async {
+    await prefs.remove("workingSeconds");
+  }
    Future<void> clearAll() async {
 
     await prefs.remove('punchIn');
@@ -82,16 +92,16 @@ class  StorageHelper {
   }
   /// 🔐 Logout and clear user data
    Future<void> logout() async {
-     await prefs.remove('user_id');
-     await prefs.remove('user_email');
-     await prefs.remove('user_role');
+     // await prefs.remove('user_id');
+     // await prefs.remove('user_email');
+     // await prefs.remove('user_role');
      await prefs.remove('isLoggedIn');
-     await prefs.remove('user_access_token');
-     await prefs.remove(_employeeDataKey);
-     // await prefs.remove('punchIn');
-     // await prefs.remove('punchOut');
-     // await prefs.remove('workingSeconds');
-    await prefs.clear(); // or use `remove(...)` for selected keys
+    //  await prefs.remove('user_access_token');
+    //  await prefs.remove(_employeeDataKey);
+    //  // await prefs.remove('punchIn');
+    //  // await prefs.remove('punchOut');
+    //  // await prefs.remove('workingSeconds');
+    // await prefs.clear(); // or use `remove(...)` for selected keys
   }
 
    Future<void> setUserId(String userId) async {
@@ -103,13 +113,12 @@ class  StorageHelper {
   }
 
    Future<void> setUserEmail(String email) async {
-
     await prefs.setString('user_email', email);
   }
    Future<String> getUserEmail() async {
-
     return prefs.getString('user_email') ?? "";
   }
+
   void setFCMToken(String token) {
     prefs.setString('fcm_token', token);
   }
@@ -132,6 +141,13 @@ class  StorageHelper {
 
   //////////////// 🔐🔐🔐🔐🔐🔐🔐🔐 ADMIN SIDE EMPLOYEE DETAILS 🔐🔐🔐🔐🔐🔐🔐🔐🔐🔐🔐
   // ID
+
+  Future<void> setCompanyOverviewId(String email) async {
+    await prefs.setString('cmp_overview_id', email);
+  }
+  Future<String> getCompanyOverviewId() async {
+    return prefs.getString('cmp_overview_id') ?? "";
+  }
   Future<void> setAdminLoginId(String adminLoginId) async {
     await prefs.setString('admin_login_id', adminLoginId);
   }
@@ -227,6 +243,15 @@ class  StorageHelper {
 
   Future<String> getEmpLoginEmail() async {
     return prefs.getString('employee_email') ?? '';
+  }
+
+  // Email
+  Future<void> setEmpLoginPhoto(String email) async {
+    await prefs.setString('employee_photo', email);
+  }
+
+  Future<String> getEmpLoginPhoto() async {
+    return prefs.getString('employee_photo') ?? '';
   }
 
   // Work Email

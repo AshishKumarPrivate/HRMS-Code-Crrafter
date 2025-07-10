@@ -47,7 +47,7 @@ class AttendanceChartProvider extends ChangeNotifier {
         _setErrorState("No Data Found");
       } else if (response.success == true && response.chart != null) {
         _chartModel = response;
-        _setLoadingState(false);
+        // _setLoadingState(false);
       } else {
         _setErrorState("No Data Found");
       }
@@ -55,8 +55,7 @@ class AttendanceChartProvider extends ChangeNotifier {
       _error = e.toString();
     }
 
-    _isLoading = false;
-    notifyListeners();
+    _setLoadingState(false);
   }
 
 
@@ -72,19 +71,23 @@ class AttendanceChartProvider extends ChangeNotifier {
 
       var response = await _repository.filterAdminAttendanceExcel(queryParams);
 
-      if (response.success == false) {
-        _setErrorState("No Data Found");
-      } else if (response.success == true && response.data != null) {
+     if (response.success == true) {
         _adminFilterAttendanceModel = response;
-        _setLoadingState(false);
+        _errorMessage = ""; // Clear any previous error message on success
+        notifyListeners();
       } else {
         _setErrorState("No Data Found");
+        _setLoadingState(false);
       }
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString(); // Update error message
+      _setErrorState("An error occurred: ${e.toString()}");
+    }finally {
+      _setLoadingState(false); // Set loading to false and notify listeners, always
     }
 
-    _isLoading = false;
-    notifyListeners();
+    // _setLoadingState(false);
+    // _isLoading = false;
+    // notifyListeners();
   }}
 

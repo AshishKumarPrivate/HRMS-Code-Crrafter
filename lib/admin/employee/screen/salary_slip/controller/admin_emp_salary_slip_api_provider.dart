@@ -47,13 +47,17 @@ class AdminEmpSalarySlipApiProvider with ChangeNotifier {
   }
 
   /// Fetch Employee List
-  Future<bool> getAllSalarySlipList({bool forceRefresh = false}) async {
+  Future<bool> getAllSalarySlipList({bool forceRefresh = false,String? startDate,  String? endDate}) async {
     _setLoadingState(true);
     _errorMessage = "";
     _empSalarySlipListModel = null;
 
     try {
-      var response = await _repository.getAllEmpSalarySlipList(); // aapka existing API call
+      Map<String, dynamic> queryParams = {
+        'startDate': startDate,
+        'endDate': endDate,
+      };
+      var response = await _repository.getAllEmpSalarySlipList(queryParams); // aapka existing API call
 
       if (response.success == false) {
         _setErrorState(response.message ?? "No Data Found");

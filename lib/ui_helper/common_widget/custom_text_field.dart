@@ -3,7 +3,7 @@ import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../util/responsive_helper_util.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final IconData? icon;
@@ -22,6 +22,8 @@ class CustomTextField extends StatelessWidget {
   final bool enableAllCaps;
   final int? maxLines;
   final bool readOnly; // Add this
+  final FormFieldValidator<String>? validator;
+  final bool isPassword;
 
 
   const CustomTextField({
@@ -44,7 +46,29 @@ class CustomTextField extends StatelessWidget {
     this.enableAllCaps = false,
     this.maxLines,
     this.readOnly = false, // Default false
+    this.validator,
+    this.isPassword = false,
   }) : super(key: key);
+
+  @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.isPassword;
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,95 +77,109 @@ class CustomTextField extends StatelessWidget {
       children: [
         FormField<String>(
           validator: (value) {
-            if (enableValidation && controller.text.isEmpty) {
-              return errorMessage;
+            if (widget.validator != null) {
+              return widget.validator!(widget.controller.text);
+            }
+            if (widget.controller.text.isEmpty) {
+              return widget.errorMessage;
             }
             return null;
           },
           builder: (FormFieldState<String> fieldState) {
-            bool isFocused = focusNode.hasFocus;
+            bool isFocused = widget.focusNode.hasFocus;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: ResponsiveHelper.padding(context, 2, 0.52),
                   child: Text(
-                    title,
+                    widget.title,
                     style: AppTextStyles.heading2(
                       context,
                       overrideStyle: TextStyle(
-                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                        fontSize: ResponsiveHelper.fontSize(context, 14),
                       ),
                     ),
                   ),
                 ),
                 Material(
-                  elevation: elevation ?? 0,
+                  elevation: widget.elevation ?? 0,
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
-                      boxShadow: enableShadow
+                      boxShadow: widget.enableShadow
                           ? [
                         BoxShadow(
                           color: isFocused
-                              ? shadowColor ?? AppColors.primary.withAlpha(50)
-                              : Colors.black12,
-                          blurRadius: 6,
-                          spreadRadius: 1,
-                          offset: Offset(0, 0), // Shadow equally on all sides
-                        ),
+                              ? widget.shadowColor ?? AppColors.primary.withAlpha(70)
 
+                              : Colors.black12,
+                          blurRadius: isFocused ? 0 : 0,
+                          offset: const Offset(0, 3),
+                        ),
                       ]
                           : [], // No shadow if enableShadow is false
                       border: Border.all(
-                        color: isFocused
-                            ? (borderColor ?? AppColors.primary)
-                            : Colors.transparent,
-                        width: borderWidth ?? 1,
+                        color: widget.focusNode.hasFocus
+                            ? (widget.borderColor ?? AppColors.primary) // Primary color when focused
+                        // Make the unfocused border more visible (e.g., a lighter grey, less transparent)
+                            : Colors.grey.shade400,
+                        width: widget.borderWidth ??0,
                       ),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        icon != null ? // 👈 only render if icon is not null
-                          Padding(
-                            padding: ResponsiveHelper.padding(context, 2, 0.02),
+                        Padding(
+                          padding: ResponsiveHelper.padding(context, 2, 0.02),
+                          child: Center(
                             child: Icon(
-                              icon,
+                              widget.icon,
                               size: ResponsiveHelper.fontSize(context, 20),
                               color: isFocused
-                                  ? (iconColor ?? AppColors.primary)
+                                  ? (widget.iconColor ?? AppColors.primary)
                                   : AppColors.txtGreyColor,
                             ),
-                          ) :Padding(
-                          padding: ResponsiveHelper.padding(context, 1, 0.02),
-
-                        ) ,
+                          ),
+                        ),
                         Expanded(
-                          child: TextFormField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            keyboardType: keyboardType,
-                            maxLength: maxLength,
-                            maxLines: maxLines ?? 1,
-                            readOnly: readOnly,
-                            textCapitalization: enableAllCaps ? TextCapitalization.characters : TextCapitalization.none,
-                            decoration: InputDecoration(
-                              counterText: "", // Hides the counter text
-                              hintText: hintText,
-                              border: InputBorder.none,
-                              hintStyle: AppTextStyles.caption(context),
-                              contentPadding: ResponsiveHelper.padding(context, 0, 0.2),
+                          child: Center(
+                            child: TextFormField(
+                              controller: widget.controller,
+                              focusNode: widget.focusNode,
+                              keyboardType: widget.keyboardType,
+                              maxLength: widget.maxLength,
+                              readOnly: widget.readOnly,
+                              obscureText: widget.isPassword ? _obscureText : false,
+                              decoration: InputDecoration(
+                                counterText: "",
+                                hintText: widget.hintText,
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 14), // better vertical padding
+                                suffixIcon: widget.isPassword
+                                    ? IconButton(
+                                  icon: Icon(
+                                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                                    color: AppColors.txtGreyColor,
+                                  ),
+                                  onPressed: _toggleVisibility,
+                                )
+                                    : null,
+                              ),
+                              style: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 14),
+                              ),
+                              onChanged: (value) {
+                                fieldState.didChange(value);
+                              },
                             ),
-                            style: AppTextStyles.heading2(context,overrideStyle: TextStyle(fontSize: 14,letterSpacing: 1)),
-                            onChanged: (value) {
-                              fieldState.didChange(value); // Trigger validation
-                            },
                           ),
                         ),
                       ],
                     ),
+
                   ),
                 ),
                 if (fieldState.hasError)
@@ -149,7 +187,10 @@ class CustomTextField extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 10, top: 5),
                     child: Text(
                       fieldState.errorText!,
-                      style: AppTextStyles.bodyText3(context,overrideStyle: TextStyle(color: Colors.red,fontSize: 12))
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
                     ),
                   ),
               ],

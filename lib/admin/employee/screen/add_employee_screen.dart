@@ -63,11 +63,21 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   File? _image;
   bool _isAgreed = false;
 
+  String? selectedBreakDown = "IT";
+  final List<String> departmentList = ['HR', 'Finance', 'IT', 'Marketing', 'Sales'];
+  final Map<String, String> departmentDisplayMap = {
+    'HR': 'HR',
+    'Finance': 'Finance',
+    'IT': 'IT',
+    'Marketing': 'Marketing',
+    'Sales': 'Sales',
+  };
+
   // handle the login api here
   Future<void> handleSubmit() async {
     final loginProvider = context.read<EmployeeApiProvider>();
     print("🟢 Login Button Clicked");
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    if (emailController.text.isEmpty) {
       print("🔴 Validation Failed: Fields are empty");
       return;
     }
@@ -90,8 +100,9 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       if (_image != null) "photo": await MultipartFile.fromFile(_image!.path, filename: "profile.jpg"),      // use MultipartFile.fromFile(...) if you have a file
       "document": "",
       "idCard": "",
+      "department": selectedBreakDown,
       "role": roleController.text.trim(),
-      "password": passwordController.text.trim(),
+      // "password": passwordController.text.trim(),
     });
     loginProvider.addEmployee(context, requestBodyAddEmployee);
   }
@@ -131,7 +142,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     List<FocusNode> focusNodes = [
       _nameFocusNode,
       _emailFocusNode,
-      _passwordFocusNode,
+      // _passwordFocusNode,
       _workEmailFocusNode,
       _phoneFocusNode,
       _altPhoneFocusNode,
@@ -153,7 +164,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   void dispose() {
     nameController.dispose();
     emailController.dispose();
-    passwordController.dispose();
+    // passwordController.dispose();
     workEmailController.dispose();
     phoneController.dispose();
     altPhoneController.dispose();
@@ -166,7 +177,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     roleController.dispose();
     _nameFocusNode.dispose();
     _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
+    // _passwordFocusNode.dispose();
     _workEmailFocusNode.dispose();
     _phoneFocusNode.dispose();
     _altPhoneFocusNode.dispose();
@@ -191,238 +202,283 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: Center(
-                    child: _image  == null
-                        ? Icon(Icons.account_circle, size: 100, color: AppColors.primary)
-                        : CircleAvatar(
-                      radius: 50,
-                      backgroundImage: FileImage(_image !),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  controller: nameController,
-                  focusNode: _nameFocusNode,
-                  icon: Icons.person_pin,
-                  hintText: "Employee Name",
-                  title: "Name",
-                  errorMessage: "Invalid Name",
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: emailController,
-                  focusNode: _emailFocusNode,
-                  icon: Icons.email_outlined,
-                  hintText: "Employee Email",
-                  title: "Email",
-                  errorMessage: "Invalid Email",
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: workEmailController,
-                  focusNode: _workEmailFocusNode,
-                  icon: Icons.email_outlined,
-                  hintText: "Employee Work Email",
-                  title: "Work Email",
-                  errorMessage: "Invalid Email",
-                  enableValidation: false,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: passwordController,
-                  focusNode: _passwordFocusNode,
-                  icon: Icons.lock_open,
-                  hintText: "Employee Password",
-                  title: "Password",
-                  errorMessage: "Invalid Password",
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: phoneController,
-                  focusNode: _phoneFocusNode,
-                  icon: Icons.phone_android_sharp,
-                  hintText: "Employee Phone Number",
-                  title: "Phone",
-                  errorMessage: "Invalid Phone No",
-                  maxLength: 10,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: altPhoneController,
-                  focusNode: _altPhoneFocusNode,
-                  icon: Icons.phone_android_sharp,
-                  hintText: "Employee Alternate Phone Number",
-                  title: "Alternate Phone",
-                  errorMessage: "Invalid Phone No",
-                  maxLength: 10,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: addressController,
-                  focusNode: _addressFocusNode,
-                  icon: Icons.location_on_sharp,
-                  hintText: "Address",
-                  title: "Address",
-                  errorMessage: "Invalid Address",
-                ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () => _selectDate(context),
-                  child: AbsorbPointer(
-                    child: CustomTextField(
-                      controller: dobController,
-                      focusNode: _dobFocusNode,
-                      icon: Icons.calendar_month,
-                      hintText: "Select Date of Birth",
-                      title: "Date of Birth",
-                      errorMessage: "Invalid Date of Birth",
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                genderDropdown(),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: qualificationController,
-                  focusNode: _qualificationFocusNode,
-                  icon: Icons.badge_outlined,
-                  hintText: "Qualification",
-                  title: "Qualification",
-                  errorMessage: "Invalid Qualification",
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: roleController,
-                  focusNode: _roleFocusNode,
-                  icon: Icons.badge_outlined,
-                  readOnly: true,
-                  hintText: "Role",
-                  title: "Role",
-                  errorMessage: "Invalid Role",
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: experienceController,
-                  focusNode: _experienceFocusNode,
-                  icon: Icons.badge_outlined,
-                  hintText: "Experience",
-                  title: "Experience",
-                  errorMessage: "Invalid Experience",
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: stateController,
-                  focusNode: _stateFocusNode,
-                  icon: Icons.location_pin,
-                  readOnly: true,
-                  hintText: "State",
-                  title: "State",
-                  errorMessage: "Invalid State",
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: cityController,
-                  focusNode: _cityFocusNode,
-                  icon: Icons.location_pin,
-                  hintText: "City",
-                  title: "City",
-                  errorMessage: "Invalid City",
-                ),
-                const SizedBox(height: 10),
-                maritalStatusDropdown(),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _isAgreed,
-                      onChanged: (value) {
-                        setState(() {
-                          _isAgreed = value ?? false;
-                        });
-                      },
-                      activeColor: AppColors.primary,
-                    ),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "I agree to the ",
-                              style: AppTextStyles.bodyText2(
-                                context,
-                                overrideStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ResponsiveHelper.fontSize(context, 12),
-                                ),
-                              ),
-                            ),
-                            TextSpan(
-                              text: "Terms & Conditions & Privacy Policy",
-                              style: AppTextStyles.heading1(
-                                context,
-                                overrideStyle: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ResponsiveHelper.fontSize(context, 12),
-                                ),
-                              ),
-                            ),
-                            TextSpan(
-                              text: " set out by this site.",
-                              style: AppTextStyles.bodyText2(
-                                context,
-                                overrideStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ResponsiveHelper.fontSize(context, 12),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Center(
+                      child: _image  == null
+                          ? Icon(Icons.account_circle, size: 100, color: AppColors.primary)
+                          : CircleAvatar(
+                        radius: 50,
+                        backgroundImage: FileImage(_image !),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Consumer<EmployeeApiProvider>(
-                  builder: (context, loginProvider, child) {
-                    print("✅ Consumer call ho rha hai ");
-                    return loginProvider.isLoading
-                        ? loadingIndicator() // Show loader
-                        : CustomButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_isAgreed) {
-                            handleSubmit();
-                          } else {
-                            CustomSnackbarHelper.customShowSnackbar(
-                              context: context,
-                              backgroundColor: Colors.red,
-                              message: "Please agree to the terms.",
-                            );
+                  ),
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                    controller: nameController,
+                    focusNode: _nameFocusNode,
+                    icon: Icons.person_pin,
+                    hintText: "Employee Name",
+                    title: "Name",
+                    errorMessage: "Invalid Name",
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: emailController,
+                    focusNode: _emailFocusNode,
+                    icon: Icons.email_outlined,
+                    hintText: "Employee Email",
+                    title: "Email",
+                    errorMessage: "Invalid Email",
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: workEmailController,
+                    focusNode: _workEmailFocusNode,
+                    icon: Icons.email_outlined,
+                    hintText: "Employee Work Email",
+                    title: "Work Email",
+                    errorMessage: "Invalid Email",
+                    enableValidation: false,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  // const SizedBox(height: 10),
+                  // CustomTextField(
+                  //   controller: passwordController,
+                  //   focusNode: _passwordFocusNode,
+                  //   icon: Icons.lock_open,
+                  //   hintText: "Employee Password",
+                  //   title: "Password",
+                  //   errorMessage: "Invalid Password",
+                  // ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: phoneController,
+                    focusNode: _phoneFocusNode,
+                    icon: Icons.phone_android_sharp,
+                    hintText: "Employee Phone Number",
+                    title: "Phone",
+                    errorMessage: "Invalid Phone No",
+                    maxLength: 10,
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: altPhoneController,
+                    focusNode: _altPhoneFocusNode,
+                    icon: Icons.phone_android_sharp,
+                    hintText: "Employee Alternate Phone Number",
+                    title: "Alternate Phone",
+                    errorMessage: "Invalid Phone No",
+                    maxLength: 10,
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: addressController,
+                    focusNode: _addressFocusNode,
+                    icon: Icons.location_on_sharp,
+                    hintText: "Address",
+                    title: "Address",
+                    errorMessage: "Invalid Address",
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: AbsorbPointer(
+                      child: CustomTextField(
+                        controller: dobController,
+                        focusNode: _dobFocusNode,
+                        icon: Icons.calendar_month,
+                        hintText: "Select Date of Birth",
+                        title: "Date of Birth",
+                        errorMessage: "Invalid Date of Birth",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  genderDropdown(),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: qualificationController,
+                    focusNode: _qualificationFocusNode,
+                    icon: Icons.badge_outlined,
+                    hintText: "Qualification",
+                    title: "Qualification",
+                    errorMessage: "Invalid Qualification",
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: roleController,
+                    focusNode: _roleFocusNode,
+                    icon: Icons.badge_outlined,
+                    readOnly: true,
+                    hintText: "Role",
+                    title: "Role",
+                    errorMessage: "Invalid Role",
+                  ),
+
+
+                  const SizedBox(height: 10),
+                  _buildDropdownFormField(
+                    title: "Break Down",
+                    value: selectedBreakDown,
+                    items:
+                    departmentList.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          departmentDisplayMap[value] ?? value,
+                          style: AppTextStyles.bodyText1(
+                            context,
+                            overrideStyle: TextStyle(
+                              color: Colors.black87,
+                              fontSize: ResponsiveHelper.fontSize(
+                                context,
+                                13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedBreakDown = newValue;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+
+
+
+
+
+
+
+
+
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: experienceController,
+                    focusNode: _experienceFocusNode,
+                    icon: Icons.badge_outlined,
+                    hintText: "Experience",
+                    title: "Experience",
+                    errorMessage: "Invalid Experience",
+                    enableValidation: false,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: stateController,
+                    focusNode: _stateFocusNode,
+                    icon: Icons.location_pin,
+                    readOnly: true,
+                    hintText: "State",
+                    title: "State",
+                    errorMessage: "Invalid State",
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: cityController,
+                    focusNode: _cityFocusNode,
+                    icon: Icons.location_pin,
+                    hintText: "City",
+                    title: "City",
+                    errorMessage: "Invalid City",
+                  ),
+                  const SizedBox(height: 10),
+                  maritalStatusDropdown(),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _isAgreed,
+                        onChanged: (value) {
+                          setState(() {
+                            _isAgreed = value ?? false;
+                          });
+                        },
+                        activeColor: AppColors.primary,
+                      ),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "I agree to the ",
+                                style: AppTextStyles.bodyText2(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                                  ),
+                                ),
+                              ),
+                              TextSpan(
+                                text: "Terms & Conditions & Privacy Policy",
+                                style: AppTextStyles.heading1(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                                  ),
+                                ),
+                              ),
+                              TextSpan(
+                                text: " set out by this site.",
+                                style: AppTextStyles.bodyText2(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Consumer<EmployeeApiProvider>(
+                    builder: (context, loginProvider, child) {
+                      print("✅ Consumer call ho rha hai ");
+                      return loginProvider.isLoading
+                          ? loadingIndicator() // Show loader
+                          : CustomButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            if (_isAgreed) {
+                              handleSubmit();
+                            } else {
+                              CustomSnackbarHelper.customShowSnackbar(
+                                context: context,
+                                backgroundColor: Colors.red,
+                                message: "Please agree to the terms.",
+                              );
+                            }
                           }
-                        }
-                      },
-                      text: 'Add Employee',
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
+                        },
+                        text: 'Add Employee',
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
@@ -430,6 +486,78 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     );
   }
 
+  Widget _buildDropdownFormField({
+    required String title,
+    required String? value,
+    required List<DropdownMenuItem<String>> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text(
+            title,
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: Offset(0, 0),
+              ),
+            ],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: DropdownButtonFormField<String>(
+            value: value,
+            decoration: InputDecoration(
+              border: InputBorder.none, // Remove default border
+              contentPadding: EdgeInsets.zero, // Remove default padding
+            ),
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+            isExpanded: true,
+            onChanged: onChanged,
+            items: items,
+            // Added menuMaxHeight to control dropdown menu's maximum height
+            menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
+            // Max 40% of screen height
+            // Added dropdownColor for better visual distinction of the menu
+            dropdownColor: Colors.white,
+            validator: (String? val) {
+              if (val == null || val.isEmpty) {
+                return 'Please select a $title';
+              }
+              return null;
+            },
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black87,
+                fontSize: ResponsiveHelper.fontSize(context, 13),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   /// 🎯 Gender Dropdown Matching`
   Widget genderDropdown() {
     return Column(

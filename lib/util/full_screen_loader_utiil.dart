@@ -1,5 +1,3 @@
-// lib/widgets/full_screen_loader.dart
-
 import 'package:flutter/material.dart';
 
 class FullScreenLoader {
@@ -26,7 +24,7 @@ class FullScreenLoader {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
+                const CircularProgressIndicator(),
                 const SizedBox(width: 20),
                 Text(message),
               ],
@@ -38,6 +36,13 @@ class FullScreenLoader {
   }
 
   static void hide(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).pop(); // Close the loader
+    try {
+      if (context.mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    } catch (e, stackTrace) {
+      debugPrint("⚠️ Error hiding FullScreenLoader: $e");
+      debugPrint("$stackTrace");
+    }
   }
 }

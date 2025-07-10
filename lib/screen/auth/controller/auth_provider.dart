@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/home/admin_home_screen.dart';
 import 'package:hrms_management_code_crafter/screen/auth/model/user_and_admin_login_model.dart';
+import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_exception.dart';
@@ -193,9 +194,10 @@ class AuthAPIProvider with ChangeNotifier {
   void logoutUser(BuildContext context) {
     // _setLoading(true);
     FullScreenLoader.show(context, message: "Logout");
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(Duration(seconds: 1), () async {
       StorageHelper().logout();
       // _setLoading(false);
+      await PunchInOutProvider().clearPunchData();
       FullScreenLoader.hide(context);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => UserSelectionScreen()),
@@ -211,6 +213,7 @@ class AuthAPIProvider with ChangeNotifier {
       await StorageHelper().setEmpLoginId(response.employeeeData!.sId.toString());
       await StorageHelper().setEmpLoginName(response.employeeeData!.name.toString());
       await StorageHelper().setEmpLoginEmail(response.employeeeData!.email.toString());
+      await StorageHelper().setEmpLoginPhoto(response.employeeeData!.employeeImage!.secureUrl.toString());
       await StorageHelper().setEmpLoginWorkEmail(response.employeeeData!.workEmail.toString());
       await StorageHelper().setEmpLoginMobile(response.employeeeData!.mobile.toString());
       await StorageHelper().setEmpLoginAlternateMobile(response.employeeeData!.alternateMobile.toString());

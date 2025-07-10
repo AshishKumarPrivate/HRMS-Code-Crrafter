@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/screen/add_company_profile_screen.dart';
-import 'package:hrms_management_code_crafter/admin/company_profile/widget/announcement_slider_widgets.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/add_employee_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/employee_list_screen.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/leave_module/emp__leaves_request_list_screen.dart';
@@ -21,10 +20,11 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../screen/auth/controller/auth_provider.dart';
 import '../../util/string_utils.dart';
-import '../announcement/cmp_announcement_model.dart';
+import '../announcement/model/cmp_announcement_model.dart';
+import '../announcement/widget/announcement_slider_widgets.dart';
 import '../company_profile/controller/comp_profile_api_provider.dart';
 import '../company_profile/screen/view_cmp_profile_screen.dart';
-import '../company_profile/widget/announcement_tab_widget.dart';
+import '../announcement/widget/announcement_tab_widget.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -600,11 +600,25 @@ class TopProfileHeader extends StatelessWidget {
                   ),
                 );
               },
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.white,
-                child: ImageLoaderUtil.assetImage("assets/images/code_crafter_logo.png"),
+              child: ClipOval(
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: logoUrl != null && logoUrl.isNotEmpty
+                      ? ImageLoaderUtil.cacheNetworkImage(
+                    logoUrl,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  )
+                      : Container(
+                    color: Colors.white,
+                    child: const Icon(Icons.business, color: AppColors.primary),
+                  ),
+                ),
               ),
+
+
             ),
             const SizedBox(width: 12),
             Expanded(

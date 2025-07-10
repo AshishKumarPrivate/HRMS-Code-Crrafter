@@ -13,19 +13,29 @@ class DioHelper {
         receiveDataWhenStatusError: true,
         // contentType: "application/json",
         contentType: isMultipart ? 'multipart/form-data' : 'application/json',
-        sendTimeout: const Duration(seconds: 60),
-        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 120),
+        receiveTimeout: const Duration(seconds: 120),
         headers: {
-          "Authorization": 'Bearer ${StorageHelper().getUserAccessToken()}',
+          "x-api-key": "ayush_don_123",
+          // "Authorization": 'Bearer ${StorageHelper().getUserAccessToken()}',
         },
+
+
+
+
       );
     } else {
       return Options(
         receiveDataWhenStatusError: true,
         // contentType: "application/json",
         contentType: isMultipart ? 'multipart/form-data' : 'application/json',
-        sendTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 120),
+        receiveTimeout: const Duration(seconds: 120),
+
+        headers: {
+        "x-api-key": "ayush_don_123",
+        // "Authorization": 'Bearer ${StorageHelper().getUserAccessToken()}',
+      },
       );
     }
   }

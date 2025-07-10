@@ -4,20 +4,16 @@ import 'package:hrms_management_code_crafter/admin/company_terms_conditions/mode
 import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/all_terms_conditions_model.dart';
 import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/delete_terms_conditions_model.dart';
 import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/update_terms_conditions_model.dart';
-import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/add_emp_bank_detail_model.dart';
-import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/emp_bank_detail_model.dart';
-import 'package:hrms_management_code_crafter/admin/employee/model/bank_detail/update_emp_bank_model.dart';
-import 'package:hrms_management_code_crafter/admin/employee/model/policy/all_cmp_policy_list_model_response.dart';
-import 'package:hrms_management_code_crafter/util/storage_util.dart';
-import '../../../../network_manager/api_exception.dart';
-import '../../../../network_manager/dio_error_handler.dart';
-import '../../../../network_manager/repository.dart';
-import '../../../../util/custom_snack_bar.dart';
-import '../../../../util/full_screen_loader_utiil.dart';
-import '../../../home/admin_home_screen.dart';
-import '../../model/policy/add_cmp_policy_model_response.dart';
 
-class CompanyPolicyApiProvider with ChangeNotifier {
+import 'package:hrms_management_code_crafter/util/storage_util.dart';
+import '../../../../../network_manager/api_exception.dart';
+import '../../../../../network_manager/dio_error_handler.dart';
+import '../../../../../network_manager/repository.dart';
+import '../../../../../util/custom_snack_bar.dart';
+import '../../../../../util/full_screen_loader_utiil.dart';
+import '../../home/admin_home_screen.dart';
+
+class CompanyTermsConditionApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
 
   bool _isLoading = false;
@@ -25,13 +21,15 @@ class CompanyPolicyApiProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  AddCompanyPolicyModel? _addPolicyModel;
-  UpdateEmpBankDetailsModel? _updateBankModel;
-  CompanyPolicyListModelResponse? _policyListModel;
+  AllTermsConditionsModel? _termsConditionsListModel;
+  UpdateTermsConditionsModel? _updateTermsConditionsModel;
+  DeleteTermsConditionsModel? _deleteTermsConditionsModel;
+  AddTermsConditionsModel? _addTermsConditionsModel;
 
-  AddCompanyPolicyModel? get employeeListModel => _addPolicyModel;
-  UpdateEmpBankDetailsModel? get updateBankModel => _updateBankModel;
-  CompanyPolicyListModelResponse? get policyListModel => _policyListModel;
+  AllTermsConditionsModel? get termsConditionsListModel => _termsConditionsListModel;
+  UpdateTermsConditionsModel? get updateTermsConditionsModel => _updateTermsConditionsModel;
+  DeleteTermsConditionsModel? get deleteTermsConditionsModel => _deleteTermsConditionsModel;
+  AddTermsConditionsModel? get addTermsConditionsModel => _addTermsConditionsModel;
 
   var employeeId ;
   /// Set Loading State
@@ -45,17 +43,27 @@ class CompanyPolicyApiProvider with ChangeNotifier {
     _errorMessage = message;
     _setLoadingState(false);
   }
+  void _handleUnexpectedErrors( BuildContext context,   dynamic e,  String message,  ) {
+    CustomSnackbarHelper.customShowSnackbar(
+      context: context,
+      message: message,
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 3),
+    );
+  }
 
-  Future<void> addPolicy(BuildContext context,Map<String, dynamic>  requestBody, ) async {
+  /// TERMS AND CONDITIONS
+  ///
+  Future<void> addTermsConditions(BuildContext context,Map<String, dynamic>  requestBody, ) async {
 
     _setLoadingState(true);
     try {
-       employeeId = await StorageHelper().getEmployeeId();
+      employeeId = await StorageHelper().getEmployeeId();
       print("EmployeeId=>${employeeId}");
 
-      var response = await _repository.addCompanyPolicy(requestBody);
+      var response = await _repository.addTermConditions(requestBody);
       if (response.success == true) {
-        _addPolicyModel = response;
+        _addTermsConditionsModel = response;
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
           message: response.message ?? 'Policy Details Added Successfully!',
@@ -87,22 +95,21 @@ class CompanyPolicyApiProvider with ChangeNotifier {
       _setLoadingState(false);
     }
   }
-
-  Future<bool> getAllPolicyList({bool forceRefresh = false}) async {
+  Future<bool> getAllTermsConditionsList({bool forceRefresh = false}) async {
     _setLoadingState(true);
     _errorMessage = "";
-    _policyListModel = null;
+    _termsConditionsListModel = null;
 
     try {
-      final response = await _repository.getAllPolicyList();
+      final response = await _repository.getAllTermsConditionsList();
 
       if (response.data != null && response.success == true ) {
-        print("✅ Policy List fetched successfully");
-        _policyListModel = response;
+        print("✅ Terms Conditions List fetched successfully");
+        _termsConditionsListModel = response;
         _setLoadingState(false);
         return true;
       } else {
-        _setErrorState(response.message ?? "Failed to fetch Policy detail");
+        _setErrorState(response.message ?? "Failed to fetch Terms Conditions List");
       }
     } catch (error) {
       _setErrorState("⚠️ API Error: $error");
@@ -111,14 +118,13 @@ class CompanyPolicyApiProvider with ChangeNotifier {
     _setLoadingState(false);
     return false;
   }
-
-  Future<bool> deletePolicy( BuildContext context ,String policyID) async {
+  Future<bool> deleteTermsConditions( BuildContext context ,String policyID) async {
     // _setLoadingState(true);
     FullScreenLoader.show(context, message: "Deleting...");
     _errorMessage = "";
 
     try {
-      final Map<String, dynamic> response = await _repository.deletePolicy(policyID);
+      final Map<String, dynamic> response = await _repository.deleteTermsConditions(policyID);
 
       final bool success = response['success'] == true;
       final String message = response['message'] ?? "Unknown error";
@@ -154,13 +160,12 @@ class CompanyPolicyApiProvider with ChangeNotifier {
 
     return false;
   }
-
-  Future<void> updatePolicyDetails(BuildContext context,Map<String, dynamic>  requestBody, String policyId) async {
+  Future<void> updateTermsConditions(BuildContext context,Map<String, dynamic>  requestBody, String policyId) async {
 
     _setLoadingState(true);
     try {
       print("policyId=>${policyId}");
-      var response = await _repository.updatePolicy(requestBody,policyId);
+      var response = await _repository.updateUpdateTermsConditions(requestBody,policyId);
       if (response.success == true) {
         // _updateBankModel = response;
         CustomSnackbarHelper.customShowSnackbar(
@@ -197,18 +202,10 @@ class CompanyPolicyApiProvider with ChangeNotifier {
       _setLoadingState(false);
     }
   }
-  /// Pull-to-Refresh Handler
-  Future<void> refreshEmployeeList() async {
-    await getAllPolicyList(forceRefresh: true);
-  }
 
-  void _handleUnexpectedErrors( BuildContext context,   dynamic e,  String message,  ) {
-    CustomSnackbarHelper.customShowSnackbar(
-      context: context,
-      message: message,
-      backgroundColor: Colors.red,
-      duration: Duration(seconds: 3),
-    );
+  /// Pull-to-Refresh Handler
+  Future<void> refreshTermsConditionList() async {
+    await getAllTermsConditionsList(forceRefresh: true);
   }
 
 

@@ -408,93 +408,95 @@ class _CalendarAttendanceScreenState extends State<CalendarAttendanceScreen> {
       ),
       body: isLoading
           ? loadingIndicator()
-          : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  _buildMonthSelector(monthYearTitle),
-                  const SizedBox(height: 10),
-                  // Day Headers (S, M, T, W, T, F, S) - Corrected order
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+          : SingleChildScrollView(
+            child: Column(
+                    children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildMonthSelector(monthYearTitle),
+                    const SizedBox(height: 10),
+                    // Day Headers (S, M, T, W, T, F, S) - Corrected order
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text("S", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red))), // Sunday in red
+                          Text("M", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          Text("T", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          Text("W", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          Text("T", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          Text("F", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          Text("S", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 10),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 7,
+                        childAspectRatio: 1.0, // Make cells square
+                        crossAxisSpacing: 4,
+                        mainAxisSpacing: 4,
+                      ),
+                      itemCount: dayWidgets.length,
+                      itemBuilder: (context, index) {
+                        return dayWidgets[index];
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("S", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red))), // Sunday in red
-                        Text("M", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
-                        Text("T", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
-                        Text("W", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
-                        Text("T", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
-                        Text("F", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
-                        Text("S", style: AppTextStyles.caption(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                        _buildCalendarLegend("Present", Colors.green.shade100),
+                        _buildCalendarLegend("Absent", Colors.red.shade100),
+                        _buildCalendarLegend("Half Day", Colors.yellow.shade100),
                       ],
                     ),
-                  ),
-                  const Divider(height: 10),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 7,
-                      childAspectRatio: 1.0, // Make cells square
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                    ),
-                    itemCount: dayWidgets.length,
-                    itemBuilder: (context, index) {
-                      return dayWidgets[index];
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildCalendarLegend("Present", Colors.green.shade100),
-                      _buildCalendarLegend("Absent", Colors.red.shade100),
-                      _buildCalendarLegend("Leave", Colors.yellow.shade100),
+                    // New section to display selected day's data
+                    if (_selectedAttendanceData != null) ...[
+                      const Divider(height: 20, thickness: 1),
+                      Text(
+                        'Details for ${_selectedAttendanceData!.day}, ${_selectedAttendanceData!.date} ${DateFormat('MMMM ').format(DateTime(currentYear, currentMonth))}',
+                        style: AppTextStyles.heading3(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold)),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildDetailRow("Status:", _getStatusText(_selectedAttendanceData!.status), valueColor: _getCellTextColor(_selectedAttendanceData!.status)),
+                      if (_selectedAttendanceData!.status == AttendanceStatus.present || _selectedAttendanceData!.status == AttendanceStatus.halfDay) ...[
+                        _buildDetailRow("Login Time:", _selectedAttendanceData!.loginTime ?? 'N/A'),
+                        _buildDetailRow("Logout Time:", _selectedAttendanceData!.logOutTime ?? 'N/A'),
+                        _buildDetailRow("Working Hours:", _selectedAttendanceData!.workingHours ?? 'N/A'),
+                      ],
+                      if (_selectedAttendanceData!.isFullDay == true) _buildDetailRow("Is Full Day:", "Yes"),
+                      if (_selectedAttendanceData!.isHalfDay == true) _buildDetailRow("Is Half Day:", "Yes"),
+                      if (_selectedAttendanceData!.isCheckIN == true) _buildDetailRow("Checked In:", "Yes"),
                     ],
-                  ),
-                  // New section to display selected day's data
-                  if (_selectedAttendanceData != null) ...[
-                    const Divider(height: 20, thickness: 1),
-                    Text(
-                      'Details for ${_selectedAttendanceData!.day}, ${_selectedAttendanceData!.date} ${DateFormat('MMMM ').format(DateTime(currentYear, currentMonth))}',
-                      style: AppTextStyles.heading3(context, overrideStyle: const TextStyle(fontWeight: FontWeight.bold)),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 10),
-                    _buildDetailRow("Status:", _getStatusText(_selectedAttendanceData!.status), valueColor: _getCellTextColor(_selectedAttendanceData!.status)),
-                    if (_selectedAttendanceData!.status == AttendanceStatus.present || _selectedAttendanceData!.status == AttendanceStatus.halfDay) ...[
-                      _buildDetailRow("Login Time:", _selectedAttendanceData!.loginTime ?? 'N/A'),
-                      _buildDetailRow("Logout Time:", _selectedAttendanceData!.logOutTime ?? 'N/A'),
-                      _buildDetailRow("Working Hours:", _selectedAttendanceData!.workingHours ?? 'N/A'),
-                    ],
-                    if (_selectedAttendanceData!.isFullDay == true) _buildDetailRow("Is Full Day:", "Yes"),
-                    if (_selectedAttendanceData!.isHalfDay == true) _buildDetailRow("Is Half Day:", "Yes"),
-                    if (_selectedAttendanceData!.isCheckIN == true) _buildDetailRow("Checked In:", "Yes"),
                   ],
-                ],
+                ),
               ),
             ),
+            // You can add other widgets below the calendar if needed
+                    ],
+                  ),
           ),
-          // You can add other widgets below the calendar if needed
-        ],
-      ),
     );
   }
 

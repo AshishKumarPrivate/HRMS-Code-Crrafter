@@ -7,6 +7,7 @@ import '../../../network_manager/dio_error_handler.dart';
 import '../../../network_manager/repository.dart';
 import '../../../util/custom_snack_bar.dart';
 import '../../../util/full_screen_loader_utiil.dart';
+import '../../../util/storage_util.dart';
 
 
 class CompanyProfileApiProvider with ChangeNotifier {
@@ -17,11 +18,11 @@ class CompanyProfileApiProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool _isAnnouncementFetched = false;
+  bool _hasFetchedOnce = false;
 
+  bool get hasFetchedOnce => _hasFetchedOnce;
   CompanyProfileDataModel? _compProfileDataModel;
-  AnnouncementListModel? _compAnnouncementListModel;
   CompanyProfileDataModel? get compProfileDataModel => _compProfileDataModel;
-  AnnouncementListModel? get compAnnouncementListModel => _compAnnouncementListModel;
 
   void _setLoadingState(bool loading) {
     _isLoading = loading;
@@ -82,7 +83,188 @@ class CompanyProfileApiProvider with ChangeNotifier {
     }
   }
 
+  Future<void> addCmpRegisteredAddress(BuildContext context,FormData  requestBody, ) async {
+
+    _setLoadingState(true);
+    try {
+      // Map<String, dynamic> requestBody = {"email": email, "password": password};
+      var response = await _repository.addCompCorporateAddress(requestBody);
+      if (response.success == true) {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response.message ?? 'Company Address Added Successfully!',
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        );
+        Navigator.of(context).pop();
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
+
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message:response.message ?? 'Failed to Add Company Address!',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } on DioException catch (e) {
+      final ApiException apiError = DioErrorHandler.handle(e);
+      CustomSnackbarHelper.customShowSnackbar(
+        context: context,
+        message: apiError.message,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "Something went wrong! Please try again later.",
+      );
+    } finally {
+      _setLoadingState(false);
+    }
+  }
+
+  Future<bool> updateCompanyOverview(BuildContext context,FormData  requestBody,String cmpOverviewId ) async {
+
+    _setLoadingState(true);
+    try {
+      // Map<String, dynamic> requestBody = {"email": email, "password": password};
+      var response = await _repository.updateCompProfileOverview(requestBody,cmpOverviewId);
+      if (response.success == true) {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response.message ?? 'Company Profile Updated Successfully!',
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        );
+        Navigator.pop(context, true);
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
+
+        return true;
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message:response.message ?? 'Failed to Update Company Profile!',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+        return false;
+      }
+    } on DioException catch (e) {
+      final ApiException apiError = DioErrorHandler.handle(e);
+      CustomSnackbarHelper.customShowSnackbar(
+        context: context,
+        message: apiError.message,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "Something went wrong! Please try again later.",
+      );
+      return false;
+    } finally {
+      _setLoadingState(false);
+      return false;
+    }
+  }
+
+  Future<void> addCmpCorporateAddress(BuildContext context,FormData  requestBody, ) async {
+
+    _setLoadingState(true);
+    try {
+      // Map<String, dynamic> requestBody = {"email": email, "password": password};
+      var response = await _repository.addCompCorporateAddress(requestBody);
+      if (response.success == true) {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response.message ?? 'Company Address Added Successfully!',
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        );
+        Navigator.of(context).pop();
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
+
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message:response.message ?? 'Failed to Add Company Address!',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } on DioException catch (e) {
+      final ApiException apiError = DioErrorHandler.handle(e);
+      CustomSnackbarHelper.customShowSnackbar(
+        context: context,
+        message: apiError.message,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "Something went wrong! Please try again later.",
+      );
+    } finally {
+      _setLoadingState(false);
+    }
+  }
+
+  Future<bool> updateCmpRegisteredAddress(BuildContext context,Map<String, dynamic>  requestBody,String cmpOverviewId ) async {
+
+    _setLoadingState(true);
+    try {
+      // Map<String, dynamic> requestBody = {"email": email, "password": password};
+      var response = await _repository.updateCompRegisteredAddress(requestBody,cmpOverviewId);
+      if (response.success == true) {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message: response.message ?? 'Company Address Updated Successfully!',
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        );
+        Navigator.pop(context, true);
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
+
+        return true;
+      } else {
+        CustomSnackbarHelper.customShowSnackbar(
+          context: context,
+          message:response.message ?? 'Failed to Update Company Address!',
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+        return false;
+      }
+    } on DioException catch (e) {
+      final ApiException apiError = DioErrorHandler.handle(e);
+      CustomSnackbarHelper.customShowSnackbar(
+        context: context,
+        message: apiError.message,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "Something went wrong! Please try again later.",
+      );
+      return false;
+    } finally {
+      _setLoadingState(false);
+      return false;
+    }
+  }
+
   Future<bool> getCompProfileData({bool callFromSplash = false} ) async {
+    if ( _hasFetchedOnce) return true;
    if(callFromSplash == false){
      _setLoadingState(true);
    }else{
@@ -114,92 +296,6 @@ class CompanyProfileApiProvider with ChangeNotifier {
     return false;
   }
 
-  Future<void> addCompanyAnnouncement(BuildContext context,Object  requestBody, ) async {
-
-    _setLoadingState(true);
-    try {
-      // Map<String, dynamic> requestBody = {"email": email, "password": password};
-      var response = await _repository.addCompAnnouncement(requestBody);
-      if (response.success == true) {
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message: response.message ?? 'Company Announcement Added Successfully!',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        );
-        Navigator.of(context).pop();
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomeScreen()),);
-
-      } else {
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message:response.message ?? 'Failed to Add Company Announcement!',
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        );
-      }
-    } on DioException catch (e) {
-      final ApiException apiError = DioErrorHandler.handle(e);
-      CustomSnackbarHelper.customShowSnackbar(
-        context: context,
-        message: apiError.message,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      );
-    } catch (e) {
-      _handleUnexpectedErrors(
-        context,
-        e,
-        "Something went wrong! Please try again later.",
-      );
-    } finally {
-      _setLoadingState(false);
-    }
-  }
-
-  Future<bool> getCompAnnouncementListData(BuildContext context,{bool callFromSplash = false} ) async {
-    // if(callFromSplash == false){
-    //   _setLoadingState(true);
-    // }else{
-    //   _setLoadingState(false);
-    // }
-
-    // _setLoadingState(true);
-    // Prevent unnecessary reloads if already fetched
-    if (_isAnnouncementFetched && _compAnnouncementListModel?.data?.isNotEmpty == true) {
-      return true;
-    }
-
-    FullScreenLoader.show(context);
-    try {
-      _setLoadingState(true); // Use proper loader for announcement call (optional)
-      _errorMessage = null;
-      final response = await _repository.getAllAnnouncementData();
-
-      if (response.success == true ) {
-
-        print("✅ Company Announcement Fetched Successfully");
-        _compAnnouncementListModel = response;
-        _isAnnouncementFetched = true;
-        _setLoadingState(false);
-        FullScreenLoader.hide(context);
-        return true;
-      } else {
-        _setErrorState("Failed to Fetch Company Announcement List");
-      }
-    }on DioException catch (e) {
-      final ApiException apiError = DioErrorHandler.handle(e);
-      _setErrorState(apiError.message); // Set error message and stop loading
-      return false;
-    }  catch (error) {
-      _setErrorState("⚠️ API Error: $error");
-    }
-
-    _setLoadingState(false);
-    FullScreenLoader.hide(context);
-    return false;
-  }
-
   void _handleUnexpectedErrors(
       BuildContext context,
       dynamic e,
@@ -211,5 +307,9 @@ class CompanyProfileApiProvider with ChangeNotifier {
       backgroundColor: Colors.red,
       duration: Duration(seconds: 3),
     );
+  }
+  /// Pull-to-Refresh Handler
+  Future<void> refreshCompProfileData() async {
+    await getCompProfileData(callFromSplash: true);
   }
 }

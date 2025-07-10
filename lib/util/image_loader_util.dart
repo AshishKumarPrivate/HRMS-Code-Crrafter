@@ -30,9 +30,9 @@ class ImageLoaderUtil {
       height: height,
       fit: fit,
       placeholder: (context, url) =>
-          Center(child: Image.asset("assets/images/img_placeholder.jpeg")),
+          Center(child: Image.asset("assets/images/code_crafter_logo.png")),
       errorWidget: (context, url, error) =>
-          Center(child: Image.asset("assets/images/img_placeholder.jpeg")),
+          Center(child: Image.asset("assets/images/code_crafter_logo.png")),
       fadeInDuration: const Duration(milliseconds: 300),
       fadeOutDuration: const Duration(milliseconds: 300),
     );

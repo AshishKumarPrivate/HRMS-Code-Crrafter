@@ -1,442 +1,345 @@
 // import 'dart:io';
-// import 'package:file_picker/file_picker.dart';
 // import 'package:flutter/material.dart';
-// import 'package:hrms_management_code_crafter/admin/employee/screen/emp_document_module/view_emp_documents_list_widget.dart';
-// import 'package:hrms_management_code_crafter/ui_helper/common_widget/solid_rounded_button.dart';
-// import 'package:hrms_management_code_crafter/util/storage_util.dart'; // Make sure this path is correct
+// import 'package:hrms_management_code_crafter/screen/nav_home/model/emp_salary_slip_emp_side_model.dart';
+// import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 // import 'package:provider/provider.dart';
+// import 'package:hrms_management_code_crafter/admin/employee/screen/salary_slip/controller/admin_emp_salary_slip_api_provider.dart';
 // import '../../../../ui_helper/app_colors.dart';
 // import '../../../../ui_helper/app_text_styles.dart';
-// import '../../../../util/custom_snack_bar.dart';
-// import '../../../../util/responsive_helper_util.dart';
-// import '../../controller/emp_document_module/emp_doc_api_provider.dart';
-// import '../../model/emp_document_module/get_emp_document_list_model.dart'; // Make sure this path is correct for your models
+// import '../../../util/responsive_helper_util.dart';
+// import '../../../util/storage_util.dart';
 //
-// // Ensure your models (GetAllEmpDocuemtsListModel, Data, Pan) are correctly defined and imported
-// // For demonstration, I'm assuming they are in 'get_emp_document_list_model.dart' as per your import.
-//
-// class AddEmpDocumentsContent extends StatefulWidget {
-//   final String empId;
-//
-//   const AddEmpDocumentsContent({super.key, required this.empId});
+// class SalarySlipEmpSideScreen extends StatefulWidget {
+//   const SalarySlipEmpSideScreen({super.key});
 //
 //   @override
-//   State<AddEmpDocumentsContent> createState() => _AddEmpDocumentsContentState();
+//   State<SalarySlipEmpSideScreen> createState() =>
+//       _SalarySlipEmpSideScreenState();
 // }
 //
-// class _AddEmpDocumentsContentState extends State<AddEmpDocumentsContent> {
-//   // This map will now hold either a File (for newly selected) or a Pan object (for existing from API)
-//   final Map<String, dynamic?> _documents = {
-//     'pan': null,
-//     'aadhaar': null,
-//     'passbook': null,
-//     'highSchool': null,
-//     'graduation': null,
-//     'salarySlip': null, // Make sure to include all document types from your Data model
-//   };
-//
-//   final Map<String, String> _documentTitles = {
-//     'pan': 'PAN Card',
-//     'aadhaar': 'Aadhaar Card',
-//     'passbook': 'Bank Passbook',
-//     'highSchool': 'High School Certificate',
-//     'graduation': 'Graduation Certificate',
-//     'salarySlip': 'Salary Slip', // Add title for salary slip
-//   };
-//
-//   bool _isLoading = true;
+// class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
+//   DateTime? startDate;
+//   DateTime? endDate;
+//   late DateTime now;
+//   String? employeeRegistrationId;
 //
 //   @override
 //   void initState() {
 //     super.initState();
-//     _fetchAndSetExistingDocuments(); // Call this to fetch and populate documents on initialization
+//     now = DateTime.now();
+//     startDate = DateTime(now.year, now.month, 1);
+//     endDate = now;
+//     loadSalarySlipData();
 //   }
 //
-//   Future<void> _fetchAndSetExistingDocuments() async {
-//     setState(() {
-//       _isLoading = true; // Show loading indicator
-//     });
-//     try {
-//       final provider = Provider.of<DocumentUploadProvider>(
-//         context,
-//         listen: false,
-//       );
+//   Future<void> loadSalarySlipData() async {
+//     employeeRegistrationId = await StorageHelper().getEmpLoginRegistrationId();
+//     if (employeeRegistrationId != null) {
+//       final String formattedStartDate =
+//           "${startDate!.year}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.day.toString().padLeft(2, '0')}";
+//       final String formattedEndDate =
+//           "${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.day.toString().padLeft(2, '0')}";
 //
-//       // Call the API to get documents. Assuming getEmployeeDocumentsList updates a model in the provider.
-//       await provider.getEmployeeDocumentsList(widget.empId);
-//
-//       // Now access the data from the provider's model
-//       final Data? empDocumentsData = provider.getAllEmpDocuemtsListModel?.data;
-//
-//       if (empDocumentsData != null) {
-//         setState(() {
-//           // Populate _documents with existing data from the API
-//           // Only if secureUrl is not empty, means the document exists
-//           if (empDocumentsData.pan?.secureUrl?.isNotEmpty == true) {
-//             _documents['pan'] = empDocumentsData.pan;
-//           }
-//           if (empDocumentsData.aadhaar?.secureUrl?.isNotEmpty == true) {
-//             _documents['aadhaar'] = empDocumentsData.aadhaar;
-//           }
-//           if (empDocumentsData.passbook?.secureUrl?.isNotEmpty == true) {
-//             _documents['passbook'] = empDocumentsData.passbook;
-//           }
-//           if (empDocumentsData.highSchool?.secureUrl?.isNotEmpty == true) {
-//             _documents['highSchool'] = empDocumentsData.highSchool;
-//           }
-//           if (empDocumentsData.graduation?.secureUrl?.isNotEmpty == true) {
-//             _documents['graduation'] = empDocumentsData.graduation;
-//           }
-//           if (empDocumentsData.salarySlip?.secureUrl?.isNotEmpty == true) {
-//             _documents['salarySlip'] = empDocumentsData.salarySlip;
-//           }
-//         });
-//       } else {
-//         // Optionally show a message if no documents are found
-//         // CustomSnackbarHelper.customShowSnackbar(
-//         //   context: context,
-//         //   backgroundColor: Colors.orange,
-//         //   message: "No existing documents found for this employee.",
-//         // );
-//       }
-//     } catch (e) {
-//       CustomSnackbarHelper.customShowSnackbar(
-//         context: context,
-//         backgroundColor: Colors.red,
-//         message: "Error fetching documents: $e",
-//       );
-//     } finally {
-//       setState(() {
-//         _isLoading = false; // Hide loading indicator
+//       WidgetsBinding.instance.addPostFrameCallback((_) {
+//         final provider = Provider.of<AdminEmpSalarySlipApiProvider>(
+//           context,
+//           listen: false,
+//         );
+//         provider.empSalarySlipEmpSide(
+//           startDate: formattedStartDate,
+//           endDate: formattedEndDate,
+//         );
 //       });
 //     }
 //   }
 //
-//   Future<void> _pickFile(String docType) async {
-//     FilePickerResult? result = await FilePicker.platform.pickFiles(
-//       type: FileType.custom,
-//       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+//   Future<void> _pickStartDate() async {
+//     DateTime? picked = await showDatePicker(
+//       context: context,
+//       initialDate: startDate ?? DateTime.now(),
+//       firstDate: DateTime(2000),
+//       lastDate: endDate ?? DateTime.now(),
 //     );
-//
-//     if (result != null && result.files.single.path != null) {
+//     if (picked != null) {
 //       setState(() {
-//         _documents[docType] = File(result.files.single.path!); // Store as File object
+//         startDate = picked;
+//         if (endDate != null && picked.isAfter(endDate!)) {
+//           endDate = null;
+//         }
+//         loadSalarySlipData();
 //       });
-//     } else {
-//       CustomSnackbarHelper.customShowSnackbar(
-//         context: context,
-//         backgroundColor: Colors.orange,
-//         message: "No file selected for ${docType.toUpperCase()}.",
-//       );
 //     }
 //   }
 //
-//   void _clearFile(String docType) {
-//     setState(() {
-//       _documents[docType] = null; // Set to null to clear
-//     });
-//   }
+//   Future<void> _pickEndDate() async {
+//     DateTime initialDate = endDate ?? DateTime.now();
+//     DateTime firstDate = startDate ?? DateTime(2000);
 //
-//   bool _isImageFile(String? fileName) {
-//     if (fileName == null) return false;
-//     final lower = fileName.toLowerCase();
-//     return lower.endsWith('.jpg') ||
-//         lower.endsWith('.jpeg') ||
-//         lower.endsWith('.png');
-//   }
-//
-//   void _submitDocuments(bool isUpdate) async {
-//     final Map<String, File> filesToUpload = {};
-//
-//     // Iterate through the _documents map and collect only the File objects
-//     _documents.forEach((key, value) {
-//       if (value is File) {
-//         filesToUpload[key] = value;
-//       }
-//     });
-//
-//     if (filesToUpload.isEmpty) {
-//       CustomSnackbarHelper.customShowSnackbar(
-//         context: context,
-//         backgroundColor: Colors.red,
-//         message: "Please select at least one new document to upload/update.",
-//       );
-//       return;
-//     }
-//
-//     final provider = Provider.of<DocumentUploadProvider>(
-//       context,
-//       listen: false,
+//     DateTime? picked = await showDatePicker(
+//       context: context,
+//       initialDate: initialDate,
+//       firstDate: firstDate,
+//       lastDate: DateTime.now(),
 //     );
-//
-//     if (isUpdate) {
-//       await provider.updateEmployeeDocuments(
-//         documents: filesToUpload,
-//         empId: widget.empId,
-//         context: context,
-//       );
-//     } else {
-//       await provider.uploadEmployeeDocuments(
-//         documents: filesToUpload,
-//         empId: widget.empId,
-//         context: context,
-//       );
+//     if (picked != null) {
+//       setState(() {
+//         endDate = picked;
+//         if (startDate != null && picked.isBefore(startDate!)) {
+//           startDate = null;
+//         }
+//         loadSalarySlipData();
+//       });
 //     }
-//     // After successful upload/update, re-fetch documents to update the UI
-//     await _fetchAndSetExistingDocuments();
+//   }
+//
+//   void _clearDateFilters() {
+//     setState(() {
+//       startDate = DateTime(now.year, now.month, 1);
+//       endDate = now;
+//       loadSalarySlipData();
+//     });
+//   }
+//
+//   String _formatDate(DateTime? date) {
+//     if (date == null) return 'Select';
+//     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 //   }
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     print("employeeId = ${widget.empId}");
+//     final provider = context.watch<AdminEmpSalarySlipApiProvider>();
+//     final model = provider.empSalarySlipEmpSideModel?.data;
+//     final employee = model?.employeeData;
 //
-//     // Show loading indicator while fetching documents
-//     if (_isLoading) {
-//       return const Center(child: CircularProgressIndicator());
-//     }
-//
-//     return SingleChildScrollView(
-//       padding: const EdgeInsets.all(15.0),
-//       child: Column(
-//         children: [
-//           // Iterate through all possible document types
-//           ..._documents.keys.map((docType) {
-//             final dynamic document = _documents[docType]; // Can be File, Pan, or null
-//             String? fileName;
-//             String? fileUrl;
-//             bool isLocalFile = false;
-//
-//             if (document is File) {
-//               isLocalFile = true;
-//               fileName = document.path.split('/').last;
-//             } else if (document is Pan) {
-//               fileName = document.secureUrl?.split('/').last;
-//               fileUrl = document.secureUrl;
-//             }
-//
-//             return Card(
-//               margin: const EdgeInsets.symmetric(vertical: 10),
-//               elevation: 0,
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         backgroundColor: AppColors.primary,
+//         leading: IconButton(
+//           icon: Icon(Icons.arrow_back, color: Colors.white), // Back button
+//           onPressed: () {
+//             Navigator.of(context).pop(); // Navigate back
+//           },
+//         ),
+//         title: Text(
+//           'Salary Slip',
+//           style: AppTextStyles.heading1(
+//             context,
+//             overrideStyle: TextStyle(
 //               color: Colors.white,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(15),
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       _documentTitles[docType] ?? docType,
-//                       style: AppTextStyles.heading1(
-//                         context,
-//                         overrideStyle: TextStyle(
-//                           color: AppColors.primary,
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: ResponsiveHelper.fontSize(context, 16),
-//                         ),
+//               fontSize: ResponsiveHelper.fontSize(context, 14),
+//             ),
+//           ),
+//         ),
+//         actions: [
+//           IconButton(
+//             icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+//             onPressed: () {},
+//           ),
+//         ],
+//         bottom: PreferredSize(
+//           preferredSize: const Size.fromHeight(50),
+//           child:   Padding(
+//             padding: const EdgeInsets.symmetric(
+//               horizontal: 18,
+//               vertical: 4,
+//             ),
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: OutlinedButton(
+//                     onPressed: _pickStartDate,
+//                     style: OutlinedButton.styleFrom(
+//                       // backgroundColor: AppColors.white, // Still want white background
+//                       foregroundColor: AppColors.primary,
+//                       // Text color
+//                       side: const BorderSide(color: AppColors.white),
+//                       // Add a border with primary color
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(8),
 //                       ),
+//                       padding: const EdgeInsets.symmetric(vertical: 1),
 //                     ),
-//                     const SizedBox(height: 15),
-//                     Container(
-//                       width: double.infinity,
-//                       height: document == null ? 100 : 200,
-//                       decoration: BoxDecoration(
-//                         color: Colors.grey[200],
-//                         borderRadius: BorderRadius.circular(10),
-//                         border: Border.all(color: Colors.grey.shade300),
-//                       ),
-//                       child: document == null
-//                           ? Column(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Icon(
-//                             Icons.cloud_upload,
-//                             size: 40,
-//                             color: Colors.grey[600],
-//                           ),
-//                           const SizedBox(height: 8),
-//                           Text(
-//                             'No file selected',
-//                             style: AppTextStyles.bodyText2(context),
-//                           ),
-//                         ],
-//                       )
-//                           : isLocalFile
-//                           ? _isImageFile(fileName)
-//                           ? ClipRRect(
-//                         borderRadius: BorderRadius.circular(10),
-//                         child: Image.file(
-//                           document as File,
-//                           fit: BoxFit.cover,
-//                           width: double.infinity,
-//                           height: double.infinity,
-//                         ),
-//                       )
-//                           : Column(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Icon(
-//                             Icons.description,
-//                             size: 40,
-//                             color: Colors.grey[600],
-//                           ),
-//                           const SizedBox(height: 8),
-//                           Padding(
-//                             padding: const EdgeInsets.symmetric(
-//                               horizontal: 8.0,
-//                             ),
-//                             child: Text(
-//                               fileName ?? 'Document',
-//                               textAlign: TextAlign.center,
-//                               style: AppTextStyles.bodyText1(
-//                                 context,
-//                                 overrideStyle: const TextStyle(
-//                                   fontWeight: FontWeight.bold,
-//                                 ),
-//                               ),
-//                               maxLines: 2,
-//                               overflow: TextOverflow.ellipsis,
-//                             ),
-//                           ),
-//                         ],
-//                       )
-//                           : // Display from URL (Pan object)
-//                       fileUrl != null
-//                           ? _isImageFile(fileName)
-//                           ? ClipRRect(
-//                         borderRadius: BorderRadius.circular(10),
-//                         child: Image.network(
-//                           fileUrl,
-//                           fit: BoxFit.cover,
-//                           width: double.infinity,
-//                           height: double.infinity,
-//                           loadingBuilder: (context, child, loadingProgress) {
-//                             if (loadingProgress == null) return child;
-//                             return Center(
-//                               child: CircularProgressIndicator(
-//                                 value: loadingProgress.expectedTotalBytes != null
-//                                     ? loadingProgress.cumulativeBytesLoaded /
-//                                     loadingProgress.expectedTotalBytes!
-//                                     : null,
-//                               ),
-//                             );
-//                           },
-//                           errorBuilder: (context, error, stackTrace) {
-//                             return const Center(
-//                               child: Icon(Icons.broken_image, size: 40, color: Colors.red),
-//                             );
-//                           },
-//                         ),
-//                       )
-//                           : Column(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Icon(
-//                             Icons.insert_drive_file, // Generic file icon for non-images
-//                             size: 40,
-//                             color: Colors.grey[600],
-//                           ),
-//                           const SizedBox(height: 8),
-//                           Padding(
-//                             padding: const EdgeInsets.symmetric(
-//                               horizontal: 8.0,
-//                             ),
-//                             child: Text(
-//                               fileName ?? 'Document',
-//                               textAlign: TextAlign.center,
-//                               style: AppTextStyles.bodyText1(
-//                                 context,
-//                                 overrideStyle: const TextStyle(
-//                                   fontWeight: FontWeight.bold,
-//                                 ),
-//                               ),
-//                               maxLines: 2,
-//                               overflow: TextOverflow.ellipsis,
-//                             ),
-//                           ),
-//                           Text(
-//                             '(Previously uploaded)',
-//                             style: AppTextStyles.bodyText2(context)?.copyWith(
-//                               fontStyle: FontStyle.italic,
-//                               color: Colors.grey[700],
-//                             ),
-//                           ),
-//                         ],
-//                       )
-//                           : const SizedBox.shrink(), // Should not happen if Pan object but secureUrl is null
-//                     ),
-//                     const SizedBox(height: 15),
-//                     Row(
+//                     child: Column(
 //                       children: [
-//                         Expanded(
-//                           child: CustomButton(
-//                             onPressed: () => _pickFile(docType),
-//                             type: ButtonType.outlined,
-//                             text: 'Select File',
-//                             textColor: AppColors.primary,
+//                         Text(
+//                           'From',
+//                           style: AppTextStyles.heading1(
+//                             context,
+//                             overrideStyle: TextStyle(
+//                               color: Colors.white,
+//                               fontSize: ResponsiveHelper.fontSize(
+//                                 context,
+//                                 12,
+//                               ),
+//                             ),
 //                           ),
 //                         ),
-//                         const SizedBox(width: 10),
-//                         Expanded(
-//                           child: CustomButton(
-//                             onPressed: document == null
-//                                 ? null
-//                                 : () => _clearFile(docType),
-//                             text: 'Clear',
-//                             color: document == null ? Colors.grey : Colors.red,
-//                             textColor: Colors.white,
+//                         Text(
+//                           '${_formatDate(startDate)}',
+//                           style: AppTextStyles.heading1(
+//                             context,
+//                             overrideStyle: TextStyle(
+//                               color: Colors.white,
+//                               fontSize: ResponsiveHelper.fontSize(
+//                                 context,
+//                                 12,
+//                               ),
+//                             ),
 //                           ),
 //                         ),
 //                       ],
 //                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 8),
+//                 Expanded(
+//                   child: OutlinedButton(
+//                     onPressed: _pickEndDate,
+//                     style: OutlinedButton.styleFrom(
+//                       // backgroundColor: AppColors.white, // Still want white background
+//                       foregroundColor: AppColors.primary,
+//                       // Text color
+//                       side: const BorderSide(color: AppColors.white),
+//                       // Add a border with primary color
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(8),
+//                       ),
+//                       padding: const EdgeInsets.symmetric(vertical: 1),
+//                     ),
+//                     child: Column(
+//                       children: [
+//                         Text(
+//                           'To',
+//                           style: AppTextStyles.heading1(
+//                             context,
+//                             overrideStyle: TextStyle(
+//                               color: Colors.white,
+//                               fontSize: ResponsiveHelper.fontSize(
+//                                 context,
+//                                 12,
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                         Text(
+//                           '${_formatDate(endDate)}',
+//                           style: AppTextStyles.heading1(
+//                             context,
+//                             overrideStyle: TextStyle(
+//                               color: Colors.white,
+//                               fontSize: ResponsiveHelper.fontSize(
+//                                 context,
+//                                 12,
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 // const SizedBox(width: 8),
+//                 IconButton(
+//                   icon: const Icon(Icons.clear, color: AppColors.white),
+//                   tooltip: 'Clear Date Filters',
+//                   onPressed: _clearDateFilters,
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//       body:
+//       provider.isLoading
+//           ? loadingIndicator()
+//           : provider.empSalarySlipEmpSideModel == null
+//           ? Center(child: Text("\u274C No salary data available."))
+//           : InteractiveViewer(
+//         boundaryMargin: const EdgeInsets.all(20),
+//         minScale: 0.5,
+//         maxScale: 3.0,
+//         panEnabled: true,
+//         scaleEnabled: true,
+//         child: SingleChildScrollView(
+//           scrollDirection: Axis.horizontal,
+//           child: Container(
+//             width: 1000,
+//             padding: const EdgeInsets.all(12),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Center(
+//                   child: Text(
+//                     "www.MSOfficeGeek.com",
+//                     style: TextStyle(fontSize: 24, color: Colors.red, fontWeight: FontWeight.bold),
+//                   ),
+//                 ),
+//                 SizedBox(height: 4),
+//                 Center(child: Text("Company Address", style: TextStyle(fontSize: 16))),
+//                 Center(child: Text("Salary Slip for the month of ${now.month}-${now.year}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+//                 Divider(),
+//                 Table(
+//                   border: TableBorder.all(),
+//                   columnWidths: const {
+//                     0: FlexColumnWidth(2),
+//                     1: FlexColumnWidth(3),
+//                     2: FlexColumnWidth(2),
+//                     3: FlexColumnWidth(3),
+//                   },
+//                   children: [
+//                     _buildTableRow(["UID:", employee?.registrationId ?? '', "Designation:", "employee?.designation" ?? '']),
+//                     _buildTableRow(["Name:", employee?.name ?? '', "Department:", "employee?.department" ?? '']),
 //                   ],
 //                 ),
-//               ),
-//             );
-//           }).toList(),
-//           const SizedBox(height: 20),
-//           Row(
-//             children: [
-//               Expanded(
-//                 child: CustomButton(
-//                   onPressed: _documents.values.any((doc) => doc is File)
-//                       ? () => _submitDocuments(false)
-//                       : null,
-//                   text: 'Save',
-//                   textColor: Colors.white,
-//                   color: _documents.values.any((doc) => doc is File)
-//                       ? AppColors.primary
-//                       : Colors.grey,
-//                   padding: const EdgeInsets.symmetric(
-//                     horizontal: 20,
-//                     vertical: 15,
-//                   ),
+//                 SizedBox(height: 10),
+//                 Text("Employee Attendance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+//                 Table(
+//                   border: TableBorder.all(),
+//                   columnWidths: const {
+//                     0: FlexColumnWidth(2),
+//                     1: FlexColumnWidth(1.5),
+//                     2: FlexColumnWidth(2),
+//                     3: FlexColumnWidth(1.5),
+//                   },
+//                   children: [
+//                     _buildTableRow(["Working Days:", "31", "Payable Days:", "28"]),
+//                     _buildTableRow(["Leave Allowed:", "2", "Leave Taken:", "5"]),
+//                   ],
 //                 ),
-//               ),
-//               const SizedBox(width: 10), // Add some space between buttons
-//               Expanded(
-//                 child: CustomButton(
-//                   onPressed: _documents.values.any((doc) => doc is File) ||
-//                       _documents.values.any((doc) => doc is Pan)
-//                       ? () => _submitDocuments(true)
-//                       : null, // Allow update if any document (new or existing) is present
-//                   text: 'Update',
-//                   textColor: Colors.white,
-//                   color: _documents.values.any((doc) => doc is File) ||
-//                       _documents.values.any((doc) => doc is Pan)
-//                       ? AppColors.primary
-//                       : Colors.grey,
-//                   padding: const EdgeInsets.symmetric(
-//                     horizontal: 20,
-//                     vertical: 15,
-//                   ),
-//                 ),
-//               ),
-//             ],
+//                 SizedBox(height: 10),
+//                 Text("Salary Transferred To:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+//                 Table(
+//                   border: TableBorder.all(),
+//                   columnWidths: const {
+//                     0: FlexColumnWidth(2),
+//                     1: FlexColumnWidth(3),
+//                   },
+//                   children: [
+//                     _buildTableRow(["Bank Name:", "employee?.bankName" ?? '']),
+//                     _buildTableRow(["Account No:", "employee?.accountNo" ?? '']),
+//                     _buildTableRow(["Branch Name:", "DEF Branch 1"]),
+//                   ],
+//                 )
+//               ],
+//             ),
 //           ),
-//         ],
+//         ),
 //       ),
+//     );
+//   }
+//
+//   TableRow _buildTableRow(List<String> cells) {
+//     return TableRow(
+//       children:
+//       cells
+//           .map(
+//             (cell) => Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: Text(cell, style: TextStyle(fontSize: 14)),
+//         ),
+//       )
+//           .toList(),
 //     );
 //   }
 // }

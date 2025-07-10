@@ -146,6 +146,12 @@ class PunchInOutProvider extends ChangeNotifier {
   /// PUBLIC method to load data
   Future<void> loadPunchData() async {
     try {
+      // this three line are make these as blank when new user login
+      punchInTime = null;
+      punchOutTime = null;
+      workingDuration = Duration.zero;
+      // this three line are make these as blank when new user login
+
       // Retrieve stored times. Assume they were saved as UTC.
       punchInTime = await StorageHelper().getPunchIn();
       punchOutTime = await StorageHelper().getPunchOut();
@@ -163,15 +169,32 @@ class PunchInOutProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print("Error loading punch data: $e");
+      await clearPunchData();
     }
+  }
+  // New method to clear punch data
+  Future<void> clearPunchData() async {
+    _stopTimer(); // Stop any running timer first
+    punchInTime = null;
+    punchOutTime = null;
+    workingDuration = Duration.zero;
+    progress = 0.0;
+
+    // Clear data from SharedPreferences
+    await StorageHelper().removePunchIn();
+    await StorageHelper().removePunchOut();
+    await StorageHelper().removeWorkingSeconds();
+
+    print("Punch data cleared!");
+    notifyListeners(); // Notify listeners that the state has changed
   }
 
   /// api call for check in check out
   Future<void> empCheckIn(BuildContext context) async {
     _setLoadingState(true);
     FullScreenLoader.show(context, message: "Please Wait");
-    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
-    print("employeeRegistrationId--- ${employeeRegistrationId}");
+    final empLoginidd =  await StorageHelper().getEmpLoginId();
+    print("empLoginidd--- ${empLoginidd}");
     _empPunchInModel = null;
     try {
       final locationService = LocationService();
@@ -199,7 +222,7 @@ class PunchInOutProvider extends ChangeNotifier {
       };
 
       var response = await _repository.empCheckIn(
-        employeeRegistrationId.toString(),
+          empLoginidd.toString(),
           requestBody
       );
 
@@ -272,12 +295,12 @@ class PunchInOutProvider extends ChangeNotifier {
   /// api call for check in check out
   Future<void> empCheckOut(BuildContext context) async {
     FullScreenLoader.show(context, message: "Please Wait");
-    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
-    print("employeeRegistrationId--- ${employeeRegistrationId}");
+    final empLoginidd =  await StorageHelper().getEmpLoginId();
+    print("empLoginidd--- ${empLoginidd}");
     _empPunchOutModel = null;
     try {
       var response = await _repository.empCheckOUT(
-        employeeRegistrationId.toString(),
+        empLoginidd.toString(),
       );
 
       if (response.success == true) {
@@ -353,13 +376,13 @@ class PunchInOutProvider extends ChangeNotifier {
     // _setLoadingState(true);
     FullScreenLoader.show(context, message: "Please Wait"); // Loader can be controlled here
 
-    final employeeRegistrationId =  await StorageHelper().getEmpLoginRegistrationId();
-    print("employeeRegistrationId--- ${employeeRegistrationId}");
+    final empLoginidd =  await StorageHelper().getEmpLoginRegistrationId();
+    print("empLoginidd--- ${empLoginidd}");
     _empCheckInStatusModel = null;
 
     try {
       var response = await _repository.checkInStatusApi(
-        employeeRegistrationId.toString(),
+        empLoginidd.toString(),
       );
 
       if (response.success == true  && response.data != null) {

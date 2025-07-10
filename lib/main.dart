@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hrms_management_code_crafter/admin/announcement/controller/announcement_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/company_terms_conditions/controller/terms_conditions_api_provider.dart';
  import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/policy/company_policy_api_provider.dart';
@@ -60,6 +62,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => LocationService()),
         ChangeNotifierProvider(create: (_) => CompanyProfileApiProvider()),
         ChangeNotifierProvider(create: (_) => DocumentUploadProvider()),
+        ChangeNotifierProvider(create: (_) => CompanyAnnouncementApiProvider()),
+        ChangeNotifierProvider(create: (_) => CompanyTermsConditionApiProvider()),
       ],
       child: const MyApp(),
     ),

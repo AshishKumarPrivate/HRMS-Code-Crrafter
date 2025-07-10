@@ -19,8 +19,8 @@ class _UserBottomNavigationScreenState
 
   final List<Widget> _screens = [
     EmployeeHomeScreen(),
-    EmployeeHomeScreen(),
-    EmployeeHomeScreen(),
+    // EmployeeHomeScreen(),
+    // EmployeeHomeScreen(),
     EmployeeSingleProfileDetailScreen(),
   ];
 
@@ -91,17 +91,17 @@ class _UserBottomNavigationScreenState
                 icon: Icon(Icons.home_outlined),
                 label: 'Home',
               ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(Icons.notifications_outlined),
+              //   label: 'Notification',
+              // ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(Icons.access_time_outlined),
+              //   label: 'Time Off',
+              // ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_outlined),
-                label: 'Notification',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.access_time_outlined),
-                label: 'Time Off',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                label: 'Settings',
+                icon: Icon(Icons.person_pin),
+                label: 'Profile',
               ),
             ],
           ),

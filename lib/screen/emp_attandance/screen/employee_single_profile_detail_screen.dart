@@ -66,7 +66,7 @@ class _EmployeeSingleProfileDetailScreenState
 
                 if (employee == null) {
                   return  Center(
-                    child: Text('No employee details found.',  style: AppTextStyles.heading2(
+                    child: Text('No employee details found.', style: AppTextStyles.heading2(
                       context,
                       overrideStyle: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -82,21 +82,77 @@ class _EmployeeSingleProfileDetailScreenState
                       children: [
                         // Header section
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 30),
                           child: Column(
                             children: [
-                              CircleAvatar(
-                                radius: 45,
-                                backgroundColor: Colors.white,
-                                backgroundImage: (employee.employeeImage!.secureUrl != null &&
-                                    employee.employeeImage!.secureUrl!.isNotEmpty)
-                                    ? NetworkImage(employee.employeeImage!.secureUrl!)
-                                    : null, // fallback tab null
-                                child: (employee.employeeImage!.secureUrl == null ||
-                                    employee.employeeImage!.secureUrl!.isEmpty)
-                                    ? Icon(Icons.person, size: 45, color: Colors.grey)
-                                    : null, // agar image hai toh child null
+                              // SizedBox(height: 15,),
+                              Container(
+                                padding: const EdgeInsets.all(
+                                  4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  // 👈 rotate colors
+                                  shape: BoxShape.circle,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 45,
+                                  backgroundColor: Colors.pink,
+                                  backgroundImage: (employee.employeeImage!.secureUrl != null &&
+                                      employee.employeeImage!.secureUrl!.isNotEmpty)
+                                      ? NetworkImage(employee.employeeImage!.secureUrl!)
+                                      : null, // fallback tab null
+                                  child: (employee.employeeImage!.secureUrl == null ||
+                                      employee.employeeImage!.secureUrl!.isEmpty)
+                                      ? Icon(Icons.person, size: 45, color: Colors.grey)
+                                      : null, // agar image hai toh child null
+                                ),
                               ),
+                              // Container(
+                              //   padding: const EdgeInsets.all(
+                              //     4,
+                              //   ),
+                              //   decoration: BoxDecoration(
+                              //     color: Colors.blue.shade50,
+                              //     // 👈 rotate colors
+                              //     shape: BoxShape.circle,
+                              //   ),
+                              //   child: CircleAvatar(
+                              //     radius: 40,
+                              //     backgroundColor: Colors.white,
+                              //     backgroundImage:
+                              //     (employee
+                              //         .employeeImage!
+                              //         .secureUrl !=
+                              //         null &&
+                              //         employee
+                              //             .employeeImage!
+                              //             .secureUrl!
+                              //             .isNotEmpty)
+                              //         ? NetworkImage(
+                              //       employee
+                              //           .employeeImage!
+                              //           .secureUrl!,
+                              //     )
+                              //         : null,
+                              //     // fallback tab null
+                              //     child:
+                              //     (employee
+                              //         .employeeImage!
+                              //         .secureUrl ==
+                              //         null ||
+                              //         employee
+                              //             .employeeImage!
+                              //             .secureUrl!
+                              //             .isEmpty)
+                              //         ? Icon(
+                              //       Icons.person,
+                              //       size: 45,
+                              //       color: Colors.grey,
+                              //     )
+                              //         : null, // agar image hai toh child null
+                              //   ),
+                              // ),
                               const SizedBox(height: 10),
                               Text(
                                 employee.name ?? 'N/A',

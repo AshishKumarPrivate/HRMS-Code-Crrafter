@@ -276,8 +276,14 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                                     Text(
                                                       employee.email ?? 'N/A',
                                                       style:
-                                                          AppTextStyles.bodyText3(context,
-                                                            overrideStyle: TextStyle( color:Colors.black,fontSize: 14
+                                                          AppTextStyles.bodyText3(
+                                                            context,
+                                                            overrideStyle:
+                                                                TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                  fontSize: 14,
                                                                 ),
                                                           ),
                                                     ),
@@ -292,78 +298,142 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                       // Card with info icons
                                       Container(
                                         width: double.infinity,
-                                        padding: const EdgeInsets.symmetric( horizontal: 20, ),
-                                        decoration: const BoxDecoration( color: Colors.white, ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                        ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
                                             const SizedBox(height: 10),
                                             Text(
                                               "Personal Details",
                                               style: AppTextStyles.heading3(
                                                 context,
-                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                                overrideStyle: TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(height: 10),
                                             _ProfileField(
                                               label: "Phone",
-                                              value: (employee.mobile != null && employee.mobile!.trim().isNotEmpty)
-                                                    ? employee.mobile!
-                                                    : "-",
+                                              value:
+                                                  (employee.mobile != null &&
+                                                          employee.mobile!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? employee.mobile!
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "Gender",
-                                              value: (employee.gender != null && employee.gender!.trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter( employee.gender!.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.gender != null &&
+                                                          employee.gender!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeFirstLetter(
+                                                        employee.gender!
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "Date of Birth",
-                                              value: (employee.dob != null && employee.dob!.trim().isNotEmpty)
-                                                  ? DateFormatter.formatCustomDdMmYyyy(employee.dob.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.dob != null &&
+                                                          employee.dob!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? DateFormatter.formatCustomDdMmYyyy(
+                                                        employee.dob.toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "Marital Status",
-                                              value: (employee.maritalStatus != null && employee.maritalStatus!.trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter(  employee.maritalStatus!.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.maritalStatus !=
+                                                              null &&
+                                                          employee
+                                                              .maritalStatus!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeFirstLetter(
+                                                        employee.maritalStatus!
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "Qualification",
-                                              value: (employee.qualification != null && employee.qualification!.trim().isNotEmpty)
-                                                  ? StringUtils.toUpperCase(  employee.qualification!.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.qualification !=
+                                                              null &&
+                                                          employee
+                                                              .qualification!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.toUpperCase(
+                                                        employee.qualification!
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "State",
-                                              value: (employee.state != null && employee.state!.trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter(  employee.state!.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.state != null &&
+                                                          employee.state!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeFirstLetter(
+                                                        employee.state!
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "City",
-                                              value: (employee.city != null && employee.city!.trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter(  employee.city!.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.city != null &&
+                                                          employee.city!
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeFirstLetter(
+                                                        employee.city!
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
 
                                             _ProfileField(
                                               label: "Address",
-                                              value: (employee.address != null && employee.address.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord(  employee.address.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.address != null &&
+                                                          employee.address
+                                                              .toString()
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeEachWord(
+                                                        employee.address
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
-
-
                                           ],
                                         ),
                                       ),
@@ -386,7 +456,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                               "Official Details",
                                               style: AppTextStyles.heading3(
                                                 context,
-                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                                overrideStyle: TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(height: 10),
@@ -399,111 +472,241 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                               value:
                                                   employee.workEmail ?? 'N/A',
                                             ),
-                                            _ProfileField(
-                                              label: "Experience",
-                                              value: "${employee.experience} yrs" ?? 'N/A',
-                                            ),
 
+                                            // _ProfileField(
+                                            //   label: "Experience",
+                                            //   value: "${employee.experience} yrs" ?? 'N/A',
+                                            // ),
                                             _ProfileField(
                                               label: "Role",
-                                              value: (employee.role != null && employee.role.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter(  employee.role.toString())
-                                                  : "-",
+                                              value:
+                                                  (employee.role != null &&
+                                                          employee.role
+                                                              .toString()
+                                                              .trim()
+                                                              .isNotEmpty)
+                                                      ? StringUtils.capitalizeFirstLetter(
+                                                        employee.role
+                                                            .toString(),
+                                                      )
+                                                      : "-",
                                             ),
-
                                           ],
                                         ),
                                       ),
                                       const SizedBox(height: 20),
                                       // const SizedBox(height: 20),
                                       // Details section
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                        ),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              "Your Company Details",
-                                              style: AppTextStyles.heading3(
-                                                context,
-                                                overrideStyle: TextStyle(color: AppColors.primary, fontSize: 14,),
+                                      if (employee.workId?.company != null)
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                "Your Company Details",
+                                                style: AppTextStyles.heading3(
+                                                  context,
+                                                  overrideStyle: TextStyle(
+                                                    color: AppColors.primary,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            _ProfileField(
-                                              label: "Name",
-                                              value: (employee.workId?.company != null && employee.workId!.company.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeFirstLetter( employee.workId!.company!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              const SizedBox(height: 10),
+                                              _ProfileField(
+                                                label: "Name",
+                                                value:
+                                                    (employee.workId?.company !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .company
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeFirstLetter(
+                                                          employee
+                                                              .workId!
+                                                              .company!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Department",
-                                              value: (employee.workId?.department != null && employee.workId!.department.toString().trim().isNotEmpty)
-                                                  ? StringUtils.toUpperCase( employee.workId!.department!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Department",
+                                                value:
+                                                    (employee.workId?.department !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .department
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.toUpperCase(
+                                                          employee
+                                                              .workId!
+                                                              .department!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Position",
-                                              value: (employee.workId?.jobPosition != null && employee.workId!.jobPosition.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord( employee.workId!.jobPosition!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Position",
+                                                value:
+                                                    (employee.workId?.jobPosition !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .jobPosition
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeEachWord(
+                                                          employee
+                                                              .workId!
+                                                              .jobPosition!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Joining Date",
-                                              value: (employee.workId?.joiningDate != null && employee.workId!.joiningDate.toString().trim().isNotEmpty)
-                                                  ? DateFormatter.formatToLongDate(employee.workId?.joiningDate.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Joining Date",
+                                                value:
+                                                    (employee.workId?.joiningDate !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .joiningDate
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? DateFormatter.formatToLongDate(
+                                                          employee
+                                                              .workId
+                                                              ?.joiningDate
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Reporting To",
-                                              value: (employee.workId?.reportingManager != null && employee.workId!.reportingManager.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord( employee.workId!.reportingManager!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Reporting To",
+                                                value:
+                                                    (employee.workId?.reportingManager !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .reportingManager
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeEachWord(
+                                                          employee
+                                                              .workId!
+                                                              .reportingManager!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Your Salary",
-                                              value: (employee.workId?.salary != null && employee.workId!.salary.toString().trim().isNotEmpty)
-                                                  ? "₹ ${StringUtils.capitalizeEachWord(employee.workId!.salary!.toString().trim())}/-"
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Your Salary",
+                                                value:
+                                                    (employee.workId?.salary !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .salary
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? "₹ ${StringUtils.capitalizeEachWord(employee.workId!.salary!.toString().trim())}/-"
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Employment Type",
-                                              value: (employee.workId?.shipInformation != null && employee.workId!.shipInformation.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord( employee.workId!.shipInformation!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Employment Type",
+                                                value:
+                                                    (employee.workId?.shipInformation !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .shipInformation
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeEachWord(
+                                                          employee
+                                                              .workId!
+                                                              .shipInformation!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Work Type",
-                                              value: (employee.workId?.workType != null && employee.workId!.workType.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord( employee.workId!.workType!.toString().trim())
-                                                  : "-",
-                                            ),
+                                              _ProfileField(
+                                                label: "Work Type",
+                                                value:
+                                                    (employee.workId?.workType !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .workType
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeEachWord(
+                                                          employee
+                                                              .workId!
+                                                              .workType!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
 
-                                            _ProfileField(
-                                              label: "Work Location",
-                                              value: (employee.workId?.workLocation != null && employee.workId!.workLocation.toString().trim().isNotEmpty)
-                                                  ? StringUtils.capitalizeEachWord( employee.workId!.workLocation!.toString().trim())
-                                                  : "-",
-                                            ),
-
-                                          ],
+                                              _ProfileField(
+                                                label: "Work Location",
+                                                value:
+                                                    (employee.workId?.workLocation !=
+                                                                null &&
+                                                            employee
+                                                                .workId!
+                                                                .workLocation
+                                                                .toString()
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                        ? StringUtils.capitalizeEachWord(
+                                                          employee
+                                                              .workId!
+                                                              .workLocation!
+                                                              .toString()
+                                                              .trim(),
+                                                        )
+                                                        : "-",
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
 
                                       const SizedBox(height: 20),
                                       // Update button
@@ -545,10 +748,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                           },
                                         ),
                                       ),
-                                      const SizedBox(height: 40),
+                                      const SizedBox(height: 20),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0,
+                                          horizontal: 18.0,
                                         ),
                                         child: Row(
                                           children: [
@@ -556,33 +759,22 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                    ),
-                                                child: CustomButton(
-                                                  text: "🏦 Add Bank",
-                                                  textColor: Colors.black,
-                                                  type: ButtonType.outlined,
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (context) =>
-                                                                AddEmployeeBankDetailScreen(),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 10,
+                                                      horizontal: 0,
                                                     ),
                                                 child: CustomButton(
                                                   text: "🏦 Bank Details",
+                                                  textStyle:
+                                                      AppTextStyles.bodyText1(
+                                                        context,
+                                                        overrideStyle:
+                                                            new TextStyle(
+                                                              color: Colors.red,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 10,
+                                                            ),
+                                                      ),
                                                   textColor: Colors.black,
                                                   type: ButtonType.outlined,
                                                   onPressed: () {
@@ -598,44 +790,12 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0,
-                                        ),
-                                        child: Row(
-                                          children: [
+                                            const SizedBox(width: 10),
                                             Expanded(
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                    ),
-                                                child: CustomButton(
-                                                  text: "👔 Add Work",
-                                                  textColor: Colors.black,
-                                                  type: ButtonType.outlined,
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (context) =>
-                                                                AddEmployeeWorkScreen(),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 10,
+                                                      horizontal: 0,
                                                     ),
                                                 child: CustomButton(
                                                   text: "👔 Work Details",
@@ -657,8 +817,64 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                           ],
                                         ),
                                       ),
-
-                                      const SizedBox(height: 15),
+                                      const SizedBox(height: 30),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.symmetric(
+                                      //     horizontal: 8.0,
+                                      //   ),
+                                      //   child: Row(
+                                      //     children: [
+                                      //       Expanded(
+                                      //         child: Padding(
+                                      //           padding:
+                                      //               const EdgeInsets.symmetric(
+                                      //                 horizontal: 10,
+                                      //               ),
+                                      //           child: CustomButton(
+                                      //             text: "👔 Add Work",
+                                      //             textColor: Colors.black,
+                                      //             type: ButtonType.outlined,
+                                      //             onPressed: () {
+                                      //               Navigator.push(
+                                      //                 context,
+                                      //                 MaterialPageRoute(
+                                      //                   builder:
+                                      //                       (context) =>
+                                      //                           AddEmployeeWorkScreen(),
+                                      //                 ),
+                                      //               );
+                                      //             },
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       Expanded(
+                                      //         child: Padding(
+                                      //           padding:
+                                      //               const EdgeInsets.symmetric(
+                                      //                 horizontal: 10,
+                                      //               ),
+                                      //           child: CustomButton(
+                                      //             text: "👔 Work Details",
+                                      //             textColor: Colors.black,
+                                      //             type: ButtonType.outlined,
+                                      //             onPressed: () {
+                                      //               Navigator.push(
+                                      //                 context,
+                                      //                 MaterialPageRoute(
+                                      //                   builder:
+                                      //                       (context) =>
+                                      //                           EmpWorkDetailScreen(),
+                                      //                 ),
+                                      //               );
+                                      //             },
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      //
+                                      // const SizedBox(height: 15),
                                     ],
                                   ),
                                 ),

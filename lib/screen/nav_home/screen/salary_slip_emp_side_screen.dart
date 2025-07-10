@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/model/emp_salary_slip_emp_side_model.dart';
+import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/salary_slip/controller/admin_emp_salary_slip_api_provider.dart';
 import '../../../../ui_helper/app_colors.dart';
@@ -109,7 +110,14 @@ class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
     final provider = context.watch<AdminEmpSalarySlipApiProvider>();
     final model = provider.empSalarySlipEmpSideModel?.data;
     final employee = model?.employeeData;
+    // Extract values safely with defaults
+    final int totalDays = model?.totalDays ?? 0;
+    final int presentDays = model?.presentDays ?? 0;
+    final int absentDays = model?.absentDays ?? 0;
+    final Object salary = model?.salary ?? "0";
+    final String estimateSalary = model?.estimateSalary?.toStringAsFixed(2) ?? "0.00";
 
+    print("Salary: $salary, Present: $presentDays, Absent: $absentDays, Total: $totalDays");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -130,12 +138,12 @@ class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
             ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+        //     onPressed: () {},
+        //   ),
+        // ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child:   Padding(
@@ -251,80 +259,112 @@ class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
       ),
       body:
       provider.isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? loadingIndicator()
           : provider.empSalarySlipEmpSideModel == null
           ? Center(child: Text("\u274C No salary data available."))
-          : InteractiveViewer(
-        boundaryMargin: const EdgeInsets.all(20),
-        minScale: 0.5,
-        maxScale: 3.0,
-        panEnabled: true,
-        scaleEnabled: true,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            width: 1000,
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    "www.MSOfficeGeek.com",
-                    style: TextStyle(fontSize: 24, color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(height: 4),
-                Center(child: Text("Company Address", style: TextStyle(fontSize: 16))),
-                Center(child: Text("Salary Slip for the month of ${now.month}-${now.year}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                Divider(),
-                Table(
-                  border: TableBorder.all(),
-                  columnWidths: const {
-                    0: FlexColumnWidth(2),
-                    1: FlexColumnWidth(3),
-                    2: FlexColumnWidth(2),
-                    3: FlexColumnWidth(3),
-                  },
-                  children: [
-                    _buildTableRow(["UID:", employee?.registrationId ?? '', "Designation:", "employee?.designation" ?? '']),
-                    _buildTableRow(["Name:", employee?.name ?? '', "Department:", "employee?.department" ?? '']),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text("Employee Attendance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Table(
-                  border: TableBorder.all(),
-                  columnWidths: const {
-                    0: FlexColumnWidth(2),
-                    1: FlexColumnWidth(1.5),
-                    2: FlexColumnWidth(2),
-                    3: FlexColumnWidth(1.5),
-                  },
-                  children: [
-                    _buildTableRow(["Working Days:", "31", "Payable Days:", "28"]),
-                    _buildTableRow(["Leave Allowed:", "2", "Leave Taken:", "5"]),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text("Salary Transferred To:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Table(
-                  border: TableBorder.all(),
-                  columnWidths: const {
-                    0: FlexColumnWidth(2),
-                    1: FlexColumnWidth(3),
-                  },
-                  children: [
-                    _buildTableRow(["Bank Name:", "employee?.bankName" ?? '']),
-                    _buildTableRow(["Account No:", "employee?.accountNo" ?? '']),
-                    _buildTableRow(["Branch Name:", "DEF Branch 1"]),
-                  ],
-                )
-              ],
+          : SingleChildScrollView(
+            child: Container(
+              // width: 1000,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Salary Overview",
+                            style: AppTextStyles.heading2(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 14),
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF004658),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildStatItem("Total Days", totalDays.toString(), "total_days"),
+                              _buildStatItem("Present", presentDays.toString(), "present"),
+                              _buildStatItem("Absent", absentDays.toString(), "absent"),
+                            ],
+                          ),
+                          const Divider(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildSalaryItem("Monthly Salary", "₹$salary"),
+                              _buildSalaryItem("Estimated", "₹$estimateSalary"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  ////////
+
+                ],
+              ),
             ),
           ),
+    );
+  }
+
+
+  Widget _buildStatItem(String title, String value, String type) {
+    Color color = AppColors.black;
+    if (type == "present") color = Colors.green;
+    if (type == "absent") color = Colors.red;
+
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTextStyles.heading3(
+            context,
+            overrideStyle: TextStyle(fontSize: 20, color: color),
+          ),
         ),
-      ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: AppTextStyles.bodyText3(
+            context,
+            overrideStyle: TextStyle(fontSize: 12, color: color),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSalaryItem(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green[700]),
+        ),
+      ],
     );
   }
 

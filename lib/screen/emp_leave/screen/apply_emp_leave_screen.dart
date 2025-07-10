@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
- import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
- import 'package:intl/intl.dart';
+import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
- import '../../../../ui_helper/app_colors.dart';
+import '../../../../ui_helper/app_colors.dart';
 import '../../../../ui_helper/app_text_styles.dart';
 import '../../../../ui_helper/common_widget/custom_text_field.dart';
 import '../../../../ui_helper/common_widget/default_common_app_bar.dart';
@@ -21,7 +21,8 @@ class ApplyEmpLeaveScreen extends StatefulWidget {
 }
 
 class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
-  final TextEditingController leaveDescriptionController = TextEditingController();
+  final TextEditingController leaveDescriptionController =
+      TextEditingController();
   final TextEditingController startDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
 
@@ -30,21 +31,37 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
   final FocusNode _endDateFocusNode = FocusNode();
 
   final _formKey = GlobalKey<FormState>();
+
   // Internal format variables for API submission
   String? _startDateForApi;
   String? _endDateForApi;
 
   final DateFormat uiDateFormat = DateFormat('dd-MM-yyyy');
   final DateFormat apiDateFormat = DateFormat('yyyy-MM-dd');
-
+  // ["HR", "Finance", "IT", "Marketing", "Sales"],
   final List<String> breakDownList = ['full', 'first_haf', 'second_haf'];
+  final List<String> departmentList = ['HR', 'Finance', 'IT', 'Marketing', 'Sales'];
   final Map<String, String> breakDownDisplayMap = {
     'full': 'Full Day Leave',
     'first_haf': 'First Half Day Leave',
     'second_haf': 'Second Half Day Leave',
   };
+  final Map<String, String> departmentDisplayMap = {
+    'HR': 'HR',
+    'Finance': 'Finance',
+    'IT': 'IT',
+    'Marketing': 'Marketing',
+    'Sales': 'Sales',
+  };
 
-  final List<String> leaveTypeList = ['Casual', 'Sick', 'Earned', 'Maternity', 'Paternity', 'unpaid'];
+  final List<String> leaveTypeList = [
+    'Casual',
+    'Sick',
+    'Earned',
+    'Maternity',
+    'Paternity',
+    'unpaid',
+  ];
   final Map<String, String> leaveTypeDisplayMap = {
     'Casual': 'Casual Leave',
     'Sick': 'Sick Leave',
@@ -59,13 +76,12 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
   bool showBreakDown = false;
   bool showLeaveType = false;
 
-
   Future<void> handleSubmit() async {
     final loginProvider = context.read<EmployeeLeaveApiProvider>();
     FormData requestBodyAddEmployee = FormData.fromMap({
       "breakDown": selectedBreakDown,
       "leaveType": selectedLeaveType,
-      "startDate":  _startDateForApi ?? '',
+      "startDate": _startDateForApi ?? '',
       "endDate": _endDateForApi ?? '',
       // "startDate": startDateController.text.trim(),
       // "endDate": endDateController.text.trim(),
@@ -192,21 +208,25 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
                 _buildDropdownFormField(
                   title: "Break Down",
                   value: selectedBreakDown,
-                  items: breakDownList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        breakDownDisplayMap[value] ?? value,
-                        style: AppTextStyles.bodyText1(
-                          context,
-                          overrideStyle: TextStyle(
-                            color: Colors.black87,
-                            fontSize: ResponsiveHelper.fontSize(context, 13),
+                  items:
+                      breakDownList.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(
+                            breakDownDisplayMap[value] ?? value,
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                color: Colors.black87,
+                                fontSize: ResponsiveHelper.fontSize(
+                                  context,
+                                  13,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedBreakDown = newValue;
@@ -217,21 +237,25 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
                 _buildDropdownFormField(
                   title: "Leave Type",
                   value: selectedLeaveType,
-                  items: leaveTypeList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        leaveTypeDisplayMap[value] ?? value,
-                        style: AppTextStyles.bodyText1(
-                          context,
-                          overrideStyle: TextStyle(
-                            color: Colors.black87,
-                            fontSize: ResponsiveHelper.fontSize(context, 13),
+                  items:
+                      leaveTypeList.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(
+                            leaveTypeDisplayMap[value] ?? value,
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                color: Colors.black87,
+                                fontSize: ResponsiveHelper.fontSize(
+                                  context,
+                                  13,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedLeaveType = newValue;
@@ -282,13 +306,13 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
                     return loginProvider.isLoading
                         ? loadingIndicator()
                         : CustomButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                            handleSubmit();
-                        }
-                      },
-                      text: 'Apply',
-                    );
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              handleSubmit();
+                            }
+                          },
+                          text: 'Apply',
+                        );
                   },
                 ),
                 const SizedBox(height: 20),
@@ -350,7 +374,8 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
             onChanged: onChanged,
             items: items,
             // Added menuMaxHeight to control dropdown menu's maximum height
-            menuMaxHeight: MediaQuery.of(context).size.height * 0.4, // Max 40% of screen height
+            menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
+            // Max 40% of screen height
             // Added dropdownColor for better visual distinction of the menu
             dropdownColor: Colors.white,
             validator: (String? val) {
@@ -381,10 +406,11 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
       itemList: breakDownList,
       showDropdown: showBreakDown,
       onToggle: () => setState(() => showBreakDown = !showBreakDown),
-      onSelect: (value) => setState(() {
-        selectedBreakDown = value;
-        showBreakDown = false;
-      }),
+      onSelect:
+          (value) => setState(() {
+            selectedBreakDown = value;
+            showBreakDown = false;
+          }),
     );
   }
 
@@ -397,10 +423,11 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
       itemList: leaveTypeList,
       showDropdown: showLeaveType,
       onToggle: () => setState(() => showLeaveType = !showLeaveType),
-      onSelect: (value) => setState(() {
-        selectedLeaveType = value;
-        showLeaveType = false;
-      }),
+      onSelect:
+          (value) => setState(() {
+            selectedLeaveType = value;
+            showLeaveType = false;
+          }),
     );
   }
 
@@ -477,21 +504,22 @@ class _ApplyEmpLeaveScreenState extends State<ApplyEmpLeaveScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
-              children: itemList.map((item) {
-                return ListTile(
-                  title: Text(
-                    displayMap[item] ?? item,
-                    style: AppTextStyles.bodyText1(
-                      context,
-                      overrideStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: ResponsiveHelper.fontSize(context, 13),
+              children:
+                  itemList.map((item) {
+                    return ListTile(
+                      title: Text(
+                        displayMap[item] ?? item,
+                        style: AppTextStyles.bodyText1(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: ResponsiveHelper.fontSize(context, 13),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  onTap: () => onSelect(item),
-                );
-              }).toList(),
+                      onTap: () => onSelect(item),
+                    );
+                  }).toList(),
             ),
           ),
       ],

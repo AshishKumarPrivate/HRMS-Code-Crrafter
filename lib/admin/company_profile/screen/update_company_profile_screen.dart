@@ -4,23 +4,35 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/controller/comp_profile_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
+import 'package:hrms_management_code_crafter/util/custom_snack_bar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../ui_helper/app_colors.dart';
+import '../../../../ui_helper/app_text_styles.dart';
 import '../../../../ui_helper/common_widget/custom_text_field.dart';
 import '../../../../ui_helper/common_widget/default_common_app_bar.dart';
 import '../../../../ui_helper/common_widget/solid_rounded_button.dart';
 import '../../../../util/loading_indicator.dart';
+import '../../../../util/responsive_helper_util.dart';
+import '../model/company_profile_data_model.dart';
 
-class AddCompanyProfileScreen extends StatefulWidget {
-  const AddCompanyProfileScreen({Key? key}) : super(key: key);
+class UpdateCompanyProfileScreen extends StatefulWidget {
+  // const UpdateCompanyProfileScreen({Key? key}) : super(key: key);
+
+  final OverviewData data;
+
+  const UpdateCompanyProfileScreen({Key? key, required this.data})
+    : super(key: key);
 
   @override
-  State<AddCompanyProfileScreen> createState() => _AddCompanyProfileScreenState();
+  State<UpdateCompanyProfileScreen> createState() =>
+      _UpdateCompanyProfileScreenState();
 }
 
-class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
+class _UpdateCompanyProfileScreenState
+    extends State<UpdateCompanyProfileScreen> {
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController brandNameController = TextEditingController();
   final TextEditingController companyEmailController = TextEditingController();
@@ -39,6 +51,7 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
   File? _image;
+  String? _existingLogoUrl; // to preview API image
 
   // handle the login api here
   Future<void> handleSubmit() async {
@@ -55,16 +68,31 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
       "website": websiteController.text.trim(),
       "domainName": domainNameController.text.trim(),
       "industryTypes": industryTypesController.text.trim(),
-      if (_image != null) "logo": await MultipartFile.fromFile(_image!.path, filename: "profile.jpg"),      // use MultipartFile.fromFile(...) if you have a file
+      if (_image != null)
+        "logo": await MultipartFile.fromFile(
+          _image!.path,
+          filename: "profile.jpg",
+        ),
 
+      // use MultipartFile.fromFile(...) if you have a file
     });
-    loginProvider.addCompanyOverview(context, requestBodyAddEmployee);
+    // loginProvider.updateCompanyOverview(context, requestBodyAddEmployee, widget.data.sId ?? '');
+    bool isUpdated = await loginProvider.updateCompanyOverview(
+      context,
+      requestBodyAddEmployee,
+      widget.data.sId ?? '',
+    );
+
+    if (isUpdated) {
+      Navigator.pop(context, true); // 🟢 Notify previous screen to refresh
+    }
   }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-    await picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    ); // or ImageSource.camera
 
     if (pickedFile != null) {
       setState(() {
@@ -76,6 +104,16 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // 🟢 Set controller text from widget.data
+    companyNameController.text = widget.data.companyName ?? '';
+    brandNameController.text = widget.data.brandName ?? '';
+    companyEmailController.text = widget.data.companyOfficialEmail ?? '';
+    companyPhoneController.text = widget.data.companyOfficialContact ?? '';
+    websiteController.text = widget.data.website ?? '';
+    domainNameController.text = widget.data.domainName ?? '';
+    industryTypesController.text = (widget.data.industryTypes ?? []).join(', ');
+
+    _existingLogoUrl = widget.data.logo?.secureUrl;
 
     List<FocusNode> focusNodes = [
       _cmpNameFocusNode,
@@ -139,41 +177,48 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
                   //     backgroundImage: FileImage(_image !),
                   //   ),
                   // ),
-
                   Center(
                     child: Container(
                       width: 150,
                       height: 150,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, style: BorderStyle.solid, width: 1),
+                        border: Border.all(
+                          color: Colors.blue,
+                          style: BorderStyle.solid,
+                          width: 1,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.grey.shade100,
                         // Dashed border requires a custom painter or external package
                       ),
-                      child: _image == null
-                          ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add, size: 30, color: Colors.blue),
-                          SizedBox(height: 8),
-                          Text(
-                            "Your Company Logo\ncomes here",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey.shade700),
-                          ),
-                        ],
-                      )
-                          : ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          _image!,
-                          width: 150,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      child:
+                          _image != null
+                              ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  _image!,
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                              : (_existingLogoUrl != null &&
+                                  _existingLogoUrl!.isNotEmpty)
+                              ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  _existingLogoUrl!,
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                          _buildLogoPlaceholder(),
+                                ),
+                              )
+                              : _buildLogoPlaceholder(),
                     ),
-                  )
+                  ),
                 ),
                 const SizedBox(height: 30),
                 CustomTextField(
@@ -247,19 +292,20 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
                   errorMessage: "Invalid Industry Type",
                 ),
                 const SizedBox(height: 20),
-                Consumer<EmployeeApiProvider>(
+                Consumer<CompanyProfileApiProvider>(
                   builder: (context, loginProvider, child) {
                     print("✅ Consumer call ho rha hai ");
                     return loginProvider.isLoading
                         ? loadingIndicator() // Show loader
                         : CustomButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                            handleSubmit();
-                        }
-                      },
-                      text: 'Save',
-                    );
+                          color: Colors.amber,
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              handleSubmit();
+                            }
+                          },
+                          text: 'Update Profile',
+                        );
                   },
                 ),
                 const SizedBox(height: 20),
@@ -271,4 +317,18 @@ class _AddCompanyProfileScreenState extends State<AddCompanyProfileScreen> {
     );
   }
 
+  Widget _buildLogoPlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.add, size: 30, color: Colors.blue),
+        const SizedBox(height: 8),
+        Text(
+          "Your Company Logo\ncomes here",
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.grey.shade700),
+        ),
+      ],
+    );
+  }
 }

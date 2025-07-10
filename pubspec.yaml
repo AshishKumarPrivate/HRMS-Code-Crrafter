@@ -66,6 +66,7 @@ dependencies:
   flutter_native_splash: ^2.4.4
   smooth_page_indicator: ^1.2.1
   file_picker: ^8.0.0+1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

@@ -16,6 +16,7 @@ import '../../nav_profile/screen/attandance_calender_view_screen.dart';
 import '../../nav_profile/screen/attandance_list_screen.dart';
 import '../../nav_profile/screen/emp_my_all_leaves_list_screen.dart';
 import '../../nav_profile/widget/cell_profile_list_tile.dart';
+import '../widget/emp_salary_stats_widget.dart';
 import 'punch_in_out_screen.dart';
 
 class EmployeeHomeScreen extends StatefulWidget {
@@ -83,6 +84,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   // const SizedBox(height: 20),
                   PunchInOutScreen(),
                   // const SizedBox(height: 10),
+                  Container(color: AppColors.lightBlueColor,height: 10,),
+                  EmpSalarySummaryWidget(),
                   Container(color: AppColors.lightBlueColor,height: 10,),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0.0),

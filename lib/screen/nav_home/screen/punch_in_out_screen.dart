@@ -15,15 +15,15 @@ import '../controller/punch_in_out_provider.dart';
 import 'camera_and_location_screen.dart';
 
 class PunchInOutScreen extends StatefulWidget {
-
   @override
   State<PunchInOutScreen> createState() => _PunchInOutScreenState();
 }
 
-class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProviderStateMixin {
+class _PunchInOutScreenState extends State<PunchInOutScreen>
+    with TickerProviderStateMixin {
   String currentTime = "";
-  Timer? _clockTimer;   // ← store reference
-  String? empName, empEmail, empPhone, empLoginId;
+  Timer? _clockTimer; // ← store reference
+  String? empName, empEmail, empPhone, empLoginId, profilePhoto;
   String? _punchPhotoPath;
 
   @override
@@ -31,7 +31,10 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     super.initState();
     loadUserStorageData();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final locationService = Provider.of<LocationService>(context, listen: false);
+      final locationService = Provider.of<LocationService>(
+        context,
+        listen: false,
+      );
       if (!locationService.hasFetchedLocationOnce) {
         locationService.getLocationAndAddress(shouldOpenSettings: false);
       }
@@ -42,11 +45,11 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     });
   }
 
-
   Future<void> loadUserStorageData() async {
     String? name = await StorageHelper().getEmpLoginName();
     String? email = await StorageHelper().getEmpLoginEmail();
     String? phone = await StorageHelper().getEmpLoginMobile();
+    profilePhoto = await StorageHelper().getEmpLoginPhoto();
 
     empLoginId = await StorageHelper().getEmpLoginId();
 
@@ -56,15 +59,18 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
       empName = name ?? "UserName";
       empEmail = email ?? "eg@gmail.com";
       empPhone = phone ?? "91xxxxxxxx";
+      profilePhoto = profilePhoto ?? "";
+
+      print("profilePhoto ${profilePhoto}");
     });
   }
 
   void _startClock() {
-    _clockTimer =  Timer.periodic(Duration(seconds: 1), (timer) {
+    _clockTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       final now = DateTime.now();
       setState(() {
         currentTime =
-        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} ${now.hour >= 12 ? "PM" : "AM"}";
+            "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} ${now.hour >= 12 ? "PM" : "AM"}";
       });
     });
   }
@@ -83,15 +89,15 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
 
       // Now, call the provider's punch method with the image path
       if (provider.isPunchedIn) {
-        await provider.empCheckOut(context, );
+        await provider.empCheckOut(context);
       } else {
-        await provider.empCheckIn(context, );
+        await provider.empCheckIn(context);
       }
     } else {
       // User cancelled camera or no photo taken
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo capture cancelled.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Photo capture cancelled.')));
     }
   }
 
@@ -100,6 +106,7 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     _clockTimer?.cancel(); // ← cancel when widget is removed
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final locationService = Provider.of<LocationService>(context);
@@ -109,8 +116,9 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     // final formattedDate =
     //     "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year} - ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.weekday % 7]}";
 
-  // Format: 19, May 2025
-    final formattedDate = "${DateFormat("dd MMMM yyyy").format(now)} - ${DateFormat('EEEE').format(now)}";
+    // Format: 19, May 2025
+    final formattedDate =
+        "${DateFormat("dd MMMM yyyy").format(now)} - ${DateFormat('EEEE').format(now)}";
     return Container(
       // color: AppColors.primary,
       decoration: BoxDecoration(
@@ -125,24 +133,21 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 15,
-        ),
+        padding: const EdgeInsets.only(top: 0, left: 0, right: 0, bottom: 15),
         child: Column(
           children: [
-            TopProfileHeader(empName:
-            StringUtils.capitalizeEachWord(empName.toString(),
-            ),empEmail:empEmail.toString(),
-                address: locationService.addressMessage.isNotEmpty
-                    ? locationService.addressMessage
-                    : "Location not available",
-                onRefresh: () {
-                  locationService.getLocationAndAddress(shouldOpenSettings: true);
-                },),
-
+            TopProfileHeader(
+              empName: StringUtils.capitalizeEachWord(empName.toString()),
+              empEmail: empEmail.toString(),
+              profilePhoto: profilePhoto ?? "",
+              address:
+                  locationService.addressMessage.isNotEmpty
+                      ? locationService.addressMessage
+                      : "Location not available",
+              onRefresh: () {
+                locationService.getLocationAndAddress(shouldOpenSettings: true);
+              },
+            ),
 
             SizedBox(height: 20),
             Text(
@@ -204,8 +209,10 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
                   circularStrokeCap: CircularStrokeCap.round,
                   center: GestureDetector(
                     onTap: () {
-                      provider.isPunchedIn ? provider.empCheckOut(context) : provider.empCheckIn(context);
-                    // _handlePunchAction(provider);
+                      provider.isPunchedIn
+                          ? provider.empCheckOut(context)
+                          : provider.empCheckIn(context);
+                      // _handlePunchAction(provider);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -269,7 +276,7 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
                         : "--:--",
                     "Punch Out",
                   ),
-                  _buildPunchTile( provider.getTotalHours() , "Total Hours"),
+                  _buildPunchTile(provider.getTotalHours(), "Total Hours"),
                 ],
               ),
             ),
@@ -284,18 +291,24 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
       children: [
         Icon(Icons.access_time, color: AppColors.primary),
         SizedBox(height: 4),
-        Text(time, style: AppTextStyles.heading1(
-          context,
-          overrideStyle: TextStyle(
-            fontSize: ResponsiveHelper.fontSize(context, 12),
+        Text(
+          time,
+          style: AppTextStyles.heading1(
+            context,
+            overrideStyle: TextStyle(
+              fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
           ),
-        ),),
-        Text(label,style: AppTextStyles.bodyText1(
-          context,
-          overrideStyle: TextStyle(
-            fontSize: ResponsiveHelper.fontSize(context, 12),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.bodyText1(
+            context,
+            overrideStyle: TextStyle(
+              fontSize: ResponsiveHelper.fontSize(context, 12),
+            ),
           ),
-        ),),
+        ),
       ],
     );
   }
@@ -311,12 +324,12 @@ class _PunchInOutScreenState extends State<PunchInOutScreen> with TickerProvider
     // Format to 'hh:mm:ss a' (e.g., 09:30:00 AM)
     return DateFormat('hh:mm a').format(istTime);
   }
-
 }
 
 class TopProfileHeader extends StatelessWidget {
   final String empName;
   final String empEmail;
+  final String profilePhoto;
   final String address;
   final VoidCallback onRefresh;
 
@@ -324,6 +337,7 @@ class TopProfileHeader extends StatelessWidget {
     Key? key,
     required this.empName,
     required this.empEmail,
+    required this.profilePhoto,
     required this.address,
     required this.onRefresh,
   }) : super(key: key);
@@ -342,11 +356,12 @@ class TopProfileHeader extends StatelessWidget {
         locationService.status == LocationStatus.deniedForever ||
         locationService.status == LocationStatus.serviceDisabled ||
         locationService.status == LocationStatus.error) {
-      displayAddress = locationService.addressMessage; // Display the error/denial message
+      displayAddress =
+          locationService.addressMessage; // Display the error/denial message
     } else {
-      displayAddress = address; // Use the provided address when granted/initial (if it has a value)
+      displayAddress =
+          address; // Use the provided address when granted/initial (if it has a value)
     }
-
 
     return Container(
       decoration: const BoxDecoration(
@@ -369,11 +384,27 @@ class TopProfileHeader extends StatelessWidget {
             // Profile section
             Row(
               children: [
-                CircleAvatar(
+                profilePhoto != null && profilePhoto.trim().isNotEmpty
+                    ? Container(
+                  padding: const EdgeInsets.all(
+                    2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                      child: CircleAvatar(
+                                        radius: 28,
+                                        backgroundImage: NetworkImage(profilePhoto),
+                                        backgroundColor: Colors.white,
+                                      ),
+                    )
+                    : CircleAvatar(
                   radius: 28,
                   backgroundColor: Colors.white,
                   child: Icon(Icons.person, size: 32, color: Colors.grey[700]),
                 ),
+
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -402,10 +433,7 @@ class TopProfileHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(
-                  Icons.verified,
-                  color: Colors.white,
-                ),
+                const Icon(Icons.verified, color: Colors.white),
               ],
             ),
             const SizedBox(height: 16),
@@ -418,7 +446,7 @@ class TopProfileHeader extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                 const Icon(Icons.location_on, color: AppColors.primary),
+                  const Icon(Icons.location_on, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -433,17 +461,15 @@ class TopProfileHeader extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon:  Icon(Icons.refresh, color: AppColors.primary),
+                    icon: Icon(Icons.refresh, color: AppColors.primary),
                     onPressed: onRefresh,
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-

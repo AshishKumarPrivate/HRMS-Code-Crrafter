@@ -100,7 +100,9 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
                         _buildDetail("Department", workDetail!.department.toString()),
                         _buildDetail("Job Position",workDetail.jobPosition.toString()),
                         _buildDetail("Joining Date", DateFormatter.formatToShortMonth(workDetail.joiningDate.toString())),
-                        _buildDetail("Salary", "₹${workDetail!.salary.toString()}"),
+                        _buildDetail("Salary", (workDetail?.salary != null && workDetail!.salary.toString().trim().isNotEmpty)
+                              ? "₹${workDetail.salary.toString().trim()}/-"
+                              : "-", ),
                         _buildDetail("Work Location", workDetail!.workLocation.toString()),
                         _buildDetail("Work Type",workDetail!.workType.toString()),
                         const SizedBox(height: 15),

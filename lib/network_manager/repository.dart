@@ -1,6 +1,12 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/add_cmp_corporate_address_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/update_comp_profile_model_response.dart';
+import 'package:hrms_management_code_crafter/admin/company_profile/model/update_registered_address_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/add_terms_conditions_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/all_terms_conditions_model.dart';
+import 'package:hrms_management_code_crafter/admin/company_terms_conditions/model/update_terms_conditions_model.dart';
 
 import 'dart:typed_data';
 import 'package:http_parser/http_parser.dart';
@@ -281,10 +287,10 @@ class Repository {
     }
   }
 
-  Future<EmpCheckOUTModelResponse> empCheckOUT(String employeeRegistrationId ) async {
+  Future<EmpCheckOUTModelResponse> empCheckOUT(String employeeLoginId ) async {
     try {
       Map<String, dynamic>? response = await _dioHelper.put(
-          url: '$baseUrl/api/v1/employee/attendance/checkout/${employeeRegistrationId}' );
+          url: '$baseUrl/api/v1/employee/attendance/checkout/${employeeLoginId}' );
       print("✅ Add Employee API Response: $response");
 
       if (response == null) {
@@ -731,6 +737,142 @@ class Repository {
   }
 
 /// !!!!!!!!!!!!!!!!!!!!!!!! ADD POLICY DETAIL API END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
+  ///
+/// !!!!!!!!!!!!!!!!!!!!!!!! ADD TERMS CONDITIONS API START HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+  Future<AddTermsConditionsModel> addTermConditions(Object requestBody) async {
+    Map<String, dynamic> response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/term-conditions/add', requestBody: requestBody);
+    return AddTermsConditionsModel.fromJson(response);
+  }
+  Future<AllTermsConditionsModel> getAllTermsConditionsList() async {
+    Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/term-conditions/all');
+    return AllTermsConditionsModel.fromJson(response);
+  }
+  Future<Map<String, dynamic>> deleteTermsConditions(String policyId) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.delete(
+        url: '$baseUrl/api/v1/term-conditions/delete/$policyId',
+      );
+      print("✅ Delete Terms & Conditions Response: $response");
+      if (response == null) {
+        return {
+          'success': false,
+          'message': 'No response from server',
+        };
+      }
+      if (response['success'] == false) {
+        return {
+          'success': false,
+          'message': response['message'] ?? 'Terms & Conditions deletion failed!',
+        };
+      }
+      return response;
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return {
+        'success': false,
+        'message': apiError.message,
+      };
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return {
+        'success': false,
+        'message': 'Unexpected error occurred',
+      };
+    }
+  }
+  Future<UpdateTermsConditionsModel> updateUpdateTermsConditions(Object requestBody,String policyId) async {
+    Map<String, dynamic> response = await _dioHelper.put(
+        url: '$baseUrl/api/v1/term-conditions/update/${policyId}', requestBody: requestBody);
+    return UpdateTermsConditionsModel.fromJson(response);
+  }
+
+
+  Future<AddCompanyAnnouncementModel> addCompAnnouncement(
+      Object  requestBody,
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/compay/profile/add/announcement',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Corporate Address API Response: $response");
+
+      if (response == null) {
+        return AddCompanyAnnouncementModel(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Corporate Address!";
+        return AddCompanyAnnouncementModel(success: false, message: errorMessage);
+      }
+      return AddCompanyAnnouncementModel.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return AddCompanyAnnouncementModel(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return AddCompanyAnnouncementModel(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+  Future<AnnouncementListModel> getAllAnnouncementData() async {
+    Map<String, dynamic> response = await _dioHelper.get(
+      url: '$baseUrl/api/v1/compay/profile/get/all/announcements',
+    );
+    return AnnouncementListModel.fromJson(response);
+  }
+  Future<Map<String, dynamic>> deleteAnnouncement(String policyId) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.delete(
+        url: '$baseUrl/api/v1/compay/profile/delete/announcement/$policyId',
+      );
+      print("✅ Delete Terms & Conditions Response: $response");
+      if (response == null) {
+        return {
+          'success': false,
+          'message': 'No response from server',
+        };
+      }
+      if (response['success'] == false) {
+        return {
+          'success': false,
+          'message': response['message'] ?? 'Terms & Conditions deletion failed!',
+        };
+      }
+      return response;
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return {
+        'success': false,
+        'message': apiError.message,
+      };
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return {
+        'success': false,
+        'message': 'Unexpected error occurred',
+      };
+    }
+  }
+  Future<UpdateTermsConditionsModel> updateAnnouncement(Object requestBody,String policyId) async {
+    Map<String, dynamic> response = await _dioHelper.put(
+        url: '$baseUrl/api/v1/compay/profile/update/announcement/${policyId}', requestBody: requestBody);
+    return UpdateTermsConditionsModel.fromJson(response);
+  }
+
+/// !!!!!!!!!!!!!!!!!!!!!!!! ADD TERMS CONDITIONS API END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
 
 /// !!!!!!!!!!!!!!!!!!!!!!!! ALL EMP LEAVE REQUESTS  START   !!!!!!!!!!!!!!!!!!!!!!!!!
   //GET API
@@ -764,16 +906,16 @@ class Repository {
 
   Future<AdminFilterAttendanceModel> filterAdminAttendanceExcel(Map<String, dynamic>? queryParameters,) async {
     Map<String, dynamic> response = await _dioHelper.get(
-        url: '$baseUrl/api/v1/employee/attendance/filter',queryParams: queryParameters
+        url: '$baseUrl/api/v1/employee/attendance/filter/',queryParams: queryParameters
     );
     return AdminFilterAttendanceModel.fromJson(response);
   }
 /// !!!!!!!!!!!!!!!!!!!!!!!! ATTENDANCE CHART END HERE   !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-  Future<PayrollSalarySlipListAdminSideModel> getAllEmpSalarySlipList() async {
+  Future<PayrollSalarySlipListAdminSideModel> getAllEmpSalarySlipList(Map<String, dynamic>? queryParameters,) async {
     Map<String, dynamic> response = await _dioHelper.get(
-      url: '$baseUrl/api/v1/payroll/view/list',
+      url: '$baseUrl/api/v1/payroll/view/list',queryParams: queryParameters
     );
     return PayrollSalarySlipListAdminSideModel.fromJson(response);
   }
@@ -826,7 +968,121 @@ class Repository {
     }
   }
 
-  Future<AddEmployeeModelResponse> addCompCorporateAddress(
+
+  Future<UpdateCompanyOverviewModelResponse> updateCompProfileOverview(
+      FormData  requestBody,
+      String comOverviewId
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.put(
+        url: '$baseUrl/api/v1/compay/profile/update/overview/${comOverviewId}',
+        requestBody: requestBody,
+      );
+      print("✅ Update Company Profile API Response: $response");
+
+      if (response == null) {
+        return UpdateCompanyOverviewModelResponse(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Update Company Profile!";
+        return UpdateCompanyOverviewModelResponse(success: false, message: errorMessage);
+      }
+      return UpdateCompanyOverviewModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return UpdateCompanyOverviewModelResponse(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return UpdateCompanyOverviewModelResponse(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+  Future<AddCorporateAddressModel> addCompRegisteredAddress(
+      Object  requestBody,
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/compay/profile/add/address/registered',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Registered Address API Response: $response");
+
+      if (response == null) {
+        return AddCorporateAddressModel(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Registered Address!";
+        return AddCorporateAddressModel(success: false, message: errorMessage);
+      }
+      return AddCorporateAddressModel.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return AddCorporateAddressModel(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return AddCorporateAddressModel(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+  Future<UpdateRegisteredAddressModel> updateCompRegisteredAddress(
+      Object  requestBody,
+      String comOverviewId
+      ) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.put(
+        url: '$baseUrl/api/v1/compay/profile/update/address/registered/${comOverviewId}',
+        requestBody: requestBody,
+      );
+      print("✅ Add Company Registered Address API Response: $response");
+
+      if (response == null) {
+        return UpdateRegisteredAddressModel(
+          success: false,
+          message: "No response from server",
+        );
+      }
+      if (response["success"] == false) {
+        String errorMessage =
+            response["message"] ?? "Failed to Add Company Registered Address!";
+        return UpdateRegisteredAddressModel(success: false, message: errorMessage);
+      }
+      return UpdateRegisteredAddressModel.fromJson(response);
+    } on DioException catch (e) {
+      final apiError = DioErrorHandler.handle(e);
+      return UpdateRegisteredAddressModel(
+        success: false,
+        message: apiError.message,
+      );
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return UpdateRegisteredAddressModel(
+        success: false,
+        message: "Unexpected error occurred",
+      );
+    }
+  }
+
+  Future<AddCorporateAddressModel> addCompCorporateAddress(
       Object  requestBody,
       ) async {
     try {
@@ -837,7 +1093,7 @@ class Repository {
       print("✅ Add Company Corporate Address API Response: $response");
 
       if (response == null) {
-        return AddEmployeeModelResponse(
+        return AddCorporateAddressModel(
           success: false,
           message: "No response from server",
         );
@@ -845,75 +1101,28 @@ class Repository {
       if (response["success"] == false) {
         String errorMessage =
             response["message"] ?? "Failed to Add Company Corporate Address!";
-        return AddEmployeeModelResponse(success: false, message: errorMessage);
+        return AddCorporateAddressModel(success: false, message: errorMessage);
       }
-      return AddEmployeeModelResponse.fromJson(response);
+      return AddCorporateAddressModel.fromJson(response);
     } on DioException catch (e) {
       final apiError = DioErrorHandler.handle(e);
-      return AddEmployeeModelResponse(
+      return AddCorporateAddressModel(
         success: false,
         message: apiError.message,
       );
     } catch (e) {
       print("❌ Unexpected Error: $e");
-      return AddEmployeeModelResponse(
+      return AddCorporateAddressModel(
         success: false,
         message: "Unexpected error occurred",
       );
     }
   }
-
-
-  Future<AddCompanyAnnouncementModel> addCompAnnouncement(
-      Object  requestBody,
-      ) async {
-    try {
-      Map<String, dynamic>? response = await _dioHelper.post(
-        url: '$baseUrl/api/v1/compay/profile/add/announcement',
-        requestBody: requestBody,
-      );
-      print("✅ Add Company Corporate Address API Response: $response");
-
-      if (response == null) {
-        return AddCompanyAnnouncementModel(
-          success: false,
-          message: "No response from server",
-        );
-      }
-      if (response["success"] == false) {
-        String errorMessage =
-            response["message"] ?? "Failed to Add Company Corporate Address!";
-        return AddCompanyAnnouncementModel(success: false, message: errorMessage);
-      }
-      return AddCompanyAnnouncementModel.fromJson(response);
-    } on DioException catch (e) {
-      final apiError = DioErrorHandler.handle(e);
-      return AddCompanyAnnouncementModel(
-        success: false,
-        message: apiError.message,
-      );
-    } catch (e) {
-      print("❌ Unexpected Error: $e");
-      return AddCompanyAnnouncementModel(
-        success: false,
-        message: "Unexpected error occurred",
-      );
-    }
-  }
-
   Future<CompanyProfileDataModel> getCompanyProfileData() async {
     Map<String, dynamic> response = await _dioHelper.get(
       url: '$baseUrl/api/v1/compay/profile/get/all/data',
     );
     return CompanyProfileDataModel.fromJson(response);
-  }
-
-
-  Future<AnnouncementListModel> getAllAnnouncementData() async {
-    Map<String, dynamic> response = await _dioHelper.get(
-      url: '$baseUrl/api/v1/compay/profile/get/all/announcements',
-    );
-    return AnnouncementListModel.fromJson(response);
   }
 
 

@@ -661,11 +661,7 @@ class _AddEmpDocumentsContentState extends State<AddEmpDocumentsContent> {
                       _uploadedDocuments.values.any((file) => file != null)
                           ? AppColors.primary
                           : Colors.grey,
-                  // visual cue for disabled
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 15,
-                  ),
+
                 ),
               ),
               const SizedBox(width: 20),
@@ -682,11 +678,7 @@ class _AddEmpDocumentsContentState extends State<AddEmpDocumentsContent> {
                       _uploadedDocuments.values.any((file) => file != null)
                           ? Colors.amber
                           : Colors.grey,
-                  // visual cue for disabled
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 15,
-                  ),
+
                 ),
               ),
             ],

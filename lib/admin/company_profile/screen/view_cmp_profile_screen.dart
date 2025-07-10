@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/widget/address_tab_widget.dart';
-import 'package:hrms_management_code_crafter/admin/company_profile/widget/announcement_tab_widget.dart';
+import 'package:hrms_management_code_crafter/admin/announcement/widget/announcement_tab_widget.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/widget/company_profile_data_widgett.dart';
+import 'package:hrms_management_code_crafter/admin/company_terms_conditions/widget/terms_conditions_tab_widget.dart';
 import 'package:hrms_management_code_crafter/admin/employee/screen/policy/policy_list_screen.dart';
 
 import '../../../ui_helper/app_colors.dart';
@@ -24,6 +25,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
     "Overview",
     "Address",
     "Announcements",
+    "Terms & Conditions",
   ];
 
   @override
@@ -74,16 +76,17 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen>
             child: TabBarView(
               controller: _tabController,
               children: _tabs.map((tabName) {
-                // Return different widgets based on the tab name
-                // Use a single if-else if-else or switch statement
                 if (tabName == "Overview") {
                   return const CompanyProfileOverviewScreen();
                 } else if (tabName == "Address") {
                   return const AddressTabContentWidget();
-                }  else if (tabName == "Announcements") {
+                }
+                else if (tabName == "Announcements") {
                   return const AnnouncementTabContentWidget();
+                }
+                else if (tabName == "Terms & Conditions") {
+                  return const TermsConditinosTabContentWidget();
                 } else {
-                  // Default content for tabs not yet implemented
                   return Center(
                     child: Text(
                       "$tabName Content (Coming Soon)",
