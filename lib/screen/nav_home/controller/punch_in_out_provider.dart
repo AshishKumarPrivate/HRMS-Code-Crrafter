@@ -456,13 +456,13 @@ class PunchInOutProvider extends ChangeNotifier {
 
       if (response.success == true  && response.data != null) {
         _empAttendanceDetailModel = response;
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message:
-          response.message ?? 'Attendance Detail Fetched Successfully!',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        );
+        // CustomSnackbarHelper.customShowSnackbar(
+        //   context: context,
+        //   message:
+        //   response.message ?? 'Attendance Detail Fetched Successfully!',
+        //   backgroundColor: Colors.green,
+        //   duration: Duration(seconds: 2),
+        // );
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
@@ -509,13 +509,13 @@ class PunchInOutProvider extends ChangeNotifier {
 
       if (response.success == true) {
         _empMonthlyAttendanceModel = response;
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message:
-          response.message ?? 'Attendance History Fetched Successfully!',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        );
+        // CustomSnackbarHelper.customShowSnackbar(
+        //   context: context,
+        //   message:
+        //   response.message ?? 'Attendance History Fetched Successfully!',
+        //   backgroundColor: Colors.green,
+        //   duration: Duration(seconds: 2),
+        // );
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,
@@ -558,12 +558,12 @@ class PunchInOutProvider extends ChangeNotifier {
 
       if (response.success == true) {
         _empSingleProfileDetailModel = response;
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message: response.message ?? 'Profile Detail Fetched Successfully!',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        );
+        // CustomSnackbarHelper.customShowSnackbar(
+        //   context: context,
+        //   message: response.message ?? 'Profile Detail Fetched Successfully!',
+        //   backgroundColor: Colors.green,
+        //   duration: Duration(seconds: 2),
+        // );
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,

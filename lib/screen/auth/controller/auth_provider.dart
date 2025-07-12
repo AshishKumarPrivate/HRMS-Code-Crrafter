@@ -55,15 +55,11 @@ class AuthAPIProvider with ChangeNotifier {
           await StorageHelper().setUserRole(response.data!.role.toString());
           await StorageHelper().setBoolIsLoggedIn(true);
           /// admin login id set here
-
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
                 (Route<dynamic> route) => false,
           );
-          // Navigator.pushAndRemoveUntil(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => AdminHomeScreen())
-          // );
+
         } else if (response.data!.role == "employee") {
 
           await setLoginUserData(response);
@@ -73,19 +69,13 @@ class AuthAPIProvider with ChangeNotifier {
                 (Route<dynamic> route) => false,
           );
 
-          // Navigator.pushAndRemoveUntil(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => UserBottomNavigationScreen(),
-          //   ),
-          // );
         }
-        CustomSnackbarHelper.customShowSnackbar(
-          context: context,
-          message: response.message ?? 'Login successful!',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        );
+        // CustomSnackbarHelper.customShowSnackbar(
+        //   context: context,
+        //   message: response.message ?? 'Login successful!',
+        //   backgroundColor: Colors.green,
+        //   duration: Duration(seconds: 2),
+        // );
       } else {
         CustomSnackbarHelper.customShowSnackbar(
           context: context,

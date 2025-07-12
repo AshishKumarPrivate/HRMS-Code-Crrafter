@@ -53,38 +53,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return true;
   }
 
-  List<Announcement> companyAnnouncements = [
-    Announcement(
-      id: '001',
-      title: 'Important System Maintenance',
-      description:
-          'Our systems will undergo scheduled maintenance on 25th July from 10 PM to 1 AM IST. Services may be intermittently unavailable during this period. We apologize for any inconvenience.',
-    ),
-    Announcement(
-      id: '002',
-      title: 'New HR Policy Update',
-      description:
-          'Please review the updated HR policy document available on the employee portal. Key changes include revised leave application procedures and remote work guidelines. Effective 1st August.',
-    ),
-    Announcement(
-      id: '003',
-      title: 'Company Picnic Rescheduled',
-      description:
-          'Due to unforeseen weather conditions, the annual company picnic has been rescheduled to 15th August. Further details regarding the venue and activities will be shared soon.',
-    ),
-    Announcement(
-      id: '004',
-      title: 'Quarterly Town Hall Meeting',
-      description:
-          'Join us for our Q3 Town Hall meeting on 5th September at 2 PM in the main auditorium. We\'ll discuss recent achievements, upcoming goals, and open floor for Q&A.',
-    ),
-    Announcement(
-      id: '005',
-      title: 'Mandatory Fire Safety Drill',
-      description:
-          'A mandatory fire safety drill will be conducted on 10th August at 11 AM. Please follow all instructions from the safety team during the drill.',
-    ),
-  ];
 
   @override
   void initState() {
@@ -439,7 +407,7 @@ void showLogoutBottomSheet(BuildContext context) {
       return Builder(
         builder:
             (innerContext) => Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 16.0,right: 16,top: 16,bottom: 30),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -474,7 +442,7 @@ void showLogoutBottomSheet(BuildContext context) {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "Are you sure you would like to logout of your Account",
+                            "Are you sure you would like to SignOut of your Account",
                             style: AppTextStyles.bodyText1(
                               context,
                               overrideStyle: TextStyle(

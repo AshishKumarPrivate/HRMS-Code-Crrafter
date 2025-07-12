@@ -90,9 +90,9 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
               child: Card(
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(0),
                   child:Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -104,6 +104,8 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
                               ? "₹${workDetail.salary.toString().trim()}/-"
                               : "-", ),
                         _buildDetail("Work Location", workDetail!.workLocation.toString()),
+                        _buildDetail("Shift Information", workDetail!.shiftInformation.toString()),
+                        _buildDetail("Reporting Manger", workDetail!.reportingManager.toString()),
                         _buildDetail("Work Type",workDetail!.workType.toString()),
                         const SizedBox(height: 15),
                         Padding(
@@ -115,7 +117,7 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => UpdateEmployeeWorkDetailsScreen(bankDetail: workDetail,)),
+                                MaterialPageRoute(builder: (context) => UpdateEmployeeWorkDetailsScreen(workDetail: workDetail,)),
                               );
                             },
                           ),
@@ -158,7 +160,7 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
               style: AppTextStyles.heading2(
                 context,
                 overrideStyle: TextStyle(
-                  fontSize: ResponsiveHelper.fontSize(context, 14),
+                  fontSize: ResponsiveHelper.fontSize(context, 12),
                 ),
               ),
             ),
@@ -170,7 +172,7 @@ class _EmpWorkDetailScreenState extends State<EmpWorkDetailScreen> {
               style: AppTextStyles.heading2(
                 context,
                 overrideStyle: TextStyle(
-                  fontSize: ResponsiveHelper.fontSize(context, 14),
+                  fontSize: ResponsiveHelper.fontSize(context, 12),
                 ),
               ),
             ),

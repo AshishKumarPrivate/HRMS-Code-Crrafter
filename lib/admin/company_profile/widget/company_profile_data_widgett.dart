@@ -48,8 +48,8 @@ class _CompanyProfileOverviewScreenState
           await Provider.of<CompanyProfileApiProvider>(context, listen: false)
               .refreshCompProfileData();
         },
-        child: SingleChildScrollView(
-          child: Column(
+        child: ListView(
+          children: [Column(
             children: [
               Consumer<CompanyProfileApiProvider>(
                 builder: (context, provider, child) {
@@ -131,13 +131,15 @@ class _CompanyProfileOverviewScreenState
 
                     setOverViewData(overview!.sId.toString());
 
-        
+
                     return SingleChildScrollView(
                       padding: const EdgeInsets.all(0.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (overview != null)
+
+                            const SizedBox(height: 10.0),
                             _buildSectionCard(
                               context,
                               title: "Company Information",
@@ -154,7 +156,7 @@ class _CompanyProfileOverviewScreenState
                                     builder: (_) => UpdateCompanyProfileScreen(data: overview),
                                   ),
                                 );
-        
+
                                 if (result == true) {
                                   context.read<CompanyProfileApiProvider>().getCompProfileData();
                                 }
@@ -209,9 +211,9 @@ class _CompanyProfileOverviewScreenState
                                           overview.logo!.secureUrl!,
                                         ),
                                         onBackgroundImageError: (
-                                          exception,
-                                          stackTrace,
-                                        ) {
+                                            exception,
+                                            stackTrace,
+                                            ) {
                                           print('Error loading logo: $exception');
                                           // Fallback to a placeholder icon if image fails to load
                                         },
@@ -241,7 +243,7 @@ class _CompanyProfileOverviewScreenState
                                   ),
                               ],
                             ),
-                          const SizedBox(height: 20.0),
+                          const SizedBox(height: 10.0),
                           if (registeredOffice != null)
                             _buildSectionCard(
                               context,
@@ -263,14 +265,14 @@ class _CompanyProfileOverviewScreenState
                                 _buildAddressInfo(context, registeredOffice),
                               ],
                             ),
-                          const SizedBox(height: 20.0),
+                          const SizedBox(height: 10.0),
                           if (corporateOffice != null)
                             _buildSectionCard(
                               context,
                               title: "Corporate Office Address",
                               children: [_buildAddressInfo(context, corporateOffice)],
                             ),
-                          const SizedBox(height: 20.0),
+                          const SizedBox(height: 10.0),
                           if (customAddress != null)
                             _buildSectionCard(
                               context,
@@ -284,7 +286,7 @@ class _CompanyProfileOverviewScreenState
                 },
               ),
             ],
-          ),
+          )],
         ),
       ),
     );

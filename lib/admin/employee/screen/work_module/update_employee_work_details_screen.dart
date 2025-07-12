@@ -13,9 +13,9 @@ import '../../../../util/loading_indicator.dart';
 import '../../controller/work_module/employee_work_api_provider.dart';
 
 class UpdateEmployeeWorkDetailsScreen extends StatefulWidget {
-  final Data? bankDetail;
+  final Data? workDetail;
 
-  const UpdateEmployeeWorkDetailsScreen({Key? key, required this.bankDetail}) : super(key: key);
+  const UpdateEmployeeWorkDetailsScreen({Key? key, required this.workDetail}) : super(key: key);
 
 
   @override
@@ -24,13 +24,13 @@ class UpdateEmployeeWorkDetailsScreen extends StatefulWidget {
 
 class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDetailsScreen> {
   final TextEditingController departmentController = TextEditingController();
-  final TextEditingController shiftInformationController = TextEditingController();
-  final TextEditingController reportingMangerController = TextEditingController();
-  final TextEditingController workLocationController = TextEditingController();
+  final TextEditingController shiftInformationController = TextEditingController(text: "Morning");
+  final TextEditingController companyController = TextEditingController();
   final TextEditingController jobPositionController = TextEditingController();
   final TextEditingController workTypeController = TextEditingController();
+  final TextEditingController reportingMangerController = TextEditingController();
+  final TextEditingController workLocationController = TextEditingController();
   final TextEditingController salaryController = TextEditingController();
-  final TextEditingController companyController = TextEditingController();
   final TextEditingController joiningDateController = TextEditingController();
   final TextEditingController tagsController = TextEditingController();
 
@@ -54,7 +54,7 @@ class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDeta
     Map<String, dynamic> requestBodyAddWorkk ={
       "department": departmentController.text.trim(),
       "shiftInformation": shiftInformationController.text.trim(),
-      "reportingManger": reportingMangerController.text.trim(),
+      "reportingManager": reportingMangerController.text.trim(),
       "workLocation": workLocationController.text.trim(),
       "jobPosition": jobPositionController.text.trim(),
       "workType": selectedWorkType ?? 'Work from office',
@@ -63,24 +63,24 @@ class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDeta
       "joiningDate": joiningDateController.text.trim(),
       "tags": tagsController.text.trim() ?? "New",
     };
-    bankDetailProvider.updateEmployeeWorkDetails(context, requestBodyAddWorkk,widget.bankDetail!.sId.toString());
+    bankDetailProvider.updateEmployeeWorkDetails(context, requestBodyAddWorkk,widget.workDetail!.sId.toString());
   }
 
   @override
   void initState() {
     super.initState();
-    print("bankIDD=>${widget.bankDetail!.sId}");
-    if (widget.bankDetail != null) {
-      departmentController.text = widget.bankDetail?.department ?? '';
-      shiftInformationController.text = widget.bankDetail?.department ?? '';
-      reportingMangerController.text = widget.bankDetail?.department ?? '';
-      workLocationController.text = widget.bankDetail?.workLocation ?? '';
-      jobPositionController.text = widget.bankDetail?.jobPosition ?? '';
-      selectedWorkType = widget.bankDetail?.workType ?? '';
-      salaryController.text = widget.bankDetail?.salary ?? '';
-      companyController.text = widget.bankDetail?.company ?? '';
-      companyController.text = widget.bankDetail?.company ?? '';
-      tagsController.text = widget.bankDetail?.company ?? '';
+    print("bankIDD=>${widget.workDetail!.sId}");
+    if (widget.workDetail != null) {
+      departmentController.text = widget.workDetail?.department ?? '';
+      shiftInformationController.text = widget.workDetail?.department ?? '';
+      reportingMangerController.text = widget.workDetail?.department ?? '';
+      workLocationController.text = widget.workDetail?.workLocation ?? '';
+      jobPositionController.text = widget.workDetail?.jobPosition ?? '';
+      selectedWorkType = widget.workDetail?.workType ?? '';
+      salaryController.text = widget.workDetail?.salary ?? '';
+      companyController.text = widget.workDetail?.company ?? '';
+      companyController.text = widget.workDetail?.company ?? '';
+      tagsController.text = widget.workDetail?.company ?? '';
     }
 
     List<FocusNode> focusNodes = [
@@ -142,13 +142,13 @@ class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDeta
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+          padding: const EdgeInsets.only(left: 15.0, right: 15.0,top: 0,bottom: 15),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 CustomTextField(
                   controller: departmentController,
                   focusNode: _departmentFocusNode,
@@ -163,19 +163,19 @@ class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDeta
                   controller: shiftInformationController,
                   focusNode: _shiftInformationFocusNode,
                   icon: Icons.food_bank_outlined,
-                  hintText: "Shift",
+                  hintText: "Work Shift",
                   title: "Shift",
                   errorMessage: "Invalid Shift",
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: workLocationController,
                   focusNode: _workLocationFocusNode,
                   icon: Icons.email_outlined,
-                  hintText: "work Location",
-                  title: "work Location",
-                  errorMessage: "Invalid work Location",
+                  hintText: "Work Location",
+                  title: "Work Location",
+                  errorMessage: "Invalid Lork Location",
                   keyboardType: TextInputType.text,
                   enableAllCaps: true,
                 ),
@@ -204,8 +204,8 @@ class _UpdateEmployeeWorkDetailsScreenState extends State<UpdateEmployeeWorkDeta
                   controller: companyController,
                   focusNode: _companyFocusNode,
                   icon: Icons.phone_android_sharp,
-                  hintText: "Country",
-                  title: "Country",
+                  hintText: "Company",
+                  title: "Company",
                   errorMessage: "Invalid Country",
                   keyboardType: TextInputType.text,
                 ),

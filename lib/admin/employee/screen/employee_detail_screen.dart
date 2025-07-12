@@ -465,7 +465,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                             const SizedBox(height: 10),
                                             _ProfileField(
                                               label: "User Id",
-                                              value: employee.sId ?? 'N/A',
+                                              value: employee.empId ?? 'N/A',
                                             ),
                                             _ProfileField(
                                               label: "Work Email",

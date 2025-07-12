@@ -247,11 +247,21 @@ class AnnouncementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: Card(
-        elevation: 2.0,
-        color: AppColors.lightBlueColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE0F7FA), Color(0xFFE8F5E9)], // light cyan to mint
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 8,
+              offset: Offset(0, 5),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),

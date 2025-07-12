@@ -37,6 +37,7 @@ class Data {
   String? address;
   String? state;
   String? city;
+  String? empId;
   String? qualification;
   String? experience;
   String? maritalStatus;
@@ -64,6 +65,7 @@ class Data {
         this.address,
         this.state,
         this.city,
+        this.empId,
         this.qualification,
         this.experience,
         this.maritalStatus,
@@ -97,6 +99,7 @@ class Data {
     address = json['address'];
     state = json['state'];
     city = json['city'];
+    empId = json['empId'];
     qualification = json['qualification'];
     experience = json['experience'];
     maritalStatus = json['maritalStatus'];
@@ -134,6 +137,7 @@ class Data {
     data['address'] = this.address;
     data['state'] = this.state;
     data['city'] = this.city;
+    data['empId'] = this.empId;
     data['qualification'] = this.qualification;
     data['experience'] = this.experience;
     data['maritalStatus'] = this.maritalStatus;

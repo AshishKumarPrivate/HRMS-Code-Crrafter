@@ -1,14 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:hrms_management_code_crafter/admin/company_profile/model/announcement_list_model.dart';
 import 'package:hrms_management_code_crafter/admin/company_profile/model/company_profile_data_model.dart';
 import '../../../network_manager/api_exception.dart';
 import '../../../network_manager/dio_error_handler.dart';
 import '../../../network_manager/repository.dart';
 import '../../../util/custom_snack_bar.dart';
-import '../../../util/full_screen_loader_utiil.dart';
-import '../../../util/storage_util.dart';
-
 
 class CompanyProfileApiProvider with ChangeNotifier {
   final Repository _repository = Repository();

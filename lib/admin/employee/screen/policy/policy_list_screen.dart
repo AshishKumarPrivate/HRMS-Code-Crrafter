@@ -65,7 +65,7 @@ class _PolicyListScreenState extends State<PolicyListScreen> {
     );
   }
 }
-
+// Inside your PolicyListItem widget
 class PolicyListItem extends StatefulWidget {
   final Data policyData;
 
@@ -78,60 +78,74 @@ class PolicyListItem extends StatefulWidget {
   State<PolicyListItem> createState() => _PolicyListItemState();
 }
 
-class _PolicyListItemState extends State<PolicyListItem> {
+class _PolicyListItemState extends State<PolicyListItem>
+    with SingleTickerProviderStateMixin {
   bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+    final theme = Theme.of(context);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       child: InkWell(
         onTap: () {
-          setState(() {
-            isExpanded = !isExpanded;
-          });
+          setState(() => isExpanded = !isExpanded);
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            gradient: LinearGradient(
+              colors: [AppColors.white, AppColors.lightBgColor],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.5),
+              width: 1.2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 5,
-                offset: const Offset(0, 3),
+                color: AppColors.primary.withOpacity(0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// Title Row
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
                       widget.policyData.title ?? "No Title",
-                      style: AppTextStyles.heading1(
+                      style: AppTextStyles.heading2(
                         context,
                         overrideStyle: TextStyle(
-                          fontSize: ResponsiveHelper.fontSize(context, 14),
+                          fontSize: ResponsiveHelper.fontSize(context, 15),
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
                       ),
                       maxLines: isExpanded ? null : 1,
-                      overflow: isExpanded
-                          ? TextOverflow.visible
-                          : TextOverflow.ellipsis,
+                      overflow:
+                      isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    tooltip: "Delete Policy",
+                    icon: const Icon(Icons.delete_forever_rounded,
+                        color: Colors.redAccent, size: 22),
                     onPressed: () async {
-                      final provider = Provider.of<CompanyPolicyApiProvider>(
-                        context,
-                        listen: false,
-                      );
+                      final provider =
+                      Provider.of<CompanyPolicyApiProvider>(context,
+                          listen: false);
                       await provider.deletePolicy(
                         context,
                         widget.policyData.sId ?? "",
@@ -140,13 +154,23 @@ class _PolicyListItemState extends State<PolicyListItem> {
                   ),
                 ],
               ),
-              if (isExpanded) ...[
-                const SizedBox(height: 8),
-                HTMLTextWidgetUtil(
-                  text: widget.policyData.description ?? "No Description",
+
+              const SizedBox(height: 6),
+
+              /// Description
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 300),
+                firstChild: const SizedBox.shrink(),
+                secondChild: Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: HTMLTextWidgetUtil(
+                    text: widget.policyData.description ?? "No Description",
+                  ),
                 ),
-              ],
-              // const SizedBox(height: 5),
+                crossFadeState: isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+              ),
             ],
           ),
         ),
@@ -154,3 +178,4 @@ class _PolicyListItemState extends State<PolicyListItem> {
     );
   }
 }
+

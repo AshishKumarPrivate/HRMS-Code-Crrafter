@@ -97,13 +97,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     style: AppTextStyles.heading2(
                       context,
                       overrideStyle: TextStyle(
-                        fontSize: ResponsiveHelper.fontSize(context, 14),
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
                       ),
                     ),
                   ),
                 ),
                 Material(
-                  elevation: widget.elevation ?? 0,
+                  // elevation: widget.elevation ?? 0,
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     decoration: BoxDecoration(
@@ -132,18 +132,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: ResponsiveHelper.padding(context, 2, 0.02),
-                          child: Center(
-                            child: Icon(
-                              widget.icon,
-                              size: ResponsiveHelper.fontSize(context, 20),
-                              color: isFocused
-                                  ? (widget.iconColor ?? AppColors.primary)
-                                  : AppColors.txtGreyColor,
+                        if (widget.icon != null)
+                          Padding(
+                            padding: ResponsiveHelper.padding(context, 2, 0.02),
+                            child: Center(
+                              child: Icon(
+                                widget.icon,
+                                size: ResponsiveHelper.fontSize(context, 20),
+                                color: isFocused
+                                    ? (widget.iconColor ?? AppColors.primary)
+                                    : AppColors.txtGreyColor,
+                              ),
                             ),
                           ),
-                        ),
                         Expanded(
                           child: Center(
                             child: TextFormField(
@@ -157,7 +158,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                                 counterText: "",
                                 hintText: widget.hintText,
                                 border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 14), // better vertical padding
+                                contentPadding: widget.icon != null
+                                    ? const EdgeInsets.symmetric(vertical: 14)
+                                    : const EdgeInsets.fromLTRB(16, 14, 16, 14),
                                 suffixIcon: widget.isPassword
                                     ? IconButton(
                                   icon: Icon(
@@ -169,7 +172,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                                     : null,
                               ),
                               style: TextStyle(
-                                fontSize: ResponsiveHelper.fontSize(context, 14),
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
                               ),
                               onChanged: (value) {
                                 fieldState.didChange(value);

@@ -70,7 +70,7 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
   Future<void> handleSubmit() async {
     final loginProvider = context.read<EmployeeApiProvider>();
     print("🟢 Login Button Clicked");
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    if (emailController.text.isEmpty) {
       print("🔴 Validation Failed: Fields are empty");
       return;
     }
@@ -86,7 +86,7 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
       "state": stateController.text.trim(),
       "city": cityController.text.trim(),
       "qualification": qualificationController.text.trim(),
-      "experience": experienceController.text.trim(),
+      // "experience": experienceController.text.trim(),
       "maritalStatus": selectedMaritalStatus,
       "children": "",
       "emergencyContact": "",
@@ -94,7 +94,7 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
       "document": "",
       "idCard": "",
       "role": roleController.text.trim(),
-      "password": passwordController.text.trim(),
+      // "password": passwordController.text.trim(),
     });
     loginProvider.updateEmployee(context, requestBodyAddEmployee , storedEmployee!.sId ?? '');
   }
@@ -287,15 +287,15 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
                   enableValidation: false,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: passwordController,
-                  focusNode: _passwordFocusNode,
-                  icon: Icons.lock_open,
-                  hintText: "Employee Password",
-                  title: "Password",
-                  errorMessage: "Invalid Password",
-                ),
+                // const SizedBox(height: 10),
+                // CustomTextField(
+                //   controller: passwordController,
+                //   focusNode: _passwordFocusNode,
+                //   icon: Icons.lock_open,
+                //   hintText: "Employee Password",
+                //   title: "Password",
+                //   errorMessage: "Invalid Password",
+                // ),
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: phoneController,
@@ -361,15 +361,15 @@ class _UpdateEmployeeScreenState extends State<UpdateEmployeeScreen> {
                   title: "Role",
                   errorMessage: "Invalid Role",
                 ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: experienceController,
-                  focusNode: _experienceFocusNode,
-                  icon: Icons.badge_outlined,
-                  hintText: "Experience",
-                  title: "Experience",
-                  errorMessage: "Invalid Experience",
-                ),
+                // const SizedBox(height: 10),
+                // CustomTextField(
+                //   controller: experienceController,
+                //   focusNode: _experienceFocusNode,
+                //   icon: Icons.badge_outlined,
+                //   hintText: "Experience",
+                //   title: "Experience",
+                //   errorMessage: "Invalid Experience",
+                // ),
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: stateController,

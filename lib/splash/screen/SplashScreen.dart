@@ -49,9 +49,11 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn) {
       if (role == "Admin") {
         final compProfileProvider = Provider.of<CompanyProfileApiProvider>(context, listen: false);
-        await compProfileProvider.getCompProfileData(callFromSplash: true); // This fetches the data
+      bool getCmpProfile =  await compProfileProvider.getCompProfileData(callFromSplash: true); // This fetches the data
 
-        _navigateTo(const AdminHomeScreen());
+        if(getCmpProfile)
+          print("getCompanyProfileSplashData");
+         _navigateTo(const AdminHomeScreen());
       } else if (role == "employee") {
         _navigateTo(const UserBottomNavigationScreen());
       } else {
