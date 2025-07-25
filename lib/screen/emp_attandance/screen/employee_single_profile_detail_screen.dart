@@ -1,11 +1,14 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
 import 'package:hrms_management_code_crafter/util/date_formate_util.dart';
 import 'package:hrms_management_code_crafter/util/loading_indicator.dart';
+import 'package:hrms_management_code_crafter/util/storage_util.dart';
 import 'package:hrms_management_code_crafter/util/string_utils.dart';
 import 'package:provider/provider.dart';
 
+import '../../../admin/employee/screen/work_module/update_employee_work_details_screen.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/common_widget/solid_rounded_button.dart';
@@ -64,6 +67,10 @@ class _EmployeeSingleProfileDetailScreenState
                 }
                 final employee = provider.empSingleProfileDetailModel?.data;
 
+                if (employee?.workId?.sId != null) {
+                  StorageHelper().setEmpLoginWorkId(employee!.workId!.sId!);
+                }
+
                 if (employee == null) {
                   return  Center(
                     child: Text('No employee details found.', style: AppTextStyles.heading2(
@@ -108,51 +115,7 @@ class _EmployeeSingleProfileDetailScreenState
                                       : null, // agar image hai toh child null
                                 ),
                               ),
-                              // Container(
-                              //   padding: const EdgeInsets.all(
-                              //     4,
-                              //   ),
-                              //   decoration: BoxDecoration(
-                              //     color: Colors.blue.shade50,
-                              //     // 👈 rotate colors
-                              //     shape: BoxShape.circle,
-                              //   ),
-                              //   child: CircleAvatar(
-                              //     radius: 40,
-                              //     backgroundColor: Colors.white,
-                              //     backgroundImage:
-                              //     (employee
-                              //         .employeeImage!
-                              //         .secureUrl !=
-                              //         null &&
-                              //         employee
-                              //             .employeeImage!
-                              //             .secureUrl!
-                              //             .isNotEmpty)
-                              //         ? NetworkImage(
-                              //       employee
-                              //           .employeeImage!
-                              //           .secureUrl!,
-                              //     )
-                              //         : null,
-                              //     // fallback tab null
-                              //     child:
-                              //     (employee
-                              //         .employeeImage!
-                              //         .secureUrl ==
-                              //         null ||
-                              //         employee
-                              //             .employeeImage!
-                              //             .secureUrl!
-                              //             .isEmpty)
-                              //         ? Icon(
-                              //       Icons.person,
-                              //       size: 45,
-                              //       color: Colors.grey,
-                              //     )
-                              //         : null, // agar image hai toh child null
-                              //   ),
-                              // ),
+
                               const SizedBox(height: 10),
                               Text(
                                 employee.name ?? 'N/A',
@@ -249,25 +212,26 @@ class _EmployeeSingleProfileDetailScreenState
 
                         const SizedBox(height: 20),
                         if(employee.workId != null )
+
                            Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5),
-                              child: Text(
-                                "Work Details",
-                                style: AppTextStyles.heading2(
-                                  context,
-                                  overrideStyle: TextStyle(
-                                    fontSize: ResponsiveHelper.fontSize(
-                                      context,
-                                      14,
-                                    ),
-                                    color: AppColors.primary
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5),
+                            //   child: Text(
+                            //     "Work Details",
+                            //     style: AppTextStyles.heading2(
+                            //       context,
+                            //       overrideStyle: TextStyle(
+                            //         fontSize: ResponsiveHelper.fontSize(
+                            //           context,
+                            //           14,
+                            //         ),
+                            //         color: AppColors.primary
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
@@ -279,6 +243,59 @@ class _EmployeeSingleProfileDetailScreenState
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 0.0,vertical: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Work Details",
+                                          style: AppTextStyles.heading2(
+                                            context,
+                                            overrideStyle: TextStyle(
+                                                fontSize: ResponsiveHelper.fontSize(
+                                                  context,
+                                                  14,
+                                                ),
+                                                color: AppColors.primary
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: (){
+
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                    UpdateEmployeeWorkDetailsScreen(
+                                                      workDetail: null,
+                                                      isEmployeeLogin: true,
+                                                      workId:employee .workId! .sId ,
+                                                      companyName:  employee .workId! .company,
+                                                      department:employee .workId! .department ,
+                                                      shiftInformation:employee .workId! .shiftInformation ,
+                                                      jobPosition:employee .workId! .jobPosition ,
+                                                      reportingManger:employee .workId! .reportingManager ,
+                                                      salary:employee .workId! .salary ,
+                                                      joiningDate:employee .workId! .joiningDate ,
+                                                      workLocation:employee .workId! .workLocation ,
+                                                      workType:employee .workId! .workType ,
+                                                    ),
+                                              ),
+                                            );
+
+                                          },
+                                          child: const Icon(
+                                            Icons.edit,
+                                            color: AppColors.primary,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   _ProfileField(
                                     label: "Company",
                                     value: employee.workId!.company ?? 'N/A',
@@ -299,6 +316,14 @@ class _EmployeeSingleProfileDetailScreenState
                                   _ProfileField(
                                     label: "Work Location",
                                     value: employee.workId!.workLocation ?? 'N/A',
+                                  ),
+                                  _ProfileField(
+                                    label: "Work Shift",
+                                    value: employee.workId!.shiftInformation ?? 'N/A',
+                                  ),
+                                  _ProfileField(
+                                    label: "Reporting To",
+                                    value: employee.workId!.reportingManager ?? 'N/A',
                                   ),
                                   _ProfileField(
                                     label: "Work Type",

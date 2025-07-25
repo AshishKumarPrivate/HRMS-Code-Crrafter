@@ -154,10 +154,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen>
                                   ),
                                 );
                               }
-                              final employee =
-                                  provider.employeeListDetailModel?.data;
+                              final employee =  provider.employeeListDetailModel?.data;
                               if (employee != null) {
                                 StorageHelper().saveEmployeeData(employee);
+                                StorageHelper().setEmpLoginWorkId(employee!.workId!.sId!);
+
                               }
 
                               if (employee == null) {

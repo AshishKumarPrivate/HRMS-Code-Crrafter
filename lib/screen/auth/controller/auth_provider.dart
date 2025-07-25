@@ -27,6 +27,7 @@ class AuthAPIProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
   void setOtpSent(bool value) {
     _isOtpSent = value;
     notifyListeners();

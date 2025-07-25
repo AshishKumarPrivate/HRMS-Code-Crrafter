@@ -5,7 +5,13 @@ import 'package:hrms_management_code_crafter/screen/emp_attandance/screen/employ
 import 'package:hrms_management_code_crafter/screen/nav_profile/screen/profile_screen.dart';
 
 class UserBottomNavigationScreen extends StatefulWidget {
-  const UserBottomNavigationScreen({super.key});
+  // const UserBottomNavigationScreen({super.key});
+
+  final int initialIndex; // Add this parameter
+
+  const UserBottomNavigationScreen({super.key, this.initialIndex = 0}); // Initialize with default 0
+
+
 
   @override
   State<UserBottomNavigationScreen> createState() =>
@@ -19,10 +25,14 @@ class _UserBottomNavigationScreenState
 
   final List<Widget> _screens = [
     EmployeeHomeScreen(),
-    // EmployeeHomeScreen(),
-    // EmployeeHomeScreen(),
     EmployeeSingleProfileDetailScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex; // Set initial index from widget
+  }
 
   Future<bool> _onBackPressed() async {
     final now = DateTime.now();

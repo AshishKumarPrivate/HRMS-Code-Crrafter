@@ -20,6 +20,7 @@ class  StorageHelper {
   Future<void> init() async {
     prefs = await SharedPreferences.getInstance();
   }
+
    Future<void> savePunchIn(DateTime? time) async {
     await prefs.setString('punchIn', time?.toIso8601String() ?? '');
   }

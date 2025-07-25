@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:hrms_management_code_crafter/bottom_navigation_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_background/animated_background.dart';
 
+import '../../../admin/announcement/controller/announcement_api_provider.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../util/location_service_utils.dart';
 import '../../../util/responsive_helper_util.dart';
 import '../../../util/storage_util.dart';
 import '../../../util/string_utils.dart';
+import '../../announcement_and_notifications/announcements_and_notifications_screen.dart';
 import '../controller/punch_in_out_provider.dart';
 import 'camera_and_location_screen.dart';
 
@@ -384,27 +387,64 @@ class TopProfileHeader extends StatelessWidget {
             // Profile section
             Row(
               children: [
-                profilePhoto != null && profilePhoto.trim().isNotEmpty
-                    ? Container(
-                  padding: const EdgeInsets.all(
-                    2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    shape: BoxShape.circle,
-                  ),
-                      child: CircleAvatar(
-                                        radius: 28,
-                                        backgroundImage: NetworkImage(profilePhoto),
-                                        backgroundColor: Colors.white,
-                                      ),
-                    )
-                    : CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 32, color: Colors.grey[700]),
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to UserBottomNavigationScreen and set initial index to Profile
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => UserBottomNavigationScreen(
+                              initialIndex: 1,
+                            ), // Assuming Profile is at index 1
+                      ),
+                    );
+                  },
+                  child:
+                      profilePhoto != null && profilePhoto.trim().isNotEmpty
+                          ? Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CircleAvatar(
+                              radius: 28,
+                              backgroundImage: NetworkImage(profilePhoto),
+                              backgroundColor: Colors.white,
+                            ),
+                          )
+                          : CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.person,
+                              size: 32,
+                              color: Colors.grey[700],
+                            ),
+                          ),
                 ),
 
+                // profilePhoto != null && profilePhoto.trim().isNotEmpty
+                //     ? Container(
+                //   padding: const EdgeInsets.all(
+                //     2,
+                //   ),
+                //   decoration: BoxDecoration(
+                //     color: Colors.blue.shade50,
+                //     shape: BoxShape.circle,
+                //   ),
+                //       child: CircleAvatar(
+                //                         radius: 28,
+                //                         backgroundImage: NetworkImage(profilePhoto),
+                //                         backgroundColor: Colors.white,
+                //                       ),
+                //     )
+                //     : CircleAvatar(
+                //   radius: 28,
+                //   backgroundColor: Colors.white,
+                //   child: Icon(Icons.person, size: 32, color: Colors.grey[700]),
+                // ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -433,7 +473,62 @@ class TopProfileHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.verified, color: Colors.white),
+                // GestureDetector(
+                //   onTap: (){
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (_) => const AnnouncementAndNotificationScreen()),
+                //     );
+                //
+                //   },
+                //   child: const Icon(Icons.notification_important_outlined, color: Colors.white),
+                // ),
+                Consumer<CompanyAnnouncementApiProvider>(
+                  builder: (context, provider, _) {
+                    final count = provider.compAnnouncementListModel?.data?.length ?? 0;
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AnnouncementAndNotificationScreen()),
+                        );
+                      },
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          const Icon(Icons.notification_important_outlined, color: Colors.white, size: 28),
+                          if (count > 0)
+                            Positioned(
+                              right: 0,
+                              top: 2,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 20,
+                                  minHeight: 20,
+                                ),
+                                child: Text(
+                                  count.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                )
+
               ],
             ),
             const SizedBox(height: 16),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hrms_management_code_crafter/admin/announcement/controller/announcement_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/company_terms_conditions/controller/terms_conditions_api_provider.dart';
- import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
+import 'package:hrms_management_code_crafter/admin/employee/controller/bank_detail/employee_bank_detail_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/employee_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/policy/company_policy_api_provider.dart';
 import 'package:hrms_management_code_crafter/admin/employee/controller/work_module/employee_work_api_provider.dart';
@@ -14,7 +14,7 @@ import 'package:hrms_management_code_crafter/screen/auth/controller/auth_provide
 import 'package:hrms_management_code_crafter/screen/emp_attandance/controller/emp_attendance_chart_provider.dart';
 import 'package:hrms_management_code_crafter/screen/emp_leave/controller/emp_leave_api_provider.dart';
 import 'package:hrms_management_code_crafter/screen/nav_home/controller/punch_in_out_provider.dart';
- import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
+import 'package:hrms_management_code_crafter/splash/controller/network_provider_controller.dart';
 import 'package:hrms_management_code_crafter/splash/screen/SplashScreen.dart';
 import 'package:hrms_management_code_crafter/ui_helper/app_colors.dart';
 import 'package:hrms_management_code_crafter/ui_helper/common_widget/loading_button_provider.dart';
@@ -29,10 +29,12 @@ import 'admin/company_profile/controller/comp_profile_api_provider.dart';
 import 'admin/employee/controller/emp_document_module/emp_doc_api_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageHelper().init();
   await Firebase.initializeApp();
+
   // Set default status bar style globally
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -49,21 +51,29 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => LoadingProvider()),
         ChangeNotifierProvider(create: (context) => AuthAPIProvider()),
-        ChangeNotifierProvider(create: (context) => AddEmployeeBankDetailApiProvider()),
+        ChangeNotifierProvider(
+          create: (context) => AddEmployeeBankDetailApiProvider(),
+        ),
         ChangeNotifierProvider(create: (context) => EmployeeApiProvider()),
         ChangeNotifierProvider(create: (context) => EmployeeWorkApiProvider()),
         ChangeNotifierProvider(create: (context) => PunchInOutProvider()),
         ChangeNotifierProvider(create: (context) => CompanyPolicyApiProvider()),
         ChangeNotifierProvider(create: (context) => EmployeeLeaveApiProvider()),
-        ChangeNotifierProvider(create: (context) => AdminEmployeeLeaveApiProvider()),
-        ChangeNotifierProvider(create: (context) => AdminEmpSalarySlipApiProvider()),
+        ChangeNotifierProvider(
+          create: (context) => AdminEmployeeLeaveApiProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AdminEmpSalarySlipApiProvider(),
+        ),
         ChangeNotifierProvider(create: (context) => FirebaeApiProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceChartProvider()),
         ChangeNotifierProvider(create: (_) => LocationService()),
         ChangeNotifierProvider(create: (_) => CompanyProfileApiProvider()),
         ChangeNotifierProvider(create: (_) => DocumentUploadProvider()),
         ChangeNotifierProvider(create: (_) => CompanyAnnouncementApiProvider()),
-        ChangeNotifierProvider(create: (_) => CompanyTermsConditionApiProvider()),
+        ChangeNotifierProvider(
+          create: (_) => CompanyTermsConditionApiProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -88,10 +98,12 @@ class MyApp extends StatelessWidget {
           initialEntries: [
             OverlayEntry(
               builder: (context) {
-                SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
-                  statusBarColor: AppColors.primary,
-                  statusBarIconBrightness: Brightness.light,
-                ));
+                SystemChrome.setSystemUIOverlayStyle(
+                  SystemUiOverlayStyle(
+                    statusBarColor: AppColors.primary,
+                    statusBarIconBrightness: Brightness.light,
+                  ),
+                );
 
                 return child!;
               },

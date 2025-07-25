@@ -145,11 +145,11 @@ class _SalarySlipEmpSideScreenState extends State<SalarySlipEmpSideScreen> {
         //   ),
         // ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
+          preferredSize: ResponsiveHelper.isTablet(context) ? const Size.fromHeight(90): const Size.fromHeight(50),
           child:   Padding(
-            padding: const EdgeInsets.symmetric(
+            padding:  EdgeInsets.symmetric(
               horizontal: 18,
-              vertical: 4,
+              vertical: ResponsiveHelper.isTablet(context) ?14 : 4,
             ),
             child: Row(
               children: [
